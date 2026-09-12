@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi Blue Rock | Covers de Rock & Roll</title>
+    <meta name="description" content="Taxi Blue Rock, banda de covers de rock & roll. Revive los clásicos de los 80 y 90. Contrataciones y próximos eventos.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* ========== RESET & VARIABLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --negro: #0a0a0a;
+            --negro-suave: #111111;
+            --gris-oscuro: #1a1a1a;
+            --gris-medio: #2a2a2a;
+            --gris-claro: #888888;
+            --blanco: #f0f0f0;
+            --azul-electrico: #0066ff;
+            --azul-neon: #00a8ff;
+            --rojo-rock: #e63946;
+            --fuente-titulo: 'Bebas Neue', sans-serif;
+            --fuente-cuerpo: 'Inter', sans-serif;
+            --transicion: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: var(--fuente-cuerpo);
+            background-color: var(--negro);
+            color: var(--blanco);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        img {
+            max-width: 100%;
+            display: block;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* ========== NAVEGACIÓN ========== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.2rem 0;
+            transition: var(--transicion);
+            background: transparent;
+        }
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--gris-medio);
+            padding: 0.8rem 0;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: var(--fuente-titulo);
+            font-size: 2rem;
+            letter-spacing: 2px;
+            color: var(--blanco);
+            text-transform: uppercase;
+        }
+        .logo span {
+            color: var(--azul-electrico);
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        .nav-links a {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gris-claro);
+            transition: var(--transicion);
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--azul-electrico);
+            transition: var(--transicion);
+        }
+        .nav-links a:hover {
+            color: var(--blanco);
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: 2px solid var(--gris-claro);
+            color: var(--blanco);
+            font-size: 1.5rem;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a0a0a 0%, #111827 50%, #0a0a0a 100%);
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(230, 57, 70, 0.08) 0%, transparent 50%);
+        }
+        .hero-noise {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 1rem;
+        }
+        .hero-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--azul-neon);
+            border: 1px solid var(--azul-electrico);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            margin-bottom: 2rem;
+            background: rgba(0, 102, 255, 0.08);
+        }
+        .hero h1 {
+            font-family: var(--fuente-titulo);
+            font-size: clamp(4rem, 12vw, 9rem);
+            line-height: 0.95;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .hero h1 .blue {
+            color: var(--azul-electrico);
+            text-shadow: 0 0 40px rgba(0, 102, 255, 0.5), 0 0 80px rgba(0, 102, 255, 0.2);
+        }
+        .hero-sub {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: var(--gris-claro);
+            margin-bottom: 3rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.9rem 2.2rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transicion);
+            border-radius: 4px;
+            font-family: var(--fuente-cuerpo);
+        }
+        .btn-primary {
+            background: var(--azul-electrico);
+            color: var(--blanco);
+        }
+        .btn-primary:hover {
+            background: var(--azul-neon);
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--blanco);
+            border: 2px solid var(--gris-medio);
+        }
+        .btn-outline:hover {
+            border-color: var(--azul-electrico);
+            color: var(--azul-neon);
+            transform: translateY(-2px);
+        }
+
+        /* ========== SECCIONES GENERALES ========== */
+        section {
+            padding: 6rem 0;
+        }
+        .section-title {
+            font-family: var(--fuente-titulo);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+        .section-title .accent {
+            color: var(--azul-electrico);
+        }
+        .section-subtitle {
+            color: var(--gris-claro);
+            font-size: 1rem;
+            margin-bottom: 3rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+        .section-line {
+            width: 60px;
+            height: 3px;
+            background: var(--azul-electrico);
+            margin-bottom: 3rem;
+        }
+
+        /* ========== LA BANDA ========== */
+        .band-section {
+            background: var(--negro-suave);
+            position: relative;
+        }
+        .band-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--azul-electrico), transparent);
+        }
+        .band-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .band-text p {
+            color: var(--gris-claro);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.9;
+        }
+        .band-text .highlight {
+            color: var(--blanco);
+            font-weight: 600;
+        }
+        .band-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+        .stat {
+            text-align: center;
+            padding: 1.5rem 0.5rem;
+            background: var(--gris-oscuro);
+            border-radius: 8px;
+            border: 1px solid var(--gris-medio);
+            transition: var(--transicion);
+        }
+        .stat:hover {
+            border-color: var(--azul-electrico);
+            transform: translateY(-4px);
+        }
+        .stat-number {
+            font-family: var(--fuente-titulo);
+            font-size: 2.5rem;
+            color: var(--azul-electrico);
+            display: block;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gris-claro);
+            margin-top: 0.5rem;
+        }
+        .band-visual {
+            position: relative;
+        }
+        .band-visual .image-placeholder {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--gris-medio);
+            overflow: hidden;
+            position: relative;
+        }
+        .band-visual .image-placeholder::after {
+            content: 'TAXI BLUE';
+            font-family: var(--fuente-titulo);
+            font-size: 3rem;
+            color: rgba(255,255,255,0.05);
+            letter-spacing: 8px;
+            position: absolute;
+            transform: rotate(-15deg);
+        }
+        .band-visual .image-placeholder svg {
+            width: 80px;
+            height: 80px;
+            fill: var(--azul-electrico);
+            opacity: 0.3;
+        }
+
+        /* ========== EVENTOS ========== */
+        .events-section {
+            background: var(--negro);
+        }
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .event-card {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            align-items: center;
+            gap: 2rem;
+            padding: 1.5rem 2rem;
+            background: var(--gris-oscuro);
+            border-radius: 10px;
+            border: 1px solid var(--gris-medio);
+            transition: var(--transicion);
+            position: relative;
+            overflow: hidden;
+        }
+        .event-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--azul-electrico);
+            opacity: 0;
+            transition: var(--transicion);
+        }
+        .event-card:hover {
+            border-color: var(--azul-electrico);
+            background: var(--gris-medio);
+            transform: translateX(4px);
+        }
+        .event-card:hover::before {
+            opacity: 1;
+        }
+        .event-date {
+            text-align: center;
+        }
+        .event-date .day {
+            font-family: var(--fuente-titulo);
+            font-size: 2.5rem;
+            color: var(--azul-electrico);
+            line-height: 1;
+        }
+        .event-date .month {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gris-claro);
+        }
+        .event-info h4 {
+            font-family: var(--fuente-titulo);
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+        }
+        .event-info p {
+            color: var(--gris-claro);
+            font-size: 0.85rem;
+        }
+        .event-info .venue {
+            color: var(--azul-neon);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .event-cta {
+            padding: 0.7rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: transparent;
+            color: var(--blanco);
+            border: 1px solid var(--gris-claro);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transicion);
+        }
+        .event-cta:hover {
+            background: var(--azul-electrico);
+            border-color: var(--azul-electrico);
+        }
+
+        /* ========== GALERÍA ========== */
+        .gallery-section {
+            background: var(--negro-suave);
+            position: relative;
+        }
+        .gallery-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--rojo-rock), transparent);
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .gallery-item {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid var(--gris-medio);
+            transition: var(--transicion);
+        }
+        .gallery-item:hover {
+            transform: scale(1.03);
+            border-color: var(--azul-electrico);
+        }
+        .gallery-item::after {
+            content: '📷';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            opacity: 0.15;
+            transition: var(--transicion);
+        }
+        .gallery-item:hover::after {
+            opacity: 0.4;
+        }
+        .gallery-item:nth-child(1) { background: linear-gradient(135deg, #1a1a2e, #0f3460); }
+        .gallery-item:nth-child(2) { background: linear-gradient(135deg, #2d1b2e, #1a1a2e); }
+        .gallery-item:nth-child(3) { background: linear-gradient(135deg, #1a1a2e, #1e3a5f); }
+        .gallery-item:nth-child(4) { background: linear-gradient(135deg, #2d1b2e, #0f3460); }
+        .gallery-item:nth-child(5) { background: linear-gradient(135deg, #1e3a5f, #1a1a2e); }
+        .gallery-item:nth-child(6) { background: linear-gradient(135deg, #1a1a2e, #2d1b2e); }
+        .gallery-cta {
+            text-align: center;
+            margin-top: 2.5rem;
+        }
+        .gallery-cta a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--azul-neon);
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: var(--transicion);
+        }
+        .gallery-cta a:hover {
+            color: var(--blanco);
+            gap: 1rem;
+        }
+
+        /* ========== CONTACTO ========== */
+        .contact-section {
+            background: var(--negro);
+            position: relative;
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+        }
+        .contact-info h3 {
+            font-family: var(--fuente-titulo);
+            font-size: 2rem;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+        .contact-info p {
+            color: var(--gris-claro);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+        .contact-detail .icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gris-oscuro);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 1px solid var(--gris-medio);
+        }
+        .contact-detail .text {
+            font-size: 0.9rem;
+            color: var(--gris-claro);
+        }
+        .contact-detail .text strong {
+            color: var(--blanco);
+            display: block;
+            font-size: 0.95rem;
+        }
+        .contact-form {
+            background: var(--gris-oscuro);
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--gris-medio);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gris-claro);
+            margin-bottom: 0.5rem;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: var(--negro);
+            border: 1px solid var(--gris-medio);
+            border-radius: 6px;
+            color: var(--blanco);
+            font-family: var(--fuente-cuerpo);
+            font-size: 0.95rem;
+            transition: var(--transicion);
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--azul-electrico);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+        .form-group.hidden {
+            display: none;
+        }
+        .btn-whatsapp {
+            width: 100%;
+            padding: 1rem;
+            background: #25D366;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            font-family: var(--fuente-cuerpo);
+        }
+        .btn-whatsapp:hover {
+            background: #1ebe5d;
+            box-shadow: 0 0 30px rgba(37, 211, 102, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-whatsapp svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+        }
+
+        /* ========== WHATSAPP FLOTANTE ========== */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            transition: var(--transicion);
+            animation: pulse 2s infinite;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
+        }
+        .whatsapp-float svg {
+            width: 30px;
+            height: 30px;
+            fill: #fff;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 4px 30px rgba(37, 211, 102, 0.7); }
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: var(--negro-suave);
+            padding: 3rem 0;
+            border-top: 1px solid var(--gris-medio);
+            text-align: center;
+        }
+        footer .footer-logo {
+            font-family: var(--fuente-titulo);
+            font-size: 2rem;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+        }
+        footer .footer-logo span {
+            color: var(--azul-electrico);
+        }
+        footer .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        footer .social-links a {
+            width: 45px;
+            height: 45px;
+            background: var(--gris-oscuro);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--gris-medio);
+            transition: var(--transicion);
+        }
+        footer .social-links a:hover {
+            border-color: var(--azul-electrico);
+            background: var(--gris-medio);
+            transform: translateY(-3px);
+        }
+        footer .social-links svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--gris-claro);
+            transition: var(--transicion);
+        }
+        footer .social-links a:hover svg {
+            fill: var(--azul-neon);
+        }
+        footer .copyright {
+            color: var(--gris-claro);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 968px) {
+            .band-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+            .band-visual {
+                order: -1;
+            }
+            .band-visual .image-placeholder {
+                aspect-ratio: 16/10;
+            }
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(10, 10, 10, 0.98);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                border-bottom: 1px solid var(--gris-medio);
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .event-card {
+                grid-template-columns: 70px 1fr;
+                gap: 1rem;
+                padding: 1.2rem;
+            }
+            .event-cta {
+                grid-column: 1 / -1;
+                width: 100%;
+                text-align: center;
+            }
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .band-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.8rem;
+            }
+            .stat-number {
+                font-size: 1.8rem;
+            }
+            .contact-form {
+                padding: 1.5rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .hero h1 {
+                letter-spacing: 2px;
+            }
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.75rem;
+            }
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .gallery-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.6rem;
+            }
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                bottom: 1.5rem;
+                right: 1.5rem;
+            }
+            .whatsapp-float svg {
+                width: 25px;
+                height: 25px;
+            }
+            .band-stats {
+                grid-template-columns: 1fr;
+            }
+            .stat {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== NAVEGACIÓN ========== -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">TAXI <span>BLUE</span></a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Menú">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#banda">La Banda</a></li>
+                <li><a href="#eventos">Eventos</a></li>
+                <li><a href="#galeria">Galería</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ========== HERO ========== -->
+    <header class="hero" id="inicio">
+        <div class="hero-bg"></div>
+        <div class="hero-noise"></div>
+        <div class="hero-content">
+            <div class="hero-badge">Covers de Rock & Roll · En Vivo</div>
+            <h1>TAXI <span class="blue">BLUE</span></h1>
+            <p class="hero-sub">Revive la energía de los clásicos. Rock de los 80 y 90 en estado puro.</p>
+            <div class="hero-buttons">
+                <a href="#contacto" class="btn btn-primary">Contratar Show</a>
+                <a href="#galeria" class="btn btn-outline">Ver Galería</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== LA BANDA ========== -->
+    <section class="band-section" id="banda">
+        <div class="container">
+            <div class="section-line"></div>
+            <h2 class="section-title">LA <span class="accent">BANDA</span></h2>
+            <p class="section-subtitle">Pasión, energía y los mejores clásicos del rock.</p>
+            <div class="band-grid">
+                <div class="band-text">
+                    <p>
+                        <span class="highlight">Taxi Blue</span> es una banda cordobesa de covers de rock internacional, reconocida como una de las mejores en su categoría. Surgida de la fusión de importantes grupos de Rosario y Villa Carlos Paz, la banda ha recorrido escenarios de todo el país y países limítrofes.
+                    </p>
+                    <p>
+                        Liderada por <span class="highlight">Ariel Pagliarecci</span> en guitarra y voz, junto a <span class="highlight">Claudio Castillo</span> en batería y <span class="highlight">Alejandro Rodríguez</span> en bajo, Taxi Blue interpreta los hits más emblemáticos de Bon Jovi, Aerosmith, U2, Guns 'n Roses, Queen, Europe, Scorpions y muchos más.
+                    </p>
+                    <p>
+                        Además de su repertorio de covers, la banda ha rendido destacados homenajes a Gustavo Cerati, consolidándose como un referente del rock en la región.
+                    </p>
+                    <div class="band-stats">
+                        <div class="stat">
+                            <span class="stat-number">+15</span>
+                            <span class="stat-label">Años en vivo</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">+200</span>
+                            <span class="stat-label">Shows</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">∞</span>
+                            <span class="stat-label">Energía</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="band-visual">
+                    <div class="image-placeholder">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== EVENTOS ========== -->
+    <section class="events-section" id="eventos">
+        <div class="container">
+            <div class="section-line"></div>
+            <h2 class="section-title">PRÓXIMOS <span class="accent">EVENTOS</span></h2>
+            <p class="section-subtitle">No te pierdas la próxima descarga de rock en vivo.</p>
+            <div class="events-list">
+                <!-- PLACEHOLDER: Reemplazar con eventos reales -->
+                <div class="event-card">
+                    <div class="event-date">
+                        <div class="day">15</div>
+                        <div class="month">Mar</div>
+                    </div>
+                    <div class="event-info">
+                        <h4>Taxi Blue en Vivo</h4>
+                        <p class="venue">La Bodega · Villa María, Córdoba</p>
+                        <p>Una noche de clásicos de los 80 y 90. Apertura 21:00 hs.</p>
+                    </div>
+                    <button class="event-cta" onclick="sendEventWhatsApp('15 de Marzo - La Bodega, Villa María')">Consultar</button>
+                </div>
+                <div class="event-card">
+                    <div class="event-date">
+                        <div class="day">22</div>
+                        <div class="month">Mar</div>
+                    </div>
+                    <div class="event-info">
+                        <h4>Especial Gustavo Cerati</h4>
+                        <p class="venue">Teatro Real · Córdoba Capital</p>
+                        <p>Homenaje sinfónico a Cerati junto a la Banda Municipal.</p>
+                    </div>
+                    <button class="event-cta" onclick="sendEventWhatsApp('22 de Marzo - Teatro Real, Córdoba')">Consultar</button>
+                </div>
+                <div class="event-card">
+                    <div class="event-date">
+                        <div class="day">05</div>
+                        <div class="month">Abr</div>
+                    </div>
+                    <div class="event-info">
+                        <h4>Rock & Roll Night</h4>
+                        <p class="venue">Mr. Morgan · Pico, La Pampa</p>
+                        <p>Los mejores covers internacionales en una noche única.</p>
+                    </div>
+                    <button class="event-cta" onclick="sendEventWhatsApp('5 de Abril - Mr. Morgan, Pico')">Consultar</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== GALERÍA ========== -->
+    <section class="gallery-section" id="galeria">
+        <div class="container">
+            <div class="section-line"></div>
+            <h2 class="section-title">GALERÍA <span class="accent">EN VIVO</span></h2>
+            <p class="section-subtitle">Momentos, escenarios y la energía del rock.</p>
+            <div class="gallery-grid">
+                <!-- Enlaces a Instagram (el usuario puede cambiar los enlaces a posts específicos) -->
+                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
+                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
+                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
+                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
+                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
+                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
+            </div>
+            <div class="gallery-cta">
+                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener">
+                    Ver más en Instagram
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CONTACTO ========== -->
+    <section class="contact-section" id="contacto">
+        <div class="container">
+            <div class="section-line"></div>
+            <h2 class="section-title">HABLEMOS DE <span class="accent">ROCK</span></h2>
+            <p class="section-subtitle">¿Querés contratar el show o pedir más información?</p>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Contrataciones</h3>
+                    <p>
+                        Escribinos directamente por WhatsApp y te respondemos a la brevedad. Podés consultar por disponibilidad, fechas, presupuesto o cualquier duda sobre el show.
+                    </p>
+                    <div class="contact-detail">
+                        <div class="icon">📱</div>
+                        <div class="text">
+                            <strong>WhatsApp</strong>
+                            +54 9 3541 381626
+                        </div>
+                    </div>
+                    <div class="contact-detail">
+                        <div class="icon">📍</div>
+                        <div class="text">
+                            <strong>Base</strong>
+                            Villa Carlos Paz, Córdoba, Argentina
+                        </div>
+                    </div>
+                    <div class="contact-detail">
+                        <div class="icon">🎸</div>
+                        <div class="text">
+                            <strong>Disponibilidad</strong>
+                            Shows en todo el país y países limítrofes
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="whatsappForm" onsubmit="sendToWhatsApp(event)">
+                        <div class="form-group">
+                            <label for="nombre">Tu nombre *</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo">Tipo de consulta *</label>
+                            <select id="tipo" name="tipo" required onchange="toggleFechaField()">
+                                <option value="">Seleccioná una opción</option>
+                                <option value="Contratación de show">Contratación de show</option>
+                                <option value="Pedido de información">Pedido de información</option>
+                            </select>
+                        </div>
+                        <div class="form-group hidden" id="fechaGroup">
+                            <label for="fecha">Fecha tentativa del evento</label>
+                            <input type="date" id="fecha" name="fecha">
+                        </div>
+                        <div class="form-group">
+                            <label for="mensaje">Mensaje</label>
+                            <textarea id="mensaje" name="mensaje" placeholder="Contanos brevemente qué necesitás..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-whatsapp">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                            Enviar por WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== WHATSAPP FLOTANTE ========== -->
+    <a href="https://wa.me/5493541381626?text=Hola%20Taxi%20Blue%2C%20quiero%20consultar%20por%20una%20contrataci%C3%B3n." 
+       class="whatsapp-float" 
+       target="_blank" 
+       rel="noopener"
+       aria-label="Contactar por WhatsApp">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+    </a>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+        <div class="container">
+            <div class="footer-logo">TAXI <span>BLUE</span></div>
+            <div class="social-links">
+                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                    </svg>
+                </a>
+                <a href="https://wa.me/5493541381626" target="_blank" rel="noopener" aria-label="WhatsApp">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                </a>
+            </div>
+            <p class="copyright">© 2025 Taxi Blue Rock. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        // ========== NAVBAR SCROLL ==========
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ========== MENÚ MÓVIL ==========
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        // Cerrar menú al hacer clic en un enlace
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // ========== FORMULARIO WHATSAPP ==========
+        const WHATSAPP_NUMBER = '5493541381626';
+
+        // Mostrar/ocultar campo de fecha según tipo de consulta
+        function toggleFechaField() {
+            const tipo = document.getElementById('tipo').value;
+            const fechaGroup = document.getElementById('fechaGroup');
+            if (tipo === 'Contratación de show') {
+                fechaGroup.classList.remove('hidden');
+            } else {
+                fechaGroup.classList.add('hidden');
+            }
+        }
+
+        // Enviar formulario a WhatsApp
+        function sendToWhatsApp(event) {
+            event.preventDefault();
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const tipo = document.getElementById('tipo').value;
+            const fecha = document.getElementById('fecha').value;
+            const mensaje = document.getElementById('mensaje').value.trim();
+
+            if (!nombre || !tipo) {
+                alert('Por favor, completá los campos obligatorios.');
+                return;
+            }
+
+            let texto = `*Consulta desde la web - Taxi Blue Rock*\n\n`;
+            texto += `👤 *Nombre:* ${nombre}\n`;
+            texto += `📋 *Tipo de consulta:* ${tipo}\n`;
+
+            if (tipo === 'Contratación de show' && fecha) {
+                // Formatear fecha legible
+                const fechaObj = new Date(fecha + 'T00:00:00');
+                const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+                const fechaLegible = fechaObj.toLocaleDateString('es-AR', opciones);
+                texto += `📅 *Fecha tentativa:* ${fechaLegible}\n`;
+            }
+
+            if (mensaje) {
+                texto += `\n💬 *Mensaje:*\n${mensaje}`;
+            }
+
+            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        }
+
+        // Enviar consulta desde botón de evento
+        function sendEventWhatsApp(eventInfo) {
+            let texto = `*Consulta sobre evento - Taxi Blue Rock*\n\n`;
+            texto += `🎸 *Evento:* ${eventInfo}\n`;
+            texto += `\nHola, me gustaría recibir más información sobre este show.`;
+            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        }
+
+        // ========== SCROLL SUAVE PARA ANCLAS ==========
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                const target = document.querySelector(targetId);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
