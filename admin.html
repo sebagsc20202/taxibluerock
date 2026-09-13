@@ -117,11 +117,19 @@ a{color:inherit;text-decoration:none;}
   width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;font-weight:700;
 }
 
+/* ====== EVENTS LIST con drag & drop ====== */
+.drag-hint{
+  font-size:.72rem;color:var(--gris-claro);background:rgba(0,102,255,.08);
+  border:1px dashed rgba(0,102,255,.35);padding:.6rem .8rem;border-radius:6px;
+  margin-bottom:1rem;text-align:center;letter-spacing:.3px;
+}
+.drag-hint strong{color:var(--azul-neon);}
 .events-list{display:flex;flex-direction:column;gap:.8rem;}
 .event-item{
   background:var(--negro);border:1px solid var(--gris-medio);border-radius:10px;
   padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:center;
-  gap:1rem;transition:var(--trans);
+  gap:1rem;position:relative;
+  /* ✨ FIX: Sin transiciones en el contenedor para evitar conflicto táctil */
 }
 .event-item:hover{border-color:var(--azul);}
 .event-item .info{flex:1;min-width:0;}
@@ -142,7 +150,40 @@ a{color:inherit;text-decoration:none;}
 .event-thumb{
   width:50px;height:50px;border-radius:6px;object-fit:cover;flex-shrink:0;
   border:1px solid var(--gris-medio);
+  /* ✨ FIX: Prevenir que la imagen capture el evento de arrastre */
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
 }
+
+/* Drag handle */
+.drag-handle{
+  cursor:grab;
+  color:var(--gris-claro);
+  font-size:1.1rem;
+  letter-spacing:-3px;
+  padding:.4rem .35rem;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none; /* ✨ FIX: Evita que el navegador interprete el gesto como scroll */
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  /* ✨ FIX: Sin transiciones para un arrastre táctil suave */
+}
+.drag-handle:active{cursor:grabbing;color:var(--azul);}
+
+/* Estados del drag */
+.event-item.dragging{opacity:.4;}
+.event-item.drag-ghost{
+  background:var(--azul)!important;
+  border-color:var(--azul-neon)!important;
+  box-shadow:0 0 25px rgba(0,102,255,.6);
+  transform:scale(1.02);
+}
+.event-item.drag-ghost .date,
+.event-item.drag-ghost .title,
+.event-item.drag-ghost .place{color:#fff!important;}
+
 .empty-state{
   text-align:center;padding:2rem 1rem;color:var(--gris-claro);font-size:.85rem;
   border:1px dashed var(--gris-medio);border-radius:10px;
@@ -167,8 +208,12 @@ a{color:inherit;text-decoration:none;}
   .topbar{flex-direction:column;align-items:flex-start;}
   .card{padding:1.3rem;}
   .form-row{grid-template-columns:1fr;}
-  .event-item{flex-wrap:wrap;}
-  .event-item .actions{width:100%;justify-content:flex-end;}
+  .event-item{flex-wrap:wrap;gap:.7rem;}
+  .event-item .actions{width:auto;margin-left:auto;}
+  .event-item .info{flex:1 1 100%;order:3;padding-left:2.2rem;}
+  .event-item .drag-handle{order:1;}
+  .event-item .event-thumb{order:2;width:44px;height:44px;}
+  .event-item .actions{order:4;}
   .toast{left:1rem;right:1rem;bottom:1rem;}
   .section-title{font-size:1.6rem;}
 }
@@ -248,6 +293,9 @@ a{color:inherit;text-decoration:none;}
     <div class="card">
       <h2 class="section-title">EVENTOS <span>CARGADOS</span></h2>
       <p class="section-sub" id="eventsCount">Cargando...</p>
+      <div class="drag-hint">
+        ✋ Arrastrá desde <strong>⋮⋮</strong> para cambiar el orden en que se muestran en la web
+      </div>
       <div class="events-list" id="eventsList"></div>
     </div>
   </div>
@@ -255,12 +303,15 @@ a{color:inherit;text-decoration:none;}
 
 <div class="toast" id="toast"></div>
 
-<!-- FIREBASE SDK -->
+<!-- SORTABLEJS -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+<!-- FIREBASE + LÓGICA -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, updateDoc, deleteDoc,
-  doc, onSnapshot, query, orderBy
+  doc, onSnapshot, query, writeBatch
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -283,8 +334,10 @@ const MAX_FLYER_KB = 800;
 let flyerBase64 = null;
 let events = [];
 let unsubscribe = null;
+let sortableInstance = null;
+let isReordering = false; // pausa el re-render mientras se guarda el nuevo orden
 
-/* LOGIN */
+/* ========== LOGIN ========== */
 function tryLogin(){
   const val = document.getElementById('passInput').value.trim();
   if(val === ADMIN_PASS){
@@ -312,22 +365,90 @@ function showPanel(){
 function logout(){
   sessionStorage.removeItem('tbAuth');
   if(unsubscribe) unsubscribe();
+  if(sortableInstance) sortableInstance.destroy();
   location.reload();
 }
 
-/* FIRESTORE: escucha en tiempo real */
+/* ========== FIRESTORE: escucha en tiempo real ========== */
 function subscribeEvents(){
-  const q = query(collection(db, COL), orderBy("fecha", "asc"));
+  const q = query(collection(db, COL));
+
   unsubscribe = onSnapshot(q, (snap) => {
+    if(isReordering) return; // no re-renderizar mientras se guarda un nuevo orden
+
     events = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Ordenar: primero por campo `orden`, con fallback a fecha
+    events.sort((a, b) => {
+      const oa = typeof a.orden === 'number' ? a.orden : Infinity;
+      const ob = typeof b.orden === 'number' ? b.orden : Infinity;
+      if (oa !== ob) return oa - ob;
+      return (a.fecha || '').localeCompare(b.fecha || '');
+    });
+
     renderEvents();
+    initSortable();
   }, (err) => {
     console.error(err);
     toast('❌ Error al leer Firestore. Revisá las reglas.', 'error');
   });
 }
 
-/* FORM */
+/* ========== SORTABLE (DRAG & DROP) ========== */
+function initSortable(){
+  const el = document.getElementById('eventsList');
+  if(!el) return;
+
+  // Destruir instancia previa para no duplicar handlers
+  if(sortableInstance){
+    try { sortableInstance.destroy(); } catch(_) {}
+    sortableInstance = null;
+  }
+  if(!events.length) return;
+
+  sortableInstance = Sortable.create(el, {
+    animation: 180,
+    handle: '.drag-handle',
+    ghostClass: 'drag-ghost',
+    dragClass: 'dragging',
+    // ✨ FIX para móvil: usar el sistema de arrastre interno de SortableJS
+    forceFallback: true,
+    fallbackOnBody: true,
+    fallbackClass: 'drag-ghost',
+    // ✨ FIX: Ajustar umbrales para evitar arrastres accidentales
+    delay: 150, // Pequeña demora para diferenciar del scroll
+    delayOnTouchOnly: true, // Solo aplicar esta demora en dispositivos táctiles
+    touchStartThreshold: 8, // Píxeles que debe mover el dedo para iniciar el arrastre
+    onEnd: async (evt) => {
+      if(evt.oldIndex === evt.newIndex) return;
+
+      // Reordenar array local en memoria
+      const [moved] = events.splice(evt.oldIndex, 1);
+      events.splice(evt.newIndex, 0, moved);
+
+      // Pausar re-render mientras se guarda
+      isReordering = true;
+
+      try {
+        const batch = writeBatch(db);
+        events.forEach((ev, i) => {
+          ev.orden = i; // reflejar en memoria
+          batch.update(doc(db, COL, ev.id), { orden: i });
+        });
+        await batch.commit();
+        toast('✅ Orden guardado','success');
+      } catch(err){
+        console.error(err);
+        toast('❌ No se pudo guardar el orden. Revisá tu conexión.','error');
+      } finally {
+        // Reanudar snapshot después de un pequeño delay
+        setTimeout(() => { isReordering = false; }, 700);
+      }
+    }
+  });
+}
+
+/* ========== FORM ========== */
 function handleFlyer(e){
   const file = e.target.files[0];
   if(!file) return;
@@ -366,13 +487,28 @@ function resetForm(){
 async function saveEvent(e){
   e.preventDefault();
   const id = document.getElementById('editId').value;
+
+  // Calcular orden: si es nuevo, va al final
+  let orden;
+  if(id){
+    const existente = events.find(x => x.id === id);
+    orden = existente && typeof existente.orden === 'number'
+      ? existente.orden
+      : (events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0);
+  } else {
+    orden = events.length
+      ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1
+      : 0;
+  }
+
   const data = {
     fecha: document.getElementById('fecha').value,
     hora: document.getElementById('hora').value.trim(),
     titulo: document.getElementById('titulo').value.trim(),
     lugar: document.getElementById('lugar').value.trim(),
     descripcion: document.getElementById('descripcion').value.trim(),
-    flyer: flyerBase64 || null
+    flyer: flyerBase64 || null,
+    orden
   };
   if(!data.fecha || !data.titulo || !data.lugar){
     toast('Completá los campos obligatorios','error'); return;
@@ -384,7 +520,7 @@ async function saveEvent(e){
       toast('✅ Evento actualizado','success');
     } else {
       await addDoc(collection(db, COL), data);
-      toast('✅ Evento agregado','success');
+      toast('✅ Evento agregado al final de la lista','success');
     }
     resetForm();
   } catch(err){
@@ -423,23 +559,26 @@ async function deleteEvent(id){
   }
 }
 
-/* RENDER */
+/* ========== RENDER ========== */
 function renderEvents(){
   const list = document.getElementById('eventsList');
   const count = document.getElementById('eventsCount');
   count.textContent = `${events.length} evento${events.length!==1?'s':''} programado${events.length!==1?'s':''}`;
+
   if(!events.length){
     list.innerHTML = '<div class="empty-state">Todavía no hay eventos cargados.<br>Agregá el primero desde el formulario.</div>';
     return;
   }
+
   list.innerHTML = events.map(ev=>{
     const d = new Date(ev.fecha + 'T00:00:00');
     const dd = String(d.getDate()).padStart(2,'0');
     const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
     const yy = d.getFullYear();
     return `
-      <div class="event-item">
-        ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="">` : ''}
+      <div class="event-item" data-id="${ev.id}">
+        <div class="drag-handle" title="Arrastrar para reordenar">⋮⋮</div>
+        ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false">` : ''}
         <div class="info">
           <span class="date">${dd} ${mm} ${yy}${ev.hora?' · '+ev.hora:''}</span>
           <div class="title">${escapeHtml(ev.titulo)}</div>
@@ -456,7 +595,7 @@ function escapeHtml(s){
   return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* TOAST */
+/* ========== TOAST ========== */
 let toastTimer;
 function toast(msg, type=''){
   const el = document.getElementById('toast');
@@ -466,7 +605,7 @@ function toast(msg, type=''){
   toastTimer = setTimeout(()=> el.classList.remove('show'), 3000);
 }
 
-/* Exponer funciones globales */
+/* ========== Exponer globales ========== */
 window.tryLogin = tryLogin;
 window.logout = logout;
 window.handleFlyer = handleFlyer;
@@ -476,7 +615,7 @@ window.saveEvent = saveEvent;
 window.editEvent = editEvent;
 window.deleteEvent = deleteEvent;
 
-/* INIT */
+/* ========== INIT ========== */
 if(sessionStorage.getItem('tbAuth') === '1'){
   showPanel();
 }
