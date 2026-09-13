@@ -834,7 +834,6 @@
         }
 
         function closeLightbox() {
-            // Animación de salida (alejar la imagen)
             if (isDragging) {
                 lightboxImg.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
                 lightboxImg.style.transform = `translate(${imgStartX}px, ${imgStartY}px) scale(0.7)`;
@@ -851,21 +850,18 @@
             isDragging = false;
         }
 
-        // Cerrar con click en cualquier parte (excepto la propia imagen)
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox || e.target === lightboxClose) {
                 closeLightbox();
             }
         });
 
-        // Cerrar con ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && lightbox.classList.contains('open')) {
                 closeLightbox();
             }
         });
 
-        // ---- Swipe para cerrar ----
         lightbox.addEventListener('touchstart', (e) => {
             if (!lightbox.classList.contains('open')) return;
             const t = e.touches[0];
@@ -888,24 +884,20 @@
             const opacity = Math.max(0.3, 1 - Math.abs(dx + dy) / 800);
             lightboxImg.style.transform = `translate(${dx}px, ${dy}px) scale(${Math.max(0.85, 1 - Math.abs(dx + dy) / 1500)})`;
             lightboxImg.style.opacity = opacity;
-            // Reducir también la opacidad del overlay
             lightbox.style.background = `rgba(0, 0, 0, ${0.95 * opacity})`;
         }, { passive: true });
 
-        lightbox.addEventListener('touchend', (e) => {
+        lightbox.addEventListener('touchend', () => {
             if (!isDragging) return;
             const elapsed = Date.now() - touchStartTime;
             const dist = Math.sqrt(imgStartX * imgStartX + imgStartY * imgStartY);
             const velocity = dist / Math.max(elapsed, 1);
 
-            // Restaurar fondo
             lightbox.style.background = '';
 
-            // Si arrastró más de 80px o fue un swipe rápido, cerrar
             if (dist > 80 || velocity > 0.5) {
                 closeLightbox();
             } else {
-                // Volver a posición original
                 lightboxImg.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
                 lightboxImg.style.transform = '';
                 lightboxImg.style.opacity = '';
@@ -916,12 +908,10 @@
             }
         });
 
-        // Prevenir scroll de fondo con gestos en el lightbox (iOS)
         lightbox.addEventListener('touchmove', (e) => {
             if (e.cancelable) e.preventDefault();
         }, { passive: false });
 
-        // Exponer globalmente
         window.openLightbox = openLightbox;
 
         /* ========== CARGAR EVENTOS DESDE FIRESTORE ========== */
@@ -931,7 +921,7 @@
 
             try {
                 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-                const { getFirestore, collection, getDocs, query, orderBy } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+                const { getFirestore, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
                 const firebaseConfig = {
                     apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
@@ -946,10 +936,16 @@
                 const app = initializeApp(firebaseConfig);
                 const db = getFirestore(app);
 
-                const q = query(collection(db, "eventos"), orderBy("fecha", "asc"));
-                const snap = await getDocs(q);
-
+                const snap = await getDocs(collection(db, "eventos"));
                 const eventos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // Ordenar: por campo `orden` (drag&drop del admin), con fallback a fecha
+                eventos.sort((a, b) => {
+                    const oa = typeof a.orden === 'number' ? a.orden : Infinity;
+                    const ob = typeof b.orden === 'number' ? b.orden : Infinity;
+                    if (oa !== ob) return oa - ob;
+                    return (a.fecha || '').localeCompare(b.fecha || '');
+                });
 
                 if (!eventos.length) {
                     list.innerHTML = `<div class="events-empty">
@@ -965,7 +961,6 @@
                     const yy = d.getFullYear();
                     const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
 
-                    // Flyer clickeable → abre lightbox
                     const flyerHtml = ev.flyer
                         ? `<img class="event-flyer"
                               src="${ev.flyer}"
