@@ -223,6 +223,41 @@
             background: var(--gris-medio); transform: translateX(4px);
         }
         .event-card:hover::before { opacity: 1; }
+
+        /* ===== EVENTO PASADO ===== */
+        .event-card.past {
+            opacity: 0.75;
+        }
+        .event-card.past.has-flyer {
+            grid-template-columns: 80px 90px 1fr auto;
+        }
+        .event-card.past::before {
+            background: var(--gris-claro);
+        }
+        .event-card.past:hover::before { opacity: 0.6; }
+        .event-card.past .event-date .day {
+            color: var(--gris-claro);
+        }
+        .event-card.past .event-info .venue {
+            color: var(--gris-claro);
+        }
+        .past-badge {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            font-size: 0.65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px;
+            color: var(--gris-claro);
+            border: 1px solid var(--gris-medio);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            white-space: nowrap;
+        }
+        .past-badge::before {
+            content: '';
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--gris-claro);
+        }
+
         .event-flyer {
             width: 80px; height: 80px; border-radius: 8px;
             object-fit: cover; border: 1px solid var(--gris-medio);
@@ -495,8 +530,10 @@
             .menu-toggle { display: block; }
             .event-card { grid-template-columns: 70px 1fr; gap: 1rem; padding: 1.2rem; }
             .event-card.has-flyer { grid-template-columns: 70px 70px 1fr; }
+            .event-card.past.has-flyer { grid-template-columns: 70px 70px 1fr; }
             .event-flyer { width: 70px; height: 70px; }
             .event-cta { grid-column: 1 / -1; width: 100%; text-align: center; }
+            .past-badge { grid-column: 1 / -1; justify-self: start; margin-top: 0.3rem; }
             .gallery-grid { grid-template-columns: repeat(2, 1fr); }
             .band-stats { grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
             .stat-number { font-size: 1.8rem; }
@@ -954,12 +991,19 @@
                     return;
                 }
 
+                // Fecha de hoy (a medianoche) para comparar
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+
                 list.innerHTML = eventos.map(ev => {
                     const d = new Date(ev.fecha + 'T00:00:00');
                     const dd = String(d.getDate()).padStart(2,'0');
                     const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
                     const yy = d.getFullYear();
                     const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
+
+                    // ¿Es un evento pasado? (fecha anterior a hoy)
+                    const esPasado = d < hoy;
 
                     const flyerHtml = ev.flyer
                         ? `<img class="event-flyer"
@@ -970,8 +1014,16 @@
 
                     const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
 
+                    // Botón "Consultar" solo si NO es pasado
+                    const botonHtml = esPasado
+                        ? `<span class="past-badge">Realizado</span>`
+                        : `<button class="event-cta"
+                              onclick="sendEventWhatsApp('${escapeJs(fechaTxt)} - ${escapeJs(ev.lugar)}')">
+                              Consultar
+                           </button>`;
+
                     return `
-                        <div class="event-card${ev.flyer ? ' has-flyer' : ''}">
+                        <div class="event-card${ev.flyer ? ' has-flyer' : ''}${esPasado ? ' past' : ''}">
                             ${flyerHtml}
                             <div class="event-date">
                                 <div class="day">${dd}</div>
@@ -982,10 +1034,7 @@
                                 <p class="venue">${escapeHtml(ev.lugar)}</p>
                                 ${extraInfo ? `<p>${escapeHtml(extraInfo)}</p>` : ''}
                             </div>
-                            <button class="event-cta"
-                                onclick="sendEventWhatsApp('${escapeJs(fechaTxt)} - ${escapeJs(ev.lugar)}')">
-                                Consultar
-                            </button>
+                            ${botonHtml}
                         </div>`;
                 }).join('');
 
