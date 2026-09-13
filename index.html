@@ -20,6 +20,7 @@
             --azul-electrico: #0066ff;
             --azul-neon: #00a8ff;
             --rojo-rock: #e63946;
+            --rojo-live: #ff1744;
             --fuente-titulo: 'Bebas Neue', sans-serif;
             --fuente-cuerpo: 'Inter', sans-serif;
             --transicion: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -224,31 +225,47 @@
         }
         .event-card:hover::before { opacity: 1; }
 
+        /* ===== EVENTO EN VIVO ===== */
+        .event-card.live {
+            border-color: rgba(230, 57, 70, 0.55);
+            box-shadow: 0 0 30px rgba(230, 57, 70, 0.18);
+            background: linear-gradient(135deg, var(--gris-oscuro), #221012);
+        }
+        .event-card.live::before {
+            background: var(--rojo-rock);
+            opacity: 1;
+            animation: liveBarPulse 1.6s ease-in-out infinite;
+        }
+        .event-card.live:hover {
+            border-color: var(--rojo-rock);
+            box-shadow: 0 0 45px rgba(230, 57, 70, 0.35);
+            background: linear-gradient(135deg, var(--gris-medio), #2a1315);
+        }
+        .event-card.live .event-date .day {
+            color: var(--rojo-live);
+        }
+
+        @keyframes liveBarPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(230, 57, 70, 0); }
+            50% { box-shadow: 0 0 15px rgba(230, 57, 70, 0.9); }
+        }
+
         /* ===== EVENTO PASADO ===== */
-        .event-card.past {
-            opacity: 0.75;
-        }
-        .event-card.past.has-flyer {
-            grid-template-columns: 80px 90px 1fr auto;
-        }
-        .event-card.past::before {
-            background: var(--gris-claro);
-        }
+        .event-card.past { opacity: 0.72; }
+        .event-card.past::before { background: var(--gris-claro); }
         .event-card.past:hover::before { opacity: 0.6; }
-        .event-card.past .event-date .day {
-            color: var(--gris-claro);
-        }
-        .event-card.past .event-info .venue {
-            color: var(--gris-claro);
-        }
+        .event-card.past .event-date .day { color: var(--gris-claro); }
+        .event-card.past .event-info .venue { color: var(--gris-claro); }
+
+        /* ===== BADGES ===== */
         .past-badge {
-            display: inline-flex; align-items: center; gap: 0.35rem;
-            font-size: 0.65rem; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.68rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: 2px;
             color: var(--gris-claro);
             border: 1px solid var(--gris-medio);
             background: rgba(255, 255, 255, 0.03);
-            padding: 0.35rem 0.75rem;
+            padding: 0.4rem 0.85rem;
             border-radius: 50px;
             white-space: nowrap;
         }
@@ -256,6 +273,52 @@
             content: '';
             width: 6px; height: 6px; border-radius: 50%;
             background: var(--gris-claro);
+            flex-shrink: 0;
+        }
+
+        /* Bloque "EN VIVO" con badge + texto */
+        .live-block {
+            display: flex; flex-direction: column;
+            align-items: flex-end; gap: 0.4rem;
+            text-align: right;
+        }
+        .live-badge {
+            display: inline-flex; align-items: center; gap: 0.55rem;
+            font-size: 0.72rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.8px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--rojo-rock), var(--rojo-live));
+            padding: 0.55rem 1.05rem;
+            border-radius: 50px;
+            box-shadow: 0 0 22px rgba(230, 57, 70, 0.6);
+            animation: liveBadgePulse 1.6s ease-in-out infinite;
+            white-space: nowrap;
+        }
+        .live-badge::before {
+            content: '';
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #fff;
+            animation: liveDotBlink 1.1s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        .live-text {
+            font-size: 0.72rem; font-weight: 800;
+            color: var(--rojo-live);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            animation: liveTextBlink 2s ease-in-out infinite;
+        }
+        @keyframes liveBadgePulse {
+            0%, 100% { box-shadow: 0 0 22px rgba(230, 57, 70, 0.6); transform: scale(1); }
+            50% { box-shadow: 0 0 34px rgba(230, 57, 70, 0.95); transform: scale(1.03); }
+        }
+        @keyframes liveDotBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.25; }
+        }
+        @keyframes liveTextBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
 
         .event-flyer {
@@ -269,7 +332,12 @@
             border-color: var(--azul-electrico);
             box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
         }
+        .event-card.live .event-flyer:hover {
+            border-color: var(--rojo-rock);
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.5);
+        }
         .event-flyer:active { transform: scale(0.98); }
+
         .event-date { text-align: center; }
         .event-date .day {
             font-family: var(--fuente-titulo); font-size: 2.5rem;
@@ -288,14 +356,20 @@
             color: var(--azul-neon); font-size: 0.8rem; font-weight: 600;
             letter-spacing: 1px; text-transform: uppercase;
         }
+        .event-card.live .event-info .venue {
+            color: var(--rojo-live);
+        }
+
         .event-cta {
             padding: 0.7rem 1.5rem; font-size: 0.75rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: 1.5px;
             background: transparent; color: var(--blanco);
             border: 1px solid var(--gris-claro); border-radius: 4px;
             cursor: pointer; transition: var(--transicion);
+            white-space: nowrap;
         }
         .event-cta:hover { background: var(--azul-electrico); border-color: var(--azul-electrico); }
+
         .events-empty {
             color: #888; text-align: center; padding: 2.5rem 1rem;
             border: 1px dashed #2a2a2a; border-radius: 10px; font-size: 0.9rem;
@@ -312,9 +386,7 @@
             transition: opacity 0.3s ease, visibility 0.3s ease;
             touch-action: none;
         }
-        .lightbox.open {
-            opacity: 1; visibility: visible;
-        }
+        .lightbox.open { opacity: 1; visibility: visible; }
         .lightbox img {
             max-width: 95vw; max-height: 90vh;
             width: auto; height: auto;
@@ -353,9 +425,7 @@
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
-        @media (min-width: 769px) {
-            .lightbox-hint { display: none; }
-        }
+        @media (min-width: 769px) { .lightbox-hint { display: none; } }
 
         /* GALERÍA */
         .gallery-section { background: var(--negro-suave); position: relative; }
@@ -530,10 +600,14 @@
             .menu-toggle { display: block; }
             .event-card { grid-template-columns: 70px 1fr; gap: 1rem; padding: 1.2rem; }
             .event-card.has-flyer { grid-template-columns: 70px 70px 1fr; }
-            .event-card.past.has-flyer { grid-template-columns: 70px 70px 1fr; }
             .event-flyer { width: 70px; height: 70px; }
             .event-cta { grid-column: 1 / -1; width: 100%; text-align: center; }
-            .past-badge { grid-column: 1 / -1; justify-self: start; margin-top: 0.3rem; }
+            .past-badge { grid-column: 1 / -1; justify-self: center; margin-top: 0.3rem; }
+            .live-block {
+                grid-column: 1 / -1; width: 100%;
+                align-items: center; text-align: center; margin-top: 0.3rem;
+            }
+            .live-badge { font-size: 0.75rem; padding: 0.6rem 1.2rem; }
             .gallery-grid { grid-template-columns: repeat(2, 1fr); }
             .band-stats { grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
             .stat-number { font-size: 1.8rem; }
@@ -554,6 +628,8 @@
             .stat { padding: 1rem; }
             .event-card.has-flyer { grid-template-columns: 60px 60px 1fr; }
             .event-flyer { width: 60px; height: 60px; }
+            .live-badge { font-size: 0.7rem; padding: 0.55rem 1rem; letter-spacing: 1.3px; }
+            .live-text { font-size: 0.68rem; }
         }
     </style>
 </head>
@@ -951,6 +1027,116 @@
 
         window.openLightbox = openLightbox;
 
+        /* ========== FECHAS DE EVENTOS ========== */
+        // Devuelve el rango horario [inicio, fin) de un evento.
+        // - Si hay hora (ej: "21:00 hs"), la ventana es [inicio, inicio + 1h].
+        // - Si no hay hora, la ventana es [00:00, 24:00) de ese día.
+        function getEventWindow(fecha, hora) {
+            const inicio = new Date(fecha + 'T00:00:00');
+            let duracionMs = 24 * 60 * 60 * 1000; // por defecto: todo el día
+
+            if (hora) {
+                const m = String(hora).match(/(\d{1,2})[:.](\d{1,2})/);
+                if (m) {
+                    const h = parseInt(m[1], 10);
+                    const min = parseInt(m[2], 10);
+                    if (!isNaN(h) && !isNaN(min)) {
+                        inicio.setHours(h, min, 0, 0);
+                        duracionMs = 60 * 60 * 1000; // 1 hora
+                    }
+                }
+            }
+            const fin = new Date(inicio.getTime() + duracionMs);
+            return { inicio, fin };
+        }
+
+        // Determina el estado del evento: 'proximo' | 'live' | 'pasado'
+        function getEstado(ev, ahora) {
+            const { inicio, fin } = getEventWindow(ev.fecha, ev.hora);
+            if (ahora < inicio) return 'proximo';
+            if (ahora < fin) return 'live';
+            return 'pasado';
+        }
+
+        /* ========== RENDER EVENTOS ========== */
+        let cachedEventos = [];
+
+        function renderEventos() {
+            const list = document.getElementById('eventsList');
+            if (!list) return;
+
+            if (!cachedEventos.length) {
+                list.innerHTML = `<div class="events-empty">
+                    Próximamente nuevas fechas. ¡Seguinos en Instagram para enterarte primero!
+                </div>`;
+                return;
+            }
+
+            const ahora = new Date();
+
+            list.innerHTML = cachedEventos.map(ev => {
+                const d = new Date(ev.fecha + 'T00:00:00');
+                const dd = String(d.getDate()).padStart(2,'0');
+                const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
+                const yy = d.getFullYear();
+                const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
+
+                const estado = getEstado(ev, ahora);
+
+                const flyerHtml = ev.flyer
+                    ? `<img class="event-flyer"
+                          src="${ev.flyer}"
+                          alt="Flyer ${escapeHtml(ev.titulo)}"
+                          onclick="openLightbox(this.src, this.alt)">`
+                    : '';
+
+                const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
+
+                // Acción según estado
+                let accionHtml = '';
+                if (estado === 'proximo') {
+                    accionHtml = `<button class="event-cta"
+                        onclick="sendEventWhatsApp('${escapeJs(fechaTxt)} - ${escapeJs(ev.lugar)}')">
+                        Consultar
+                    </button>`;
+                } else if (estado === 'live') {
+                    accionHtml = `
+                        <div class="live-block">
+                            <span class="live-badge">EN VIVO AHORA</span>
+                            <span class="live-text">¡Vení, te esperamos!</span>
+                        </div>`;
+                } else {
+                    accionHtml = `<span class="past-badge">Realizado</span>`;
+                }
+
+                const claseEstado = estado === 'live' ? ' live' : (estado === 'pasado' ? ' past' : '');
+
+                return `
+                    <div class="event-card${ev.flyer ? ' has-flyer' : ''}${claseEstado}">
+                        ${flyerHtml}
+                        <div class="event-date">
+                            <div class="day">${dd}</div>
+                            <div class="month">${mm} ${yy}</div>
+                        </div>
+                        <div class="event-info">
+                            <h4>${escapeHtml(ev.titulo)}</h4>
+                            <p class="venue">${escapeHtml(ev.lugar)}</p>
+                            ${extraInfo ? `<p>${escapeHtml(extraInfo)}</p>` : ''}
+                        </div>
+                        ${accionHtml}
+                    </div>`;
+            }).join('');
+        }
+
+        // Auto-refresh cada 60 segundos (no molesta si el lightbox está abierto)
+        function scheduleRefresh() {
+            setInterval(() => {
+                if (!lightbox.classList.contains('open')) {
+                    renderEventos();
+                }
+            }, 60000);
+        }
+
         /* ========== CARGAR EVENTOS DESDE FIRESTORE ========== */
         async function loadEventos() {
             const list = document.getElementById('eventsList');
@@ -974,69 +1160,18 @@
                 const db = getFirestore(app);
 
                 const snap = await getDocs(collection(db, "eventos"));
-                const eventos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                cachedEventos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                // Ordenar: por campo `orden` (drag&drop del admin), con fallback a fecha
-                eventos.sort((a, b) => {
+                // Ordenar: por campo `orden` (drag&drop del admin), fallback a fecha
+                cachedEventos.sort((a, b) => {
                     const oa = typeof a.orden === 'number' ? a.orden : Infinity;
                     const ob = typeof b.orden === 'number' ? b.orden : Infinity;
                     if (oa !== ob) return oa - ob;
                     return (a.fecha || '').localeCompare(b.fecha || '');
                 });
 
-                if (!eventos.length) {
-                    list.innerHTML = `<div class="events-empty">
-                        Próximamente nuevas fechas. ¡Seguinos en Instagram para enterarte primero!
-                    </div>`;
-                    return;
-                }
-
-                // Fecha de hoy (a medianoche) para comparar
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-
-                list.innerHTML = eventos.map(ev => {
-                    const d = new Date(ev.fecha + 'T00:00:00');
-                    const dd = String(d.getDate()).padStart(2,'0');
-                    const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
-                    const yy = d.getFullYear();
-                    const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
-
-                    // ¿Es un evento pasado? (fecha anterior a hoy)
-                    const esPasado = d < hoy;
-
-                    const flyerHtml = ev.flyer
-                        ? `<img class="event-flyer"
-                              src="${ev.flyer}"
-                              alt="Flyer ${escapeHtml(ev.titulo)}"
-                              onclick="openLightbox(this.src, this.alt)">`
-                        : '';
-
-                    const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
-
-                    // Botón "Consultar" solo si NO es pasado
-                    const botonHtml = esPasado
-                        ? `<span class="past-badge">Realizado</span>`
-                        : `<button class="event-cta"
-                              onclick="sendEventWhatsApp('${escapeJs(fechaTxt)} - ${escapeJs(ev.lugar)}')">
-                              Consultar
-                           </button>`;
-
-                    return `
-                        <div class="event-card${ev.flyer ? ' has-flyer' : ''}${esPasado ? ' past' : ''}">
-                            ${flyerHtml}
-                            <div class="event-date">
-                                <div class="day">${dd}</div>
-                                <div class="month">${mm} ${yy}</div>
-                            </div>
-                            <div class="event-info">
-                                <h4>${escapeHtml(ev.titulo)}</h4>
-                                <p class="venue">${escapeHtml(ev.lugar)}</p>
-                                ${extraInfo ? `<p>${escapeHtml(extraInfo)}</p>` : ''}
-                            </div>
-                            ${botonHtml}
-                        </div>`;
-                }).join('');
+                renderEventos();
+                scheduleRefresh();
 
             } catch (err) {
                 console.error('Error al cargar eventos desde Firestore:', err);
