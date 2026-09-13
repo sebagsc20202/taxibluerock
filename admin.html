@@ -192,9 +192,6 @@ a{color:inherit;text-decoration:none;}
   <div class="topbar">
     <div class="logo">TAXI <span>BLUE</span> · ADMIN</div>
     <div class="topbar-actions">
-      <button class="btn btn-outline" onclick="exportJSON()">⬇ Exportar JSON</button>
-      <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆ Importar JSON</button>
-      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importJSON(event)">
       <button class="btn btn-outline" onclick="logout()">Salir</button>
     </div>
   </div>
@@ -250,7 +247,7 @@ a{color:inherit;text-decoration:none;}
     <!-- LIST -->
     <div class="card">
       <h2 class="section-title">EVENTOS <span>CARGADOS</span></h2>
-      <p class="section-sub" id="eventsCount">0 eventos programados</p>
+      <p class="section-sub" id="eventsCount">Cargando...</p>
       <div class="events-list" id="eventsList"></div>
     </div>
   </div>
@@ -258,13 +255,34 @@ a{color:inherit;text-decoration:none;}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, updateDoc, deleteDoc,
+  doc, onSnapshot, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
+  authDomain: "taxiblue-87289.firebaseapp.com",
+  projectId: "taxiblue-87289",
+  storageBucket: "taxiblue-87289.firebasestorage.app",
+  messagingSenderId: "886873440517",
+  appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
+  measurementId: "G-M04PSGFYDM"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const COL = "eventos";
+
 const ADMIN_PASS = '666666';
-const STORAGE_KEY = 'taxiBlueEventos';
 const MAX_FLYER_KB = 800;
 
 let flyerBase64 = null;
 let events = [];
+let unsubscribe = null;
 
 /* LOGIN */
 function tryLogin(){
@@ -289,27 +307,24 @@ document.getElementById('passInput').addEventListener('input', () => {
 function showPanel(){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('panel').classList.add('active');
-  loadEvents();
-  renderEvents();
+  subscribeEvents();
 }
 function logout(){
   sessionStorage.removeItem('tbAuth');
+  if(unsubscribe) unsubscribe();
   location.reload();
 }
 
-/* STORAGE */
-function loadEvents(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    events = raw ? JSON.parse(raw) : [];
-  }catch(e){ events = []; }
-}
-function persist(){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
-  }catch(e){
-    toast('⚠️ Almacenamiento lleno. Exportá el JSON.','error');
-  }
+/* FIRESTORE: escucha en tiempo real */
+function subscribeEvents(){
+  const q = query(collection(db, COL), orderBy("fecha", "asc"));
+  unsubscribe = onSnapshot(q, (snap) => {
+    events = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderEvents();
+  }, (err) => {
+    console.error(err);
+    toast('❌ Error al leer Firestore. Revisá las reglas.', 'error');
+  });
 }
 
 /* FORM */
@@ -348,11 +363,10 @@ function resetForm(){
   document.getElementById('formTitle').innerHTML = 'NUEVO <span>EVENTO</span>';
 }
 
-function saveEvent(e){
+async function saveEvent(e){
   e.preventDefault();
   const id = document.getElementById('editId').value;
   const data = {
-    id: id || Date.now().toString(36) + Math.random().toString(36).slice(2,6),
     fecha: document.getElementById('fecha').value,
     hora: document.getElementById('hora').value.trim(),
     titulo: document.getElementById('titulo').value.trim(),
@@ -363,18 +377,20 @@ function saveEvent(e){
   if(!data.fecha || !data.titulo || !data.lugar){
     toast('Completá los campos obligatorios','error'); return;
   }
-  if(id){
-    const i = events.findIndex(x => x.id === id);
-    if(i > -1) events[i] = data;
-    toast('✅ Evento actualizado','success');
-  } else {
-    events.push(data);
-    toast('✅ Evento agregado','success');
+
+  try {
+    if(id){
+      await updateDoc(doc(db, COL, id), data);
+      toast('✅ Evento actualizado','success');
+    } else {
+      await addDoc(collection(db, COL), data);
+      toast('✅ Evento agregado','success');
+    }
+    resetForm();
+  } catch(err){
+    console.error(err);
+    toast('❌ Error al guardar en Firestore','error');
   }
-  events.sort((a,b)=> a.fecha.localeCompare(b.fecha));
-  persist();
-  renderEvents();
-  resetForm();
 }
 
 function editEvent(id){
@@ -396,11 +412,15 @@ function editEvent(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function deleteEvent(id){
+async function deleteEvent(id){
   if(!confirm('¿Eliminar este evento?')) return;
-  events = events.filter(x=>x.id!==id);
-  persist(); renderEvents();
-  toast('🗑️ Evento eliminado','success');
+  try {
+    await deleteDoc(doc(db, COL, id));
+    toast('🗑️ Evento eliminado','success');
+  } catch(err){
+    console.error(err);
+    toast('❌ Error al eliminar','error');
+  }
 }
 
 /* RENDER */
@@ -433,39 +453,7 @@ function renderEvents(){
   }).join('');
 }
 function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-/* EXPORT / IMPORT */
-function exportJSON(){
-  const data = { updated: new Date().toISOString(), eventos: events };
-  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'eventos.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('⬇ eventos.json descargado. Subilo a GitHub.','success');
-}
-
-function importJSON(e){
-  const file = e.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try{
-      const parsed = JSON.parse(ev.target.result);
-      const arr = Array.isArray(parsed) ? parsed : parsed.eventos;
-      if(!Array.isArray(arr)) throw new Error('Formato inválido');
-      events = arr;
-      persist(); renderEvents();
-      toast('✅ Eventos importados','success');
-    }catch(err){
-      toast('❌ Archivo JSON inválido','error');
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 /* TOAST */
@@ -477,6 +465,16 @@ function toast(msg, type=''){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=> el.classList.remove('show'), 3000);
 }
+
+/* Exponer funciones globales */
+window.tryLogin = tryLogin;
+window.logout = logout;
+window.handleFlyer = handleFlyer;
+window.removeFlyer = removeFlyer;
+window.resetForm = resetForm;
+window.saveEvent = saveEvent;
+window.editEvent = editEvent;
+window.deleteEvent = deleteEvent;
 
 /* INIT */
 if(sessionStorage.getItem('tbAuth') === '1'){
