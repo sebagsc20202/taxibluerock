@@ -74,8 +74,10 @@ a{color:inherit;text-decoration:none;}
 .btn-primary:hover{background:var(--azul-neon);box-shadow:0 0 20px rgba(0,102,255,.5);}
 .btn-outline{background:transparent;border-color:var(--gris-medio);color:var(--blanco);}
 .btn-outline:hover{border-color:var(--azul);color:var(--azul-neon);}
-.btn-danger{background:transparent;border-color:var(--rojo);color:var(--rojo);}
-.btn-danger:hover{background:var(--rojo);color:#fff;}
+.btn-icon{
+  padding:0;width:44px;height:44px;justify-content:center;font-size:1.1rem;
+  flex-shrink:0;
+}
 
 .section-title{font-family:var(--fuente-titulo);font-size:2rem;letter-spacing:2px;margin-bottom:.3rem;}
 .section-title span{color:var(--azul);}
@@ -100,6 +102,17 @@ a{color:inherit;text-decoration:none;}
 .form-group textarea{resize:vertical;min-height:80px;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
 
+.input-with-btn{display:flex;gap:.5rem;align-items:stretch;}
+.input-with-btn input{flex:1;min-width:0;}
+.field-hint{
+  font-size:.7rem;color:var(--gris-claro);margin-top:.4rem;line-height:1.5;
+}
+.field-hint strong{color:var(--azul-neon);font-weight:600;}
+.field-hint code{
+  background:rgba(0,102,255,.1);color:var(--azul-neon);
+  padding:1px 5px;border-radius:3px;font-family:monospace;font-size:.7rem;
+}
+
 .flyer-upload{
   border:2px dashed var(--gris-medio);border-radius:10px;padding:1.5rem;text-align:center;
   cursor:pointer;transition:var(--trans);position:relative;overflow:hidden;
@@ -117,7 +130,7 @@ a{color:inherit;text-decoration:none;}
   width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;font-weight:700;
 }
 
-/* ====== EVENTS LIST con drag & drop ====== */
+/* EVENTS LIST */
 .drag-hint{
   font-size:.72rem;color:var(--gris-claro);background:rgba(0,102,255,.08);
   border:1px dashed rgba(0,102,255,.35);padding:.6rem .8rem;border-radius:6px;
@@ -129,7 +142,6 @@ a{color:inherit;text-decoration:none;}
   background:var(--negro);border:1px solid var(--gris-medio);border-radius:10px;
   padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:center;
   gap:1rem;position:relative;
-  /* ✨ FIX: Sin transiciones en el contenedor para evitar conflicto táctil */
 }
 .event-item:hover{border-color:var(--azul);}
 .event-item .info{flex:1;min-width:0;}
@@ -147,38 +159,25 @@ a{color:inherit;text-decoration:none;}
 }
 .event-item .actions .edit:hover{border-color:var(--azul);color:var(--azul-neon);}
 .event-item .actions .del:hover{border-color:var(--rojo);color:var(--rojo);}
+.event-item .actions .map:hover{border-color:var(--verde);color:var(--verde);}
 .event-thumb{
   width:50px;height:50px;border-radius:6px;object-fit:cover;flex-shrink:0;
   border:1px solid var(--gris-medio);
-  /* ✨ FIX: Prevenir que la imagen capture el evento de arrastre */
-  -webkit-user-drag: none;
-  user-drag: none;
-  pointer-events: none;
+  -webkit-user-drag: none;user-drag: none;pointer-events: none;
 }
 
-/* Drag handle */
 .drag-handle{
-  cursor:grab;
-  color:var(--gris-claro);
-  font-size:1.1rem;
-  letter-spacing:-3px;
-  padding:.4rem .35rem;
-  user-select:none;
-  -webkit-user-select:none;
-  touch-action:none; /* ✨ FIX: Evita que el navegador interprete el gesto como scroll */
-  display:flex;align-items:center;justify-content:center;
+  cursor:grab;color:var(--gris-claro);font-size:1.1rem;letter-spacing:-3px;
+  padding:.4rem .35rem;user-select:none;-webkit-user-select:none;
+  touch-action:none;display:flex;align-items:center;justify-content:center;
   flex-shrink:0;
-  /* ✨ FIX: Sin transiciones para un arrastre táctil suave */
 }
 .drag-handle:active{cursor:grabbing;color:var(--azul);}
 
-/* Estados del drag */
 .event-item.dragging{opacity:.4;}
 .event-item.drag-ghost{
-  background:var(--azul)!important;
-  border-color:var(--azul-neon)!important;
-  box-shadow:0 0 25px rgba(0,102,255,.6);
-  transform:scale(1.02);
+  background:var(--azul)!important;border-color:var(--azul-neon)!important;
+  box-shadow:0 0 25px rgba(0,102,255,.6);transform:scale(1.02);
 }
 .event-item.drag-ghost .date,
 .event-item.drag-ghost .title,
@@ -262,10 +261,31 @@ a{color:inherit;text-decoration:none;}
           <label>Título del evento *</label>
           <input type="text" id="titulo" placeholder="Ej: Taxi Blue en Vivo" required>
         </div>
+
+        <!-- LUGAR con botón de verificación en Google Maps -->
         <div class="form-group">
-          <label>Lugar / Venue *</label>
-          <input type="text" id="lugar" placeholder="Ej: La Bodega · Villa María, Córdoba" required>
+          <label>Lugar / Venue (dirección para Maps) *</label>
+          <div class="input-with-btn">
+            <input type="text" id="lugar" placeholder="Ej: La Bodega, Villa María, Córdoba" required>
+            <button type="button" class="btn btn-outline btn-icon" onclick="verificarEnMaps()" title="Verificar dirección en Google Maps">🔍</button>
+          </div>
+          <div class="field-hint">
+            Escribí una <strong>dirección completa</strong> (calle + ciudad) para que el mapa la encuentre bien. Después tocá <strong>🔍</strong> para verificarla.
+          </div>
         </div>
+
+        <!-- URL opcional de Google Maps -->
+        <div class="form-group">
+          <label>URL de Google Maps (opcional)</label>
+          <div class="input-with-btn">
+            <input type="url" id="mapsUrl" placeholder="https://maps.app.goo.gl/...">
+            <button type="button" class="btn btn-outline btn-icon" onclick="probarMapsUrl()" title="Probar URL">↗</button>
+          </div>
+          <div class="field-hint">
+            Opcional. En Google Maps buscá el local, tocá <strong>Compartir → Copiar vínculo</strong> y pegalo acá. Si lo dejás vacío, se genera automáticamente desde la dirección.
+          </div>
+        </div>
+
         <div class="form-group">
           <label>Descripción</label>
           <textarea id="descripcion" placeholder="Breve descripción del show..."></textarea>
@@ -335,7 +355,7 @@ let flyerBase64 = null;
 let events = [];
 let unsubscribe = null;
 let sortableInstance = null;
-let isReordering = false; // pausa el re-render mientras se guarda el nuevo orden
+let isReordering = false;
 
 /* ========== LOGIN ========== */
 function tryLogin(){
@@ -374,11 +394,10 @@ function subscribeEvents(){
   const q = query(collection(db, COL));
 
   unsubscribe = onSnapshot(q, (snap) => {
-    if(isReordering) return; // no re-renderizar mientras se guarda un nuevo orden
+    if(isReordering) return;
 
     events = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // Ordenar: primero por campo `orden`, con fallback a fecha
     events.sort((a, b) => {
       const oa = typeof a.orden === 'number' ? a.orden : Infinity;
       const ob = typeof b.orden === 'number' ? b.orden : Infinity;
@@ -394,12 +413,11 @@ function subscribeEvents(){
   });
 }
 
-/* ========== SORTABLE (DRAG & DROP) ========== */
+/* ========== SORTABLE ========== */
 function initSortable(){
   const el = document.getElementById('eventsList');
   if(!el) return;
 
-  // Destruir instancia previa para no duplicar handlers
   if(sortableInstance){
     try { sortableInstance.destroy(); } catch(_) {}
     sortableInstance = null;
@@ -411,28 +429,24 @@ function initSortable(){
     handle: '.drag-handle',
     ghostClass: 'drag-ghost',
     dragClass: 'dragging',
-    // ✨ FIX para móvil: usar el sistema de arrastre interno de SortableJS
     forceFallback: true,
     fallbackOnBody: true,
     fallbackClass: 'drag-ghost',
-    // ✨ FIX: Ajustar umbrales para evitar arrastres accidentales
-    delay: 150, // Pequeña demora para diferenciar del scroll
-    delayOnTouchOnly: true, // Solo aplicar esta demora en dispositivos táctiles
-    touchStartThreshold: 8, // Píxeles que debe mover el dedo para iniciar el arrastre
+    delay: 150,
+    delayOnTouchOnly: true,
+    touchStartThreshold: 8,
     onEnd: async (evt) => {
       if(evt.oldIndex === evt.newIndex) return;
 
-      // Reordenar array local en memoria
       const [moved] = events.splice(evt.oldIndex, 1);
       events.splice(evt.newIndex, 0, moved);
 
-      // Pausar re-render mientras se guarda
       isReordering = true;
 
       try {
         const batch = writeBatch(db);
         events.forEach((ev, i) => {
-          ev.orden = i; // reflejar en memoria
+          ev.orden = i;
           batch.update(doc(db, COL, ev.id), { orden: i });
         });
         await batch.commit();
@@ -441,11 +455,34 @@ function initSortable(){
         console.error(err);
         toast('❌ No se pudo guardar el orden. Revisá tu conexión.','error');
       } finally {
-        // Reanudar snapshot después de un pequeño delay
         setTimeout(() => { isReordering = false; }, 700);
       }
     }
   });
+}
+
+/* ========== GOOGLE MAPS HELPERS ========== */
+function verificarEnMaps(){
+  const lugar = document.getElementById('lugar').value.trim();
+  if(!lugar){
+    toast('Escribí una dirección primero','error');
+    return;
+  }
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lugar)}`;
+  window.open(url, '_blank');
+}
+
+function probarMapsUrl(){
+  const url = document.getElementById('mapsUrl').value.trim();
+  if(!url){
+    toast('Pegá primero una URL','error');
+    return;
+  }
+  if(!/^https?:\/\//i.test(url)){
+    toast('La URL debe empezar con https://','error');
+    return;
+  }
+  window.open(url, '_blank');
 }
 
 /* ========== FORM ========== */
@@ -479,6 +516,7 @@ function resetForm(){
   document.getElementById('hora').value = '';
   document.getElementById('titulo').value = '';
   document.getElementById('lugar').value = '';
+  document.getElementById('mapsUrl').value = '';
   document.getElementById('descripcion').value = '';
   removeFlyer();
   document.getElementById('formTitle').innerHTML = 'NUEVO <span>EVENTO</span>';
@@ -488,7 +526,6 @@ async function saveEvent(e){
   e.preventDefault();
   const id = document.getElementById('editId').value;
 
-  // Calcular orden: si es nuevo, va al final
   let orden;
   if(id){
     const existente = events.find(x => x.id === id);
@@ -506,6 +543,7 @@ async function saveEvent(e){
     hora: document.getElementById('hora').value.trim(),
     titulo: document.getElementById('titulo').value.trim(),
     lugar: document.getElementById('lugar').value.trim(),
+    mapsUrl: document.getElementById('mapsUrl').value.trim() || null,
     descripcion: document.getElementById('descripcion').value.trim(),
     flyer: flyerBase64 || null,
     orden
@@ -536,6 +574,7 @@ function editEvent(id){
   document.getElementById('hora').value = ev.hora || '';
   document.getElementById('titulo').value = ev.titulo;
   document.getElementById('lugar').value = ev.lugar;
+  document.getElementById('mapsUrl').value = ev.mapsUrl || '';
   document.getElementById('descripcion').value = ev.descripcion || '';
   if(ev.flyer){
     flyerBase64 = ev.flyer;
@@ -575,6 +614,7 @@ function renderEvents(){
     const dd = String(d.getDate()).padStart(2,'0');
     const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
     const yy = d.getFullYear();
+    const mapsUrl = ev.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.lugar || '')}`;
     return `
       <div class="event-item" data-id="${ev.id}">
         <div class="drag-handle" title="Arrastrar para reordenar">⋮⋮</div>
@@ -585,6 +625,7 @@ function renderEvents(){
           <div class="place">${escapeHtml(ev.lugar)}</div>
         </div>
         <div class="actions">
+          <button class="map" title="Ver en Google Maps" onclick="window.open('${mapsUrl.replace(/'/g,"\\'")}','_blank')">📍</button>
           <button class="edit" title="Editar" onclick="editEvent('${ev.id}')">✎</button>
           <button class="del" title="Eliminar" onclick="deleteEvent('${ev.id}')">✕</button>
         </div>
@@ -614,6 +655,8 @@ window.resetForm = resetForm;
 window.saveEvent = saveEvent;
 window.editEvent = editEvent;
 window.deleteEvent = deleteEvent;
+window.verificarEnMaps = verificarEnMaps;
+window.probarMapsUrl = probarMapsUrl;
 
 /* ========== INIT ========== */
 if(sessionStorage.getItem('tbAuth') === '1'){
