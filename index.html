@@ -525,7 +525,7 @@
         </div>
     </section>
 
-    <!-- EVENTOS (dinámico) -->
+    <!-- EVENTOS -->
     <section class="events-section" id="eventos">
         <div class="container">
             <div class="section-line"></div>
@@ -657,14 +657,14 @@
     </footer>
 
     <script>
-        /* ========== NAVBAR SCROLL ========== */
+        /* NAVBAR SCROLL */
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) navbar.classList.add('scrolled');
             else navbar.classList.remove('scrolled');
         });
 
-        /* ========== MENÚ MÓVIL ========== */
+        /* MENÚ MÓVIL */
         const menuToggle = document.getElementById('menuToggle');
         const navLinks = document.getElementById('navLinks');
         menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
@@ -672,7 +672,7 @@
             link.addEventListener('click', () => navLinks.classList.remove('active'));
         });
 
-        /* ========== FORMULARIO WHATSAPP ========== */
+        /* FORMULARIO WHATSAPP */
         const WHATSAPP_NUMBER = '5493541381626';
 
         function toggleFechaField() {
@@ -711,7 +711,7 @@
             window.open(url, '_blank');
         }
 
-        /* ========== SCROLL SUAVE ========== */
+        /* SCROLL SUAVE */
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 const targetId = this.getAttribute('href');
@@ -724,7 +724,7 @@
             });
         });
 
-        /* ========== CARGAR EVENTOS DINÁMICOS ========== */
+        /* CARGAR EVENTOS DESDE FIRESTORE */
         function escapeHtml(s){
             return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
@@ -737,70 +737,77 @@
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        async function loadEventos(){
+        async function loadEventos() {
             const list = document.getElementById('eventsList');
             if (!list) return;
 
-            let eventos = [];
-
             try {
-                const res = await fetch('eventos.json?t=' + Date.now());
-                if (res.ok) {
-                    const data = await res.json();
-                    eventos = Array.isArray(data) ? data : (data.eventos || []);
-                }
-            } catch (e) {
-                console.warn('No se pudo cargar eventos.json', e);
-            }
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+                const { getFirestore, collection, getDocs, query, orderBy } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-            // Fallback: localStorage (útil en pruebas locales desde admin)
-            if (!eventos.length) {
-                try {
-                    const local = localStorage.getItem('taxiBlueEventos');
-                    if (local) eventos = JSON.parse(local);
-                } catch (_) {}
-            }
+                const firebaseConfig = {
+                    apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
+                    authDomain: "taxiblue-87289.firebaseapp.com",
+                    projectId: "taxiblue-87289",
+                    storageBucket: "taxiblue-87289.firebasestorage.app",
+                    messagingSenderId: "886873440517",
+                    appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
+                    measurementId: "G-M04PSGFYDM"
+                };
 
-            if (!eventos.length) {
-                list.innerHTML = `<div class="events-empty">
-                    Próximamente nuevas fechas. ¡Seguinos en Instagram para enterarte primero!
-                </div>`;
-                return;
-            }
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
 
-            eventos.sort((a,b) => a.fecha.localeCompare(b.fecha));
+                const q = query(collection(db, "eventos"), orderBy("fecha", "asc"));
+                const snap = await getDocs(q);
 
-            list.innerHTML = eventos.map(ev => {
-                const d = new Date(ev.fecha + 'T00:00:00');
-                const dd = String(d.getDate()).padStart(2,'0');
-                const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
-                const yy = d.getFullYear();
-                const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
+                const eventos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                const flyerHtml = ev.flyer
-                    ? `<img class="event-flyer" src="${ev.flyer}" alt="Flyer ${escapeHtml(ev.titulo)}">`
-                    : '';
-
-                const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
-
-                return `
-                    <div class="event-card${ev.flyer ? ' has-flyer' : ''}">
-                        ${flyerHtml}
-                        <div class="event-date">
-                            <div class="day">${dd}</div>
-                            <div class="month">${mm} ${yy}</div>
-                        </div>
-                        <div class="event-info">
-                            <h4>${escapeHtml(ev.titulo)}</h4>
-                            <p class="venue">${escapeHtml(ev.lugar)}</p>
-                            ${extraInfo ? `<p>${escapeHtml(extraInfo)}</p>` : ''}
-                        </div>
-                        <button class="event-cta"
-                            onclick="sendEventWhatsApp('${escapeJs(fechaTxt)} - ${escapeJs(ev.lugar)}')">
-                            Consultar
-                        </button>
+                if (!eventos.length) {
+                    list.innerHTML = `<div class="events-empty">
+                        Próximamente nuevas fechas. ¡Seguinos en Instagram para enterarte primero!
                     </div>`;
-            }).join('');
+                    return;
+                }
+
+                list.innerHTML = eventos.map(ev => {
+                    const d = new Date(ev.fecha + 'T00:00:00');
+                    const dd = String(d.getDate()).padStart(2,'0');
+                    const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
+                    const yy = d.getFullYear();
+                    const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
+
+                    const flyerHtml = ev.flyer
+                        ? `<img class="event-flyer" src="${ev.flyer}" alt="Flyer ${escapeHtml(ev.titulo)}">`
+                        : '';
+
+                    const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
+
+                    return `
+                        <div class="event-card${ev.flyer ? ' has-flyer' : ''}">
+                            ${flyerHtml}
+                            <div class="event-date">
+                                <div class="day">${dd}</div>
+                                <div class="month">${mm} ${yy}</div>
+                            </div>
+                            <div class="event-info">
+                                <h4>${escapeHtml(ev.titulo)}</h4>
+                                <p class="venue">${escapeHtml(ev.lugar)}</p>
+                                ${extraInfo ? `<p>${escapeHtml(extraInfo)}</p>` : ''}
+                            </div>
+                            <button class="event-cta"
+                                onclick="sendEventWhatsApp('${escapeJs(fechaTxt)} - ${escapeJs(ev.lugar)}')">
+                                Consultar
+                            </button>
+                        </div>`;
+                }).join('');
+
+            } catch (err) {
+                console.error('Error al cargar eventos desde Firestore:', err);
+                list.innerHTML = `<div class="events-empty" style="border-color:#e63946;color:#e63946;">
+                    No se pudieron cargar los eventos. Revisá la consola.
+                </div>`;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', loadEventos);
