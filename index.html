@@ -21,6 +21,7 @@
             --azul-neon: #00a8ff;
             --rojo-rock: #e63946;
             --rojo-live: #ff1744;
+            --verde-maps: #34a853;
             --fuente-titulo: 'Bebas Neue', sans-serif;
             --fuente-cuerpo: 'Inter', sans-serif;
             --transicion: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -225,39 +226,33 @@
         }
         .event-card:hover::before { opacity: 1; }
 
-        /* ===== EVENTO EN VIVO ===== */
+        /* EN VIVO */
         .event-card.live {
             border-color: rgba(230, 57, 70, 0.55);
             box-shadow: 0 0 30px rgba(230, 57, 70, 0.18);
             background: linear-gradient(135deg, var(--gris-oscuro), #221012);
         }
         .event-card.live::before {
-            background: var(--rojo-rock);
-            opacity: 1;
+            background: var(--rojo-rock); opacity: 1;
             animation: liveBarPulse 1.6s ease-in-out infinite;
         }
         .event-card.live:hover {
             border-color: var(--rojo-rock);
             box-shadow: 0 0 45px rgba(230, 57, 70, 0.35);
-            background: linear-gradient(135deg, var(--gris-medio), #2a1315);
         }
-        .event-card.live .event-date .day {
-            color: var(--rojo-live);
-        }
-
+        .event-card.live .event-date .day { color: var(--rojo-live); }
         @keyframes liveBarPulse {
             0%, 100% { box-shadow: 0 0 0 rgba(230, 57, 70, 0); }
             50% { box-shadow: 0 0 15px rgba(230, 57, 70, 0.9); }
         }
 
-        /* ===== EVENTO PASADO ===== */
+        /* PASADO */
         .event-card.past { opacity: 0.72; }
         .event-card.past::before { background: var(--gris-claro); }
         .event-card.past:hover::before { opacity: 0.6; }
         .event-card.past .event-date .day { color: var(--gris-claro); }
-        .event-card.past .event-info .venue { color: var(--gris-claro); }
 
-        /* ===== BADGES ===== */
+        /* BADGES */
         .past-badge {
             display: inline-flex; align-items: center; gap: 0.4rem;
             font-size: 0.68rem; font-weight: 700;
@@ -270,13 +265,10 @@
             white-space: nowrap;
         }
         .past-badge::before {
-            content: '';
-            width: 6px; height: 6px; border-radius: 50%;
-            background: var(--gris-claro);
-            flex-shrink: 0;
+            content: ''; width: 6px; height: 6px; border-radius: 50%;
+            background: var(--gris-claro); flex-shrink: 0;
         }
 
-        /* Bloque "EN VIVO" con badge + texto */
         .live-block {
             display: flex; flex-direction: column;
             align-items: flex-end; gap: 0.4rem;
@@ -295,8 +287,7 @@
             white-space: nowrap;
         }
         .live-badge::before {
-            content: '';
-            width: 8px; height: 8px; border-radius: 50%;
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
             background: #fff;
             animation: liveDotBlink 1.1s ease-in-out infinite;
             flex-shrink: 0;
@@ -352,12 +343,66 @@
             letter-spacing: 1px; margin-bottom: 0.3rem;
         }
         .event-info p { color: var(--gris-claro); font-size: 0.85rem; }
-        .event-info .venue {
+
+        /* VENUE LINK (dirección → ruta más corta) */
+        .venue-link {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            color: var(--azul-neon); font-size: 0.8rem; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            transition: var(--transicion);
+            margin-bottom: 0.15rem;
+        }
+        .venue-link:hover { color: var(--blanco); }
+        .venue-link:hover .venue-pin { transform: translateY(-1px) scale(1.1); }
+        .venue-pin {
+            width: 13px; height: 13px;
+            flex-shrink: 0;
+            transition: var(--transicion);
+        }
+        .venue-text {
             color: var(--azul-neon); font-size: 0.8rem; font-weight: 600;
             letter-spacing: 1px; text-transform: uppercase;
         }
-        .event-card.live .event-info .venue {
-            color: var(--rojo-live);
+        .event-card.live .venue-link,
+        .event-card.live .venue-text { color: var(--rojo-live); }
+        .event-card.past .venue-link,
+        .event-card.past .venue-text { color: var(--gris-claro); }
+
+        /* Botón "Cómo llegar" */
+        .directions-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            margin-top: 0.5rem;
+            font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.2px;
+            color: var(--blanco);
+            background: rgba(52, 168, 83, 0.12);
+            border: 1px solid rgba(52, 168, 83, 0.4);
+            padding: 0.35rem 0.8rem;
+            border-radius: 50px;
+            transition: var(--transicion);
+            white-space: nowrap;
+        }
+        .directions-link:hover {
+            background: var(--verde-maps);
+            border-color: var(--verde-maps);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(52, 168, 83, 0.4);
+        }
+        .directions-link:active { transform: translateY(0); }
+        .directions-link svg {
+            width: 12px; height: 12px; fill: currentColor; flex-shrink: 0;
+        }
+        .event-card.live .directions-link {
+            background: rgba(255, 23, 68, 0.14);
+            border-color: rgba(255, 23, 68, 0.45);
+            color: #ff5577;
+        }
+        .event-card.live .directions-link:hover {
+            background: var(--rojo-live);
+            border-color: var(--rojo-live);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(255, 23, 68, 0.5);
         }
 
         .event-cta {
@@ -375,7 +420,7 @@
             border: 1px dashed #2a2a2a; border-radius: 10px; font-size: 0.9rem;
         }
 
-        /* ====== LIGHTBOX ====== */
+        /* LIGHTBOX */
         .lightbox {
             position: fixed; inset: 0; z-index: 5000;
             background: rgba(0, 0, 0, 0.95);
@@ -394,9 +439,7 @@
             box-shadow: 0 20px 60px rgba(0, 102, 255, 0.35);
             transform: scale(0.85);
             transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            user-select: none;
-            -webkit-user-drag: none;
-            pointer-events: none;
+            user-select: none; -webkit-user-drag: none; pointer-events: none;
         }
         .lightbox.open img { transform: scale(1); }
         .lightbox-close {
@@ -406,8 +449,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: var(--blanco); font-size: 1.4rem; font-weight: 300;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: var(--transicion);
-            z-index: 2;
+            transition: var(--transicion); z-index: 2;
         }
         .lightbox-close:hover {
             background: var(--azul-electrico); border-color: var(--azul-electrico);
@@ -421,10 +463,7 @@
             text-transform: uppercase; pointer-events: none;
             animation: hintPulse 2.5s ease-in-out infinite;
         }
-        @keyframes hintPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
+        @keyframes hintPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         @media (min-width: 769px) { .lightbox-hint { display: none; } }
 
         /* GALERÍA */
@@ -608,6 +647,7 @@
                 align-items: center; text-align: center; margin-top: 0.3rem;
             }
             .live-badge { font-size: 0.75rem; padding: 0.6rem 1.2rem; }
+            .directions-link { margin-top: 0.4rem; }
             .gallery-grid { grid-template-columns: repeat(2, 1fr); }
             .band-stats { grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
             .stat-number { font-size: 1.8rem; }
@@ -838,7 +878,7 @@
         </div>
     </footer>
 
-    <!-- ====== LIGHTBOX ====== -->
+    <!-- LIGHTBOX -->
     <div class="lightbox" id="lightbox" aria-hidden="true">
         <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar">✕</button>
         <img id="lightboxImg" alt="Flyer ampliado">
@@ -926,17 +966,47 @@
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
+        /* ========== GOOGLE MAPS HELPERS ========== */
+        // URL para VER el lugar en Maps (usa el link del admin si existe, o búsqueda por dirección)
+        function getMapsUrl(ev){
+            if(ev.mapsUrl && /^https?:\/\//i.test(ev.mapsUrl)) return ev.mapsUrl;
+            if(!ev.lugar) return null;
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.lugar)}`;
+        }
+
+        // URL para la RUTA MÁS CORTA desde la ubicación actual del visitante hasta el lugar.
+        // Si el evento tiene `mapsUrl`, intenta extraer el destino (coords o nombre) de ese link.
+        function getDirectionsUrl(ev){
+            if(!ev.lugar) return null;
+
+            let destino = ev.lugar;
+            if(ev.mapsUrl){
+                const coords = extraerCoordsDeMapsUrl(ev.mapsUrl);
+                if(coords) destino = coords;
+            }
+
+            return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destino)}`;
+        }
+
+        // Extrae "lat,lng" de una URL de Google Maps si existe, o devuelve null
+        function extraerCoordsDeMapsUrl(url){
+            // Ej: .../@-31.4201,-64.1888,15z
+            let m = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if(m) return `${m[1]},${m[2]}`;
+            // Ej: ...?q=-31.4201,-64.1888  |  ...&query=-31.4201,-64.1888
+            m = url.match(/[?&](?:q|query|destination)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if(m) return `${m[1]},${m[2]}`;
+            // Links cortos (maps.app.goo.gl) no tienen coords visibles, se usa la dirección
+            return null;
+        }
+
         /* ========== LIGHTBOX ========== */
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightboxImg');
         const lightboxClose = document.getElementById('lightboxClose');
 
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchStartTime = 0;
-        let imgStartX = 0;
-        let imgStartY = 0;
-        let isDragging = false;
+        let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+        let imgStartX = 0, imgStartY = 0, isDragging = false;
 
         function openLightbox(src, alt) {
             lightboxImg.src = src;
@@ -964,25 +1034,19 @@
         }
 
         lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox || e.target === lightboxClose) {
-                closeLightbox();
-            }
+            if (e.target === lightbox || e.target === lightboxClose) closeLightbox();
         });
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && lightbox.classList.contains('open')) {
-                closeLightbox();
-            }
+            if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
         });
 
         lightbox.addEventListener('touchstart', (e) => {
             if (!lightbox.classList.contains('open')) return;
             const t = e.touches[0];
-            touchStartX = t.clientX;
-            touchStartY = t.clientY;
+            touchStartX = t.clientX; touchStartY = t.clientY;
             touchStartTime = Date.now();
-            imgStartX = 0;
-            imgStartY = 0;
+            imgStartX = 0; imgStartY = 0;
             isDragging = true;
             lightboxImg.style.transition = 'none';
         }, { passive: true });
@@ -992,8 +1056,7 @@
             const t = e.touches[0];
             const dx = t.clientX - touchStartX;
             const dy = t.clientY - touchStartY;
-            imgStartX = dx;
-            imgStartY = dy;
+            imgStartX = dx; imgStartY = dy;
             const opacity = Math.max(0.3, 1 - Math.abs(dx + dy) / 800);
             lightboxImg.style.transform = `translate(${dx}px, ${dy}px) scale(${Math.max(0.85, 1 - Math.abs(dx + dy) / 1500)})`;
             lightboxImg.style.opacity = opacity;
@@ -1005,18 +1068,14 @@
             const elapsed = Date.now() - touchStartTime;
             const dist = Math.sqrt(imgStartX * imgStartX + imgStartY * imgStartY);
             const velocity = dist / Math.max(elapsed, 1);
-
             lightbox.style.background = '';
-
             if (dist > 80 || velocity > 0.5) {
                 closeLightbox();
             } else {
                 lightboxImg.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
                 lightboxImg.style.transform = '';
                 lightboxImg.style.opacity = '';
-                setTimeout(() => {
-                    lightboxImg.style.transition = '';
-                }, 260);
+                setTimeout(() => { lightboxImg.style.transition = ''; }, 260);
                 isDragging = false;
             }
         });
@@ -1027,14 +1086,10 @@
 
         window.openLightbox = openLightbox;
 
-        /* ========== FECHAS DE EVENTOS ========== */
-        // Devuelve el rango horario [inicio, fin) de un evento.
-        // - Si hay hora (ej: "21:00 hs"), la ventana es [inicio, inicio + 1h].
-        // - Si no hay hora, la ventana es [00:00, 24:00) de ese día.
+        /* ========== VENTANA TEMPORAL DE EVENTO ========== */
         function getEventWindow(fecha, hora) {
             const inicio = new Date(fecha + 'T00:00:00');
-            let duracionMs = 24 * 60 * 60 * 1000; // por defecto: todo el día
-
+            let duracionMs = 24 * 60 * 60 * 1000;
             if (hora) {
                 const m = String(hora).match(/(\d{1,2})[:.](\d{1,2})/);
                 if (m) {
@@ -1042,7 +1097,7 @@
                     const min = parseInt(m[2], 10);
                     if (!isNaN(h) && !isNaN(min)) {
                         inicio.setHours(h, min, 0, 0);
-                        duracionMs = 60 * 60 * 1000; // 1 hora
+                        duracionMs = 60 * 60 * 1000;
                     }
                 }
             }
@@ -1050,7 +1105,6 @@
             return { inicio, fin };
         }
 
-        // Determina el estado del evento: 'proximo' | 'live' | 'pasado'
         function getEstado(ev, ahora) {
             const { inicio, fin } = getEventWindow(ev.fecha, ev.hora);
             if (ahora < inicio) return 'proximo';
@@ -1058,7 +1112,7 @@
             return 'pasado';
         }
 
-        /* ========== RENDER EVENTOS ========== */
+        /* ========== RENDER ========== */
         let cachedEventos = [];
 
         function renderEventos() {
@@ -1092,7 +1146,28 @@
 
                 const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
 
-                // Acción según estado
+                // ===== Dirección clickeable → RUTA más corta =====
+                const directionsUrl = getDirectionsUrl(ev);
+                const lugarHtml = (estado !== 'pasado' && directionsUrl)
+                    ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="venue-link" title="Trazar ruta más corta en Google Maps">
+                           <svg class="venue-pin" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
+                           </svg>
+                           ${escapeHtml(ev.lugar)}
+                       </a>`
+                    : `<span class="venue-text">${escapeHtml(ev.lugar)}</span>`;
+
+                // ===== Botón "Cómo llegar" (solo si NO es pasado) =====
+                const directionsHtml = (estado !== 'pasado' && directionsUrl)
+                    ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="directions-link" title="Ruta más corta en Google Maps">
+                           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                               <path d="M21.71 11.29l-9-9a.996.996 0 00-1.41 0l-9 9a.996.996 0 000 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 000-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/>
+                           </svg>
+                           Cómo llegar
+                       </a>`
+                    : '';
+
+                // ===== Acción según estado =====
                 let accionHtml = '';
                 if (estado === 'proximo') {
                     accionHtml = `<button class="event-cta"
@@ -1120,15 +1195,15 @@
                         </div>
                         <div class="event-info">
                             <h4>${escapeHtml(ev.titulo)}</h4>
-                            <p class="venue">${escapeHtml(ev.lugar)}</p>
+                            ${lugarHtml}
                             ${extraInfo ? `<p>${escapeHtml(extraInfo)}</p>` : ''}
+                            ${directionsHtml}
                         </div>
                         ${accionHtml}
                     </div>`;
             }).join('');
         }
 
-        // Auto-refresh cada 60 segundos (no molesta si el lightbox está abierto)
         function scheduleRefresh() {
             setInterval(() => {
                 if (!lightbox.classList.contains('open')) {
@@ -1162,7 +1237,6 @@
                 const snap = await getDocs(collection(db, "eventos"));
                 cachedEventos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                // Ordenar: por campo `orden` (drag&drop del admin), fallback a fecha
                 cachedEventos.sort((a, b) => {
                     const oa = typeof a.orden === 'number' ? a.orden : Infinity;
                     const ob = typeof b.orden === 'number' ? b.orden : Infinity;
