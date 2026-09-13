@@ -1,0 +1,23 @@
+{
+  "updated": "2025-01-01T00:00:00.000Z",
+  "eventos": [
+    {
+      "id": "ejemplo1",
+      "fecha": "2025-03-15",
+      "hora": "21:00 hs",
+      "titulo": "Taxi Blue en Vivo",
+      "lugar": "La Bodega · Villa María, Córdoba",
+      "descripcion": "Una noche de clásicos de los 80 y 90.",
+      "flyer": null
+    },
+    {
+      "id": "ejemplo2",
+      "fecha": "2025-03-22",
+      "hora": "22:00 hs",
+      "titulo": "Especial Gustavo Cerati",
+      "lugar": "Teatro Real · Córdoba Capital",
+      "descripcion": "Homenaje sinfónico a Cerati.",
+      "flyer": null
+    }
+  ]
+}
