@@ -125,6 +125,7 @@ a{color:inherit;text-decoration:none;}
   cursor:pointer;transition:var(--trans);position:relative;overflow:hidden;
 }
 .flyer-upload:hover{border-color:var(--azul);background:rgba(0,102,255,.05);}
+.flyer-upload.processing{opacity:.6;pointer-events:none;}
 .flyer-upload input{display:none;}
 .flyer-upload .icon{font-size:2.2rem;margin-bottom:.5rem;opacity:.7;}
 .flyer-upload .text{font-size:.8rem;color:var(--gris-claro);}
@@ -136,6 +137,11 @@ a{color:inherit;text-decoration:none;}
   position:absolute;top:.5rem;right:.5rem;background:var(--rojo);color:#fff;border:none;
   width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;font-weight:700;
 }
+.flyer-info{
+  font-size:.7rem;color:var(--gris-claro);margin-top:.5rem;text-align:center;
+  letter-spacing:.3px;
+}
+.flyer-info strong{color:var(--verde);}
 
 .drag-hint{
   font-size:.72rem;color:var(--gris-claro);background:rgba(0,102,255,.08);
@@ -329,7 +335,7 @@ a{color:inherit;text-decoration:none;}
     <!-- FORM -->
     <div class="card">
       <h2 class="section-title" id="formTitle">NUEVO <span>EVENTO</span></h2>
-      <p class="section-sub">Completá los datos y guardá. El flyer es opcional (JPG/PNG).</p>
+      <p class="section-sub">Completá los datos y guardá. El flyer se comprime automáticamente.</p>
       <form onsubmit="saveEvent(event)">
         <input type="hidden" id="editId">
         <div class="form-row">
@@ -371,15 +377,16 @@ a{color:inherit;text-decoration:none;}
         </div>
         <div class="form-group">
           <label>Flyer del evento (JPG/PNG · opcional)</label>
-          <div class="flyer-upload" onclick="document.getElementById('flyerInput').click()">
+          <div class="flyer-upload" id="flyerUpload" onclick="document.getElementById('flyerInput').click()">
             <input type="file" id="flyerInput" accept="image/jpeg,image/jpg,image/png" onchange="handleFlyer(event)">
             <div class="icon">🖼️</div>
-            <div class="text">Hacé click o arrastrá una imagen<br><strong>JPG / PNG</strong> · máx. 800 KB</div>
+            <div class="text">Hacé click o arrastrá una imagen<br><strong>JPG / PNG</strong> · se comprime automáticamente</div>
           </div>
           <div class="flyer-preview" id="flyerPreview">
             <img id="flyerImg" alt="Flyer">
             <button type="button" class="remove" onclick="removeFlyer()">✕</button>
           </div>
+          <div class="flyer-info" id="flyerInfo" style="display:none;"></div>
         </div>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
           <button type="submit" class="btn btn-primary" style="flex:1;">💾 Guardar Evento</button>
@@ -494,8 +501,8 @@ const LOGS_COL = "logs";
 
 const OWNER_EMAIL = 'sebagsc2020@gmail.com';
 const MAX_FLYER_KB = 800;
-const LOGS_FETCH_LIMIT = 300;  // traemos más
-const LOGS_DISPLAY_LIMIT = 100; // mostramos los últimos 100
+const LOGS_FETCH_LIMIT = 300;
+const LOGS_DISPLAY_LIMIT = 100;
 
 let flyerBase64 = null;
 let events = [];
@@ -529,6 +536,84 @@ async function logAction(action, details){
   } catch(e){
     console.warn('[Log] No se pudo registrar:', e.code, e.message);
   }
+}
+
+/* ========== COMPRESIÓN DE IMAGEN ========== */
+// Convierte un File a base64 JPEG comprimido por debajo de maxKB
+// Devuelve { base64, originalBytes, compressedBytes, width, height }
+async function compressImage(file, maxKB){
+  const maxBytes = maxKB * 1024;
+
+  // 1. Leer archivo como Data URL
+  const originalDataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  // 2. Cargar como imagen
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = reject;
+    i.src = originalDataUrl;
+  });
+
+  // 3. Preparar canvas con dimensiones máximas razonables
+  const MAX_DIM = 1600;
+  let width = img.naturalWidth || img.width;
+  let height = img.naturalHeight || img.height;
+  if (width > MAX_DIM || height > MAX_DIM){
+    const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+    width = Math.round(width * ratio);
+    height = Math.round(height * ratio);
+  }
+
+  // 4. Reducir iterativamente hasta que quede por debajo del límite
+  let quality = 0.9;
+  let dataUrl = '';
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Ciclo externo: reduce dimensiones si hace falta
+  for (let attempt = 0; attempt < 6; attempt++){
+    canvas.width = width;
+    canvas.height = height;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+
+    // Ciclo interno: baja calidad
+    quality = 0.9;
+    dataUrl = canvas.toDataURL('image/jpeg', quality);
+    while (dataUrl.length > maxBytes && quality > 0.35){
+      quality = Math.round((quality - 0.1) * 10) / 10;
+      dataUrl = canvas.toDataURL('image/jpeg', quality);
+    }
+
+    if (dataUrl.length <= maxBytes) break;
+
+    // Reducir dimensiones un 15% y reintentar
+    width = Math.round(width * 0.85);
+    height = Math.round(height * 0.85);
+    if (width < 400 || height < 400) break; // no reducir más allá de cierto punto
+  }
+
+  // Nota: length de base64 ≈ bytes reales * 1.37. Ya estamos midiendo base64,
+  // así que comparamos contra maxBytes directamente (el "peso" que le importa al user).
+  return {
+    base64: dataUrl,
+    originalBytes: file.size,
+    compressedBytes: Math.round(dataUrl.length * 0.75),
+    width, height
+  };
+}
+
+function formatBytes(b){
+  if (b < 1024) return b + ' B';
+  if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB';
+  return (b / (1024 * 1024)).toFixed(2) + ' MB';
 }
 
 /* ========== LOGIN ========== */
@@ -762,11 +847,9 @@ async function showLogsModal(){
   list.innerHTML = '<div class="log-empty">Cargando...</div>';
 
   try {
-    // Traemos más registros para poder filtrar los del owner y mostrar 100 reales
     const q = query(collection(db, LOGS_COL), orderBy('timestamp','desc'), limit(LOGS_FETCH_LIMIT));
     const snap = await getDocs(q);
 
-    // ✨ FILTRO: excluimos las acciones hechas por el owner
     const ownerLower = OWNER_EMAIL.toLowerCase();
     const filtered = snap.docs.filter(d => {
       const log = d.data();
@@ -915,25 +998,55 @@ function probarMapsUrl(){
 }
 
 /* ========== FORM ========== */
-function handleFlyer(e){
+async function handleFlyer(e){
   const file = e.target.files[0];
   if(!file) return;
-  if(!/image\/(jpeg|jpg|png)/.test(file.type)){ toast('Solo JPG o PNG','error'); return; }
-  if(file.size > MAX_FLYER_KB * 1024){ toast(`Máximo ${MAX_FLYER_KB} KB.`,'error'); return; }
-  const reader = new FileReader();
-  reader.onload = ev => {
-    flyerBase64 = ev.target.result;
+
+  // Solo JPG / PNG
+  if(!/image\/(jpeg|jpg|png)/.test(file.type)){
+    toast('Solo se permiten JPG o PNG','error');
+    e.target.value = '';
+    return;
+  }
+
+  const uploadBox = document.getElementById('flyerUpload');
+  const infoBox = document.getElementById('flyerInfo');
+
+  uploadBox.classList.add('processing');
+  infoBox.style.display = 'block';
+  infoBox.innerHTML = '⏳ Comprimiendo imagen...';
+
+  try {
+    const result = await compressImage(file, MAX_FLYER_KB);
+
+    // Guardamos el base64 comprimido
+    flyerBase64 = result.base64;
     document.getElementById('flyerImg').src = flyerBase64;
     document.getElementById('flyerPreview').classList.add('show');
-  };
-  reader.readAsDataURL(file);
+
+    // Mostramos info al usuario
+    const orig = formatBytes(result.originalBytes);
+    const comp = formatBytes(result.compressedBytes);
+    const pct = Math.round((1 - result.compressedBytes / result.originalBytes) * 100);
+    infoBox.innerHTML = `✅ Comprimido: <strong>${orig} → ${comp}</strong> (-${pct}%) · ${result.width}×${result.height}px`;
+  } catch (err){
+    console.error('[Compress]', err);
+    toast('❌ Error al comprimir la imagen','error');
+    infoBox.style.display = 'none';
+  } finally {
+    uploadBox.classList.remove('processing');
+  }
 }
+
 function removeFlyer(){
   flyerBase64 = null;
   document.getElementById('flyerInput').value = '';
   document.getElementById('flyerPreview').classList.remove('show');
   document.getElementById('flyerImg').src = '';
+  document.getElementById('flyerInfo').style.display = 'none';
+  document.getElementById('flyerInfo').innerHTML = '';
 }
+
 function resetForm(){
   document.getElementById('editId').value = '';
   document.getElementById('fecha').value = '';
@@ -991,6 +1104,8 @@ async function saveEvent(e){
     console.error('[saveEvent]', err.code, err.message);
     if(err.code === 'permission-denied'){
       toast('❌ Sin permisos. Verificá las reglas de Firestore.','error');
+    } else if(err.message && err.message.includes('too large')){
+      toast('❌ El evento es demasiado grande. Probá con un flyer más liviano.','error');
     } else {
       toast('❌ Error al guardar','error');
     }
@@ -1010,7 +1125,13 @@ function editEvent(id){
     flyerBase64 = ev.flyer;
     document.getElementById('flyerImg').src = ev.flyer;
     document.getElementById('flyerPreview').classList.add('show');
-  } else { removeFlyer(); }
+    // Info aproximada del flyer actual
+    const aproxBytes = Math.round(ev.flyer.length * 0.75);
+    document.getElementById('flyerInfo').style.display = 'block';
+    document.getElementById('flyerInfo').innerHTML = `📎 Flyer actual: <strong>${formatBytes(aproxBytes)}</strong>`;
+  } else {
+    removeFlyer();
+  }
   document.getElementById('formTitle').innerHTML = 'EDITAR <span>EVENTO</span>';
   window.scrollTo({top:0,behavior:'smooth'});
 }
