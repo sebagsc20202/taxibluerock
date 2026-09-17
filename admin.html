@@ -47,7 +47,15 @@ a{color:inherit;text-decoration:none;}
   cursor:pointer;transition:var(--trans);font-family:var(--fuente-cuerpo);
 }
 .login-card button:hover{background:var(--azul-neon);box-shadow:0 0 25px rgba(0,102,255,.5);}
-.login-error{color:var(--rojo);font-size:.85rem;margin-top:1rem;display:none;font-weight:600;}
+.login-error{
+  color:var(--rojo);font-size:.8rem;margin-top:1rem;display:none;font-weight:600;
+  background:rgba(230,57,70,.08);border:1px solid rgba(230,57,70,.3);border-radius:6px;
+  padding:.7rem;line-height:1.5;word-break:break-all;
+}
+.login-error code{
+  background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px;
+  font-family:monospace;font-size:.75rem;color:var(--azul-neon);
+}
 
 /* PANEL */
 .panel{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;display:none;}
@@ -206,7 +214,6 @@ a{color:inherit;text-decoration:none;}
 }
 .modal-close:hover{border-color:var(--rojo);color:var(--rojo);}
 
-/* Lista de usuarios */
 .user-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;}
 .user-item{
   background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;
@@ -279,7 +286,7 @@ a{color:inherit;text-decoration:none;}
     <input type="email" id="emailInput" placeholder="Email" autocomplete="email">
     <input type="password" id="passInput" placeholder="Contraseña" autocomplete="current-password">
     <button onclick="tryLogin()">Ingresar</button>
-    <div class="login-error" id="loginError">Email o contraseña incorrectos.</div>
+    <div class="login-error" id="loginError"></div>
   </div>
 </div>
 
@@ -477,6 +484,15 @@ let unsubscribeAdmins = null;
 let sortableInstance = null;
 let isReordering = false;
 let adminsList = [];
+let verifyingAdmin = false; // ← evita doble verificación
+
+/* ========== SAFE DESTROY ========== */
+function safeDestroySortable(){
+  if(sortableInstance){
+    try { sortableInstance.destroy(); } catch(e){ /* silencioso */ }
+    sortableInstance = null;
+  }
+}
 
 /* ========== AUTENTICACIÓN ========== */
 async function tryLogin(){
@@ -486,29 +502,63 @@ async function tryLogin(){
     showLoginError('Completá todos los campos.');
     return;
   }
+
+  // 1. Autenticar
+  let cred;
   try {
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-    // Verificar que el UID esté en la colección de admins
+    cred = await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    console.error('[Login] Error autenticando:', error.code, error.message);
+    let msg = 'Email o contraseña incorrectos.';
+    if(error.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Esperá unos minutos.';
+    if(error.code === 'auth/network-request-failed') msg = 'Sin conexión. Revisá tu internet.';
+    showLoginError(msg);
+    return;
+  }
+
+  // 2. Verificar que el UID esté en la colección admins
+  verifyingAdmin = true;
+  try {
     const adminDoc = await getDoc(doc(db, ADMINS_COL, cred.user.uid));
     if(!adminDoc.exists()){
+      // Definitivamente NO existe el doc → signOut
       await signOut(auth);
-      showLoginError('Tu cuenta no tiene permisos de administrador.');
+      showLoginError(
+        `Tu UID no tiene permisos de administrador.<br><br>` +
+        `UID de tu cuenta: <code>${cred.user.uid}</code><br><br>` +
+        `Copiá ese UID y creá un documento en Firestore → colección <code>admins</code> con ese ID.`
+      );
       return;
     }
-    document.getElementById('loginError').style.display = 'none';
+    // ✅ Todo OK
+    hideLoginError();
   } catch (error) {
-    console.error(error);
-    showLoginError('Email o contraseña incorrectos.');
+    // Error de red / permisos → NO deslogueamos
+    console.error('[Login] Error verificando admin:', error.code, error.message);
+    showLoginError(
+      `No se pudo verificar tus permisos: ${error.code || error.message}<br><br>` +
+      `Revisá las reglas de Firestore.`
+    );
+  } finally {
+    verifyingAdmin = false;
   }
 }
 
-function showLoginError(msg){
+function showLoginError(html){
   const err = document.getElementById('loginError');
-  err.textContent = msg;
+  err.innerHTML = html;
   err.style.display = 'block';
+}
+function hideLoginError(){
+  const err = document.getElementById('loginError');
+  err.innerHTML = '';
+  err.style.display = 'none';
 }
 
 onAuthStateChanged(auth, async (user) => {
+  // Mientras se está verificando el admin, no hacemos nada
+  if(verifyingAdmin) return;
+
   if (user) {
     document.getElementById('topbarUser').innerHTML = `👤 <strong>${user.email}</strong>`;
     document.getElementById('loginScreen').classList.add('hidden');
@@ -518,9 +568,11 @@ onAuthStateChanged(auth, async (user) => {
   } else {
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('panel').classList.remove('active');
-    if (unsubscribe) unsubscribe();
-    if (unsubscribeAdmins) unsubscribeAdmins();
-    if (sortableInstance) sortableInstance.destroy();
+    try { if (unsubscribe) unsubscribe(); } catch(_){}
+    try { if (unsubscribeAdmins) unsubscribeAdmins(); } catch(_){}
+    unsubscribe = null;
+    unsubscribeAdmins = null;
+    safeDestroySortable();
   }
 });
 
@@ -530,16 +582,21 @@ function logout(){
 
 /* ========== GESTIÓN DE USUARIOS ========== */
 function subscribeAdmins(){
-  unsubscribeAdmins = onSnapshot(collection(db, ADMINS_COL), (snap) => {
-    adminsList = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-    renderUsers();
-  }, (err) => {
-    console.error('Error leyendo admins:', err);
-  });
+  try {
+    unsubscribeAdmins = onSnapshot(collection(db, ADMINS_COL), (snap) => {
+      adminsList = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+      renderUsers();
+    }, (err) => {
+      console.error('[Admins] onSnapshot error:', err.code, err.message);
+    });
+  } catch(e){
+    console.error('[Admins] No se pudo suscribir:', e);
+  }
 }
 
 function renderUsers(){
   const list = document.getElementById('userList');
+  if(!list) return;
   if(!adminsList.length){
     list.innerHTML = '<div class="empty-state">No hay usuarios administradores.</div>';
     return;
@@ -585,7 +642,6 @@ async function addUser(event){
 
   let secondaryApp;
   try {
-    // Creamos una app secundaria para no perder la sesión del admin actual
     const secondaryName = 'Secondary' + Date.now();
     secondaryApp = initializeApp(firebaseConfig, secondaryName);
     const secondaryAuth = getAuth(secondaryApp);
@@ -593,10 +649,8 @@ async function addUser(event){
     const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
     const newUid = cred.user.uid;
 
-    // Cerramos la sesión en la app secundaria
     await signOut(secondaryAuth);
 
-    // Guardamos el nuevo admin en Firestore
     await setDoc(doc(db, ADMINS_COL, newUid), {
       email: email,
       createdAt: serverTimestamp()
@@ -652,7 +706,6 @@ function hideChangePasswordModal(){
   document.getElementById('changePasswordModal').classList.remove('show');
 }
 
-// Cerrar modales clickeando el fondo
 document.getElementById('usersModal').addEventListener('click', (e)=>{
   if(e.target.id === 'usersModal') hideUsersModal();
 });
@@ -691,65 +744,71 @@ async function changePassword(event){
 
 /* ========== FIRESTORE: escucha de eventos ========== */
 function subscribeEvents(){
-  unsubscribe = onSnapshot(collection(db, COL), (snap) => {
-    if(isReordering) return;
-    events = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    events.sort((a, b) => {
-      const oa = typeof a.orden === 'number' ? a.orden : Infinity;
-      const ob = typeof b.orden === 'number' ? b.orden : Infinity;
-      if (oa !== ob) return oa - ob;
-      return (a.fecha || '').localeCompare(b.fecha || '');
+  try {
+    unsubscribe = onSnapshot(collection(db, COL), (snap) => {
+      if(isReordering) return;
+      events = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      events.sort((a, b) => {
+        const oa = typeof a.orden === 'number' ? a.orden : Infinity;
+        const ob = typeof b.orden === 'number' ? b.orden : Infinity;
+        if (oa !== ob) return oa - ob;
+        return (a.fecha || '').localeCompare(b.fecha || '');
+      });
+      renderEvents();
+      initSortable();
+    }, (err) => {
+      console.error('[Eventos] onSnapshot error:', err.code, err.message);
     });
-    renderEvents();
-    initSortable();
-  }, (err) => {
-    console.error(err);
-    toast('❌ Error al leer Firestore.','error');
-  });
+  } catch(e){
+    console.error('[Eventos] No se pudo suscribir:', e);
+  }
 }
 
 /* ========== SORTABLE ========== */
 function initSortable(){
   const el = document.getElementById('eventsList');
   if(!el) return;
-  if(sortableInstance){
-    try { sortableInstance.destroy(); } catch(_) {}
-    sortableInstance = null;
-  }
+
+  safeDestroySortable();
+
   if(!events.length) return;
 
-  sortableInstance = Sortable.create(el, {
-    animation: 180,
-    handle: '.drag-handle',
-    ghostClass: 'drag-ghost',
-    dragClass: 'dragging',
-    forceFallback: true,
-    fallbackOnBody: true,
-    fallbackClass: 'drag-ghost',
-    delay: 150,
-    delayOnTouchOnly: true,
-    touchStartThreshold: 8,
-    onEnd: async (evt) => {
-      if(evt.oldIndex === evt.newIndex) return;
-      const [moved] = events.splice(evt.oldIndex, 1);
-      events.splice(evt.newIndex, 0, moved);
-      isReordering = true;
-      try {
-        const batch = writeBatch(db);
-        events.forEach((ev, i) => {
-          ev.orden = i;
-          batch.update(doc(db, COL, ev.id), { orden: i });
-        });
-        await batch.commit();
-        toast('✅ Orden guardado','success');
-      } catch(err){
-        console.error(err);
-        toast('❌ No se pudo guardar el orden.','error');
-      } finally {
-        setTimeout(() => { isReordering = false; }, 700);
+  try {
+    sortableInstance = Sortable.create(el, {
+      animation: 180,
+      handle: '.drag-handle',
+      ghostClass: 'drag-ghost',
+      dragClass: 'dragging',
+      forceFallback: true,
+      fallbackOnBody: true,
+      fallbackClass: 'drag-ghost',
+      delay: 150,
+      delayOnTouchOnly: true,
+      touchStartThreshold: 8,
+      onEnd: async (evt) => {
+        if(evt.oldIndex === evt.newIndex) return;
+        const [moved] = events.splice(evt.oldIndex, 1);
+        events.splice(evt.newIndex, 0, moved);
+        isReordering = true;
+        try {
+          const batch = writeBatch(db);
+          events.forEach((ev, i) => {
+            ev.orden = i;
+            batch.update(doc(db, COL, ev.id), { orden: i });
+          });
+          await batch.commit();
+          toast('✅ Orden guardado','success');
+        } catch(err){
+          console.error(err);
+          toast('❌ No se pudo guardar el orden.','error');
+        } finally {
+          setTimeout(() => { isReordering = false; }, 700);
+        }
       }
-    }
-  });
+    });
+  } catch(e){
+    console.error('[Sortable] No se pudo inicializar:', e);
+  }
 }
 
 /* ========== GOOGLE MAPS HELPERS ========== */
@@ -877,6 +936,7 @@ async function deleteEvent(id){
 function renderEvents(){
   const list = document.getElementById('eventsList');
   const count = document.getElementById('eventsCount');
+  if(!list || !count) return;
   count.textContent = `${events.length} evento${events.length!==1?'s':''} programado${events.length!==1?'s':''}`;
 
   if(!events.length){
