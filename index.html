@@ -402,7 +402,7 @@
         }
         .event-info p { color: var(--gris-claro); font-size: 0.85rem; }
 
-        /* VENUE LINK (dirección → ruta más corta) */
+        /* VENUE LINK */
         .venue-link {
             display: inline-flex; align-items: center; gap: 0.35rem;
             color: var(--azul-neon); font-size: 0.8rem; font-weight: 600;
@@ -1201,7 +1201,6 @@
 
                 const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
 
-                // Dirección → ruta más corta (solo si NO es pasado)
                 const directionsUrl = getDirectionsUrl(ev);
                 const lugarHtml = (estado !== 'pasado' && directionsUrl)
                     ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="venue-link" title="Trazar ruta más corta en Google Maps">
@@ -1267,14 +1266,14 @@
             }, 60000);
         }
 
-        /* ========== CARGAR DESDE FIRESTORE ========== */
+        /* ========== CARGAR DESDE FIRESTORE (TIEMPO REAL) ========== */
         async function loadEventos() {
             const list = document.getElementById('eventsList');
             if (!list) return;
 
             try {
                 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-                const { getFirestore, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+                const { getFirestore, collection, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
                 const firebaseConfig = {
                     apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
@@ -1289,37 +1288,46 @@
                 const app = initializeApp(firebaseConfig);
                 const db = getFirestore(app);
 
-                const snap = await getDocs(collection(db, "eventos"));
-                const todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                // 🔴 onSnapshot: escucha en tiempo real
+                onSnapshot(collection(db, "eventos"), (snap) => {
+                    const todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                // ✨ Filtro: solo eventos CONFIRMADOS
-                // Borradores y cancelados NO se muestran al público
-                const eventos = todos.filter(e => {
-                    const est = e.estado || 'confirmado';
-                    return est === 'confirmado';
+                    // Filtro: solo eventos CONFIRMADOS
+                    // Borradores y cancelados NO se muestran al público
+                    const eventos = todos.filter(e => {
+                        const est = e.estado || 'confirmado';
+                        return est === 'confirmado';
+                    });
+
+                    // Ordenar por campo `orden` (drag&drop del admin), fallback a fecha
+                    eventos.sort((a, b) => {
+                        const oa = typeof a.orden === 'number' ? a.orden : Infinity;
+                        const ob = typeof b.orden === 'number' ? b.orden : Infinity;
+                        if (oa !== ob) return oa - ob;
+                        return (a.fecha || '').localeCompare(b.fecha || '');
+                    });
+
+                    // Remarcados primero
+                    eventos.sort((a, b) => {
+                        const ra = (a.categoria || '') === 'remarcado' ? 0 : 1;
+                        const rb = (b.categoria || '') === 'remarcado' ? 0 : 1;
+                        return ra - rb;
+                    });
+
+                    cachedEventos = eventos;
+                    renderEventos();
+                }, (err) => {
+                    console.error('Error en tiempo real Firestore:', err);
+                    list.innerHTML = `<div class="events-empty" style="border-color:#e63946;color:#e63946;">
+                        No se pudieron cargar los eventos. Revisá la consola.
+                    </div>`;
                 });
 
-                // Ordenar por campo `orden` (drag&drop del admin), fallback a fecha
-                eventos.sort((a, b) => {
-                    const oa = typeof a.orden === 'number' ? a.orden : Infinity;
-                    const ob = typeof b.orden === 'number' ? b.orden : Infinity;
-                    if (oa !== ob) return oa - ob;
-                    return (a.fecha || '').localeCompare(b.fecha || '');
-                });
-
-                // ✨ Remarcados primero
-                eventos.sort((a, b) => {
-                    const ra = (a.categoria || '') === 'remarcado' ? 0 : 1;
-                    const rb = (b.categoria || '') === 'remarcado' ? 0 : 1;
-                    return ra - rb;
-                });
-
-                cachedEventos = eventos;
-                renderEventos();
+                // Refresco cada 60s para actualizar el estado "EN VIVO" (basado en hora actual)
                 scheduleRefresh();
 
             } catch (err) {
-                console.error('Error al cargar eventos desde Firestore:', err);
+                console.error('Error al inicializar Firestore:', err);
                 list.innerHTML = `<div class="events-empty" style="border-color:#e63946;color:#e63946;">
                     No se pudieron cargar los eventos. Revisá la consola.
                 </div>`;
