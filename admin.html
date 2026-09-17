@@ -13,6 +13,7 @@
   --negro:#0a0a0a; --negro-suave:#111; --gris-oscuro:#1a1a1a;
   --gris-medio:#2a2a2a; --gris-claro:#888; --blanco:#f0f0f0;
   --azul:#0066ff; --azul-neon:#00a8ff; --rojo:#e63946; --verde:#25D366;
+  --amarillo:#f5a623;
   --fuente-titulo:'Bebas Neue',sans-serif; --fuente-cuerpo:'Inter',sans-serif;
   --trans:all .3s cubic-bezier(.25,.46,.45,.94);
 }
@@ -37,8 +38,7 @@ a{color:inherit;text-decoration:none;}
 .login-card input{
   width:100%;padding:1rem;background:var(--negro);border:1px solid var(--gris-medio);
   border-radius:8px;color:var(--blanco);font-size:1rem;text-align:center;
-  font-family:var(--fuente-cuerpo);outline:none;transition:var(--trans);
-  margin-bottom: 1rem;
+  font-family:var(--fuente-cuerpo);outline:none;transition:var(--trans);margin-bottom:1rem;
 }
 .login-card input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,102,255,.2);}
 .login-card button{
@@ -95,9 +95,7 @@ a{color:inherit;text-decoration:none;}
 
 .admin-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:2rem;align-items:start;}
 
-.card{
-  background:var(--gris-oscuro);border:1px solid var(--gris-medio);border-radius:12px;padding:1.8rem;
-}
+.card{background:var(--gris-oscuro);border:1px solid var(--gris-medio);border-radius:12px;padding:1.8rem;}
 .form-group{margin-bottom:1.2rem;}
 .form-group label{
   display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;
@@ -114,12 +112,8 @@ a{color:inherit;text-decoration:none;}
 
 .input-with-btn{display:flex;gap:.5rem;align-items:stretch;}
 .input-with-btn input{flex:1;min-width:0;}
-.btn-icon{
-  padding:0;width:44px;height:44px;justify-content:center;font-size:1.1rem;flex-shrink:0;
-}
-.field-hint{
-  font-size:.7rem;color:var(--gris-claro);margin-top:.4rem;line-height:1.5;
-}
+.btn-icon{padding:0;width:44px;height:44px;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.field-hint{font-size:.7rem;color:var(--gris-claro);margin-top:.4rem;line-height:1.5;}
 .field-hint strong{color:var(--azul-neon);font-weight:600;}
 
 .flyer-upload{
@@ -171,13 +165,12 @@ a{color:inherit;text-decoration:none;}
 .event-thumb{
   width:50px;height:50px;border-radius:6px;object-fit:cover;flex-shrink:0;
   border:1px solid var(--gris-medio);
-  -webkit-user-drag: none;user-drag: none;pointer-events: none;
+  -webkit-user-drag:none;user-drag:none;pointer-events:none;
 }
 .drag-handle{
   cursor:grab;color:var(--gris-claro);font-size:1.1rem;letter-spacing:-3px;
   padding:.4rem .35rem;user-select:none;-webkit-user-select:none;
-  touch-action:none;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
+  touch-action:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .drag-handle:active{cursor:grabbing;color:var(--azul);}
 
@@ -203,7 +196,7 @@ a{color:inherit;text-decoration:none;}
 .modal-backdrop.show{display:flex;animation:fadeIn .25s;}
 .modal{
   background:var(--gris-oscuro);border:1px solid var(--gris-medio);border-radius:14px;
-  width:100%;max-width:520px;max-height:90vh;overflow-y:auto;
+  width:100%;max-width:560px;max-height:90vh;overflow-y:auto;
   padding:2rem;box-shadow:0 25px 70px rgba(0,0,0,.7);
 }
 .modal .section-title{margin-bottom:.3rem;}
@@ -214,20 +207,18 @@ a{color:inherit;text-decoration:none;}
 }
 .modal-close:hover{border-color:var(--rojo);color:var(--rojo);}
 
+/* Usuarios */
 .user-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;}
 .user-item{
   background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;
-  padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;
-  gap:.8rem;
+  padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;
 }
 .user-item .info{flex:1;min-width:0;}
 .user-item .email{
   font-size:.85rem;font-weight:600;color:var(--blanco);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.user-item .meta{
-  font-size:.68rem;color:var(--gris-claro);letter-spacing:.5px;margin-top:.15rem;
-}
+.user-item .meta{font-size:.68rem;color:var(--gris-claro);letter-spacing:.5px;margin-top:.15rem;}
 .user-item .badge-you{
   display:inline-block;background:rgba(0,102,255,.15);color:var(--azul-neon);
   font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
@@ -241,9 +232,31 @@ a{color:inherit;text-decoration:none;}
 .user-item .del-user:hover{border-color:var(--rojo);color:var(--rojo);}
 .user-item .del-user:disabled{opacity:.3;cursor:not-allowed;}
 
-.divider{
-  height:1px;background:var(--gris-medio);margin:1.5rem 0;
+/* Logs */
+.log-list{display:flex;flex-direction:column;gap:.5rem;}
+.log-item{
+  background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;
+  padding:.8rem 1rem;display:flex;gap:.8rem;align-items:flex-start;
 }
+.log-icon{
+  width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.log-icon.create{background:rgba(37,211,102,.15);color:var(--verde);}
+.log-icon.update{background:rgba(0,102,255,.15);color:var(--azul-neon);}
+.log-icon.delete{background:rgba(230,57,70,.15);color:var(--rojo);}
+.log-icon.reorder{background:rgba(245,166,35,.15);color:var(--amarillo);}
+.log-body{flex:1;min-width:0;}
+.log-action{font-size:.85rem;font-weight:600;color:var(--blanco);}
+.log-detail{font-size:.75rem;color:var(--gris-claro);margin-top:.15rem;word-break:break-word;}
+.log-meta{font-size:.65rem;color:var(--gris-claro);margin-top:.3rem;letter-spacing:.3px;}
+.log-meta strong{color:var(--azul-neon);font-weight:600;}
+.log-empty{
+  text-align:center;padding:2rem 1rem;color:var(--gris-claro);font-size:.85rem;
+  border:1px dashed var(--gris-medio);border-radius:10px;
+}
+
+.divider{height:1px;background:var(--gris-medio);margin:1.5rem 0;}
 
 .toast{
   position:fixed;bottom:2rem;right:2rem;background:var(--gris-oscuro);
@@ -255,10 +268,9 @@ a{color:inherit;text-decoration:none;}
 .toast.show{transform:translateY(0);}
 .toast.success{border-color:var(--verde);}
 .toast.error{border-color:var(--rojo);}
+.toast.warn{border-color:var(--amarillo);}
 
-@media (max-width:900px){
-  .admin-grid{grid-template-columns:1fr;}
-}
+@media (max-width:900px){ .admin-grid{grid-template-columns:1fr;} }
 @media (max-width:600px){
   .panel{padding:1rem .8rem 3rem;}
   .topbar{flex-direction:column;align-items:flex-start;}
@@ -296,6 +308,7 @@ a{color:inherit;text-decoration:none;}
     <div class="logo">TAXI <span>BLUE</span> · ADMIN</div>
     <div class="topbar-actions">
       <span class="topbar-user" id="topbarUser">—</span>
+      <button class="btn btn-outline" onclick="showLogsModal()">📜 Historial</button>
       <button class="btn btn-outline" onclick="showUsersModal()">👥 Usuarios</button>
       <button class="btn btn-outline" onclick="showChangePasswordModal()">🔑 Mi Contraseña</button>
       <button class="btn btn-outline" onclick="logout()">Salir</button>
@@ -328,11 +341,9 @@ a{color:inherit;text-decoration:none;}
           <label>Lugar / Venue (dirección para Maps) *</label>
           <div class="input-with-btn">
             <input type="text" id="lugar" placeholder="Ej: La Bodega, Villa María, Córdoba" required>
-            <button type="button" class="btn btn-outline btn-icon" onclick="verificarEnMaps()" title="Verificar dirección en Google Maps">🔍</button>
+            <button type="button" class="btn btn-outline btn-icon" onclick="verificarEnMaps()" title="Verificar en Google Maps">🔍</button>
           </div>
-          <div class="field-hint">
-            Escribí una <strong>dirección completa</strong> (calle + ciudad) para que el mapa la encuentre bien.
-          </div>
+          <div class="field-hint">Escribí una <strong>dirección completa</strong> (calle + ciudad).</div>
         </div>
 
         <div class="form-group">
@@ -341,9 +352,7 @@ a{color:inherit;text-decoration:none;}
             <input type="url" id="mapsUrl" placeholder="https://maps.app.goo.gl/...">
             <button type="button" class="btn btn-outline btn-icon" onclick="probarMapsUrl()" title="Probar URL">↗</button>
           </div>
-          <div class="field-hint">
-            Opcional. Google Maps → <strong>Compartir → Copiar vínculo</strong>. Si lo dejás vacío, se genera desde la dirección.
-          </div>
+          <div class="field-hint">Opcional. <strong>Compartir → Copiar vínculo</strong> en Google Maps.</div>
         </div>
 
         <div class="form-group">
@@ -373,32 +382,22 @@ a{color:inherit;text-decoration:none;}
     <div class="card">
       <h2 class="section-title">EVENTOS <span>CARGADOS</span></h2>
       <p class="section-sub" id="eventsCount">Cargando...</p>
-      <div class="drag-hint">
-        ✋ Arrastrá desde <strong>⋮⋮</strong> para cambiar el orden en que se muestran en la web
-      </div>
+      <div class="drag-hint">✋ Arrastrá desde <strong>⋮⋮</strong> para cambiar el orden</div>
       <div class="events-list" id="eventsList"></div>
     </div>
   </div>
 </div>
 
-<!-- MODAL: USUARIOS -->
+<!-- MODAL USUARIOS -->
 <div class="modal-backdrop" id="usersModal">
   <div class="modal">
     <button class="modal-close" onclick="hideUsersModal()">✕</button>
     <h2 class="section-title">Gestión de <span>Usuarios</span></h2>
     <p class="section-sub">Administradores con acceso al panel.</p>
-
-    <div class="user-list" id="userList">
-      <div class="empty-state">Cargando usuarios...</div>
-    </div>
-
+    <div class="user-list" id="userList"><div class="empty-state">Cargando usuarios...</div></div>
     <div class="divider"></div>
-
-    <h3 style="font-family:var(--fuente-titulo);font-size:1.3rem;letter-spacing:2px;margin-bottom:.3rem;">
-      AGREGAR <span style="color:var(--azul);">USUARIO</span>
-    </h3>
+    <h3 style="font-family:var(--fuente-titulo);font-size:1.3rem;letter-spacing:2px;margin-bottom:.3rem;">AGREGAR <span style="color:var(--azul);">USUARIO</span></h3>
     <p class="section-sub">Se creará una cuenta con acceso completo al panel.</p>
-
     <form onsubmit="addUser(event)">
       <div class="form-group">
         <label>Email *</label>
@@ -408,14 +407,22 @@ a{color:inherit;text-decoration:none;}
         <label>Contraseña *</label>
         <input type="password" id="newUserPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
-        ➕ Crear usuario
-      </button>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">➕ Crear usuario</button>
     </form>
   </div>
 </div>
 
-<!-- MODAL: CAMBIO DE CONTRASEÑA -->
+<!-- MODAL HISTORIAL -->
+<div class="modal-backdrop" id="logsModal">
+  <div class="modal" style="max-width:640px;">
+    <button class="modal-close" onclick="hideLogsModal()">✕</button>
+    <h2 class="section-title">Historial de <span>Cambios</span></h2>
+    <p class="section-sub">Últimas acciones registradas (máx. 100).</p>
+    <div class="log-list" id="logList"><div class="log-empty">Cargando...</div></div>
+  </div>
+</div>
+
+<!-- MODAL CAMBIO CONTRASEÑA -->
 <div class="modal-backdrop" id="changePasswordModal">
   <div class="modal">
     <button class="modal-close" onclick="hideChangePasswordModal()">✕</button>
@@ -434,9 +441,7 @@ a{color:inherit;text-decoration:none;}
         <label>Confirmar nueva contraseña</label>
         <input type="password" id="confirmPassword" required minlength="6">
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
-        Actualizar contraseña
-      </button>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Actualizar contraseña</button>
     </form>
   </div>
 </div>
@@ -451,7 +456,8 @@ a{color:inherit;text-decoration:none;}
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, updateDoc, deleteDoc,
-  doc, onSnapshot, writeBatch, setDoc, getDoc, serverTimestamp
+  doc, onSnapshot, writeBatch, setDoc, getDoc, serverTimestamp,
+  query, orderBy, limit, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
@@ -474,6 +480,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const COL = "eventos";
 const ADMINS_COL = "admins";
+const LOGS_COL = "logs";
 
 const MAX_FLYER_KB = 800;
 
@@ -484,13 +491,29 @@ let unsubscribeAdmins = null;
 let sortableInstance = null;
 let isReordering = false;
 let adminsList = [];
-let verifyingAdmin = false; // ← evita doble verificación
 
 /* ========== SAFE DESTROY ========== */
 function safeDestroySortable(){
   if(sortableInstance){
-    try { sortableInstance.destroy(); } catch(e){ /* silencioso */ }
+    try { sortableInstance.destroy(); } catch(e){}
     sortableInstance = null;
+  }
+}
+
+/* ========== LOG DE ACCIONES ========== */
+async function logAction(action, details){
+  try {
+    const user = auth.currentUser;
+    if(!user) return;
+    await addDoc(collection(db, LOGS_COL), {
+      action,
+      details: details || '',
+      userId: user.uid,
+      userEmail: user.email,
+      timestamp: serverTimestamp()
+    });
+  } catch(e){
+    console.warn('[Log] No se pudo registrar la acción:', e.code, e.message);
   }
 }
 
@@ -503,12 +526,11 @@ async function tryLogin(){
     return;
   }
 
-  // 1. Autenticar
   let cred;
   try {
     cred = await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
-    console.error('[Login] Error autenticando:', error.code, error.message);
+    console.error('[Login]', error.code, error.message);
     let msg = 'Email o contraseña incorrectos.';
     if(error.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Esperá unos minutos.';
     if(error.code === 'auth/network-request-failed') msg = 'Sin conexión. Revisá tu internet.';
@@ -516,31 +538,24 @@ async function tryLogin(){
     return;
   }
 
-  // 2. Verificar que el UID esté en la colección admins
-  verifyingAdmin = true;
   try {
     const adminDoc = await getDoc(doc(db, ADMINS_COL, cred.user.uid));
     if(!adminDoc.exists()){
-      // Definitivamente NO existe el doc → signOut
       await signOut(auth);
       showLoginError(
         `Tu UID no tiene permisos de administrador.<br><br>` +
-        `UID de tu cuenta: <code>${cred.user.uid}</code><br><br>` +
-        `Copiá ese UID y creá un documento en Firestore → colección <code>admins</code> con ese ID.`
+        `UID: <code>${cred.user.uid}</code><br><br>` +
+        `Creá un documento en Firestore → <code>admins</code> con ese ID.`
       );
       return;
     }
-    // ✅ Todo OK
     hideLoginError();
   } catch (error) {
-    // Error de red / permisos → NO deslogueamos
-    console.error('[Login] Error verificando admin:', error.code, error.message);
+    console.error('[Login verify]', error.code, error.message);
     showLoginError(
-      `No se pudo verificar tus permisos: ${error.code || error.message}<br><br>` +
-      `Revisá las reglas de Firestore.`
+      `No se pudo verificar permisos: <code>${error.code||error.message}</code><br><br>` +
+      `Verificá que las reglas de Firestore estén publicadas.`
     );
-  } finally {
-    verifyingAdmin = false;
   }
 }
 
@@ -550,15 +565,12 @@ function showLoginError(html){
   err.style.display = 'block';
 }
 function hideLoginError(){
-  const err = document.getElementById('loginError');
-  err.innerHTML = '';
-  err.style.display = 'none';
+  const el = document.getElementById('loginError');
+  el.innerHTML = '';
+  el.style.display = 'none';
 }
 
 onAuthStateChanged(auth, async (user) => {
-  // Mientras se está verificando el admin, no hacemos nada
-  if(verifyingAdmin) return;
-
   if (user) {
     document.getElementById('topbarUser').innerHTML = `👤 <strong>${user.email}</strong>`;
     document.getElementById('loginScreen').classList.add('hidden');
@@ -577,20 +589,25 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 function logout(){
+  logAction('logout', 'Cierre de sesión');
   signOut(auth);
 }
 
-/* ========== GESTIÓN DE USUARIOS ========== */
+/* ========== USUARIOS ========== */
 function subscribeAdmins(){
   try {
     unsubscribeAdmins = onSnapshot(collection(db, ADMINS_COL), (snap) => {
       adminsList = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
       renderUsers();
     }, (err) => {
-      console.error('[Admins] onSnapshot error:', err.code, err.message);
+      console.error('[Admins]', err.code, err.message);
+      document.getElementById('userList').innerHTML =
+        `<div class="empty-state" style="border-color:var(--rojo);color:var(--rojo);">
+          Error al cargar usuarios: ${err.code}<br>Verificá las reglas de Firestore.
+        </div>`;
     });
   } catch(e){
-    console.error('[Admins] No se pudo suscribir:', e);
+    console.error('[Admins]', e);
   }
 }
 
@@ -610,17 +627,14 @@ function renderUsers(){
     return `
       <div class="user-item">
         <div class="info">
-          <div class="email">
-            ${escapeHtml(u.email || '(sin email)')}
+          <div class="email">${escapeHtml(u.email||'(sin email)')}
             ${isMe ? '<span class="badge-you">Vos</span>' : ''}
           </div>
           <div class="meta">Alta: ${created}</div>
         </div>
         <button class="del-user"
           onclick="removeUser('${u.uid}','${escapeJs(u.email||'')}')"
-          ${isMe ? 'disabled title="No podés eliminarte a vos mismo"' : 'title="Eliminar usuario"'}>
-          🗑️
-        </button>
+          ${isMe ? 'disabled title="No podés eliminarte a vos mismo"' : 'title="Eliminar usuario"'}>🗑️</button>
       </div>`;
   }).join('');
 }
@@ -630,12 +644,8 @@ async function addUser(event){
   const email = document.getElementById('newUserEmail').value.trim();
   const password = document.getElementById('newUserPassword').value;
 
-  if(!email || !password){
-    toast('Completá todos los campos.','error'); return;
-  }
-  if(password.length < 6){
-    toast('La contraseña debe tener al menos 6 caracteres.','error'); return;
-  }
+  if(!email || !password){ toast('Completá todos los campos.','error'); return; }
+  if(password.length < 6){ toast('Mínimo 6 caracteres.','error'); return; }
   if(adminsList.some(a => (a.email||'').toLowerCase() === email.toLowerCase())){
     toast('Ya existe un usuario con ese email.','error'); return;
   }
@@ -645,10 +655,8 @@ async function addUser(event){
     const secondaryName = 'Secondary' + Date.now();
     secondaryApp = initializeApp(firebaseConfig, secondaryName);
     const secondaryAuth = getAuth(secondaryApp);
-
     const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
     const newUid = cred.user.uid;
-
     await signOut(secondaryAuth);
 
     await setDoc(doc(db, ADMINS_COL, newUid), {
@@ -656,32 +664,30 @@ async function addUser(event){
       createdAt: serverTimestamp()
     });
 
-    toast('✅ Usuario creado correctamente.','success');
+    await logAction('create_user', `Nuevo usuario: ${email} (UID: ${newUid})`);
+    toast('✅ Usuario creado.','success');
     document.getElementById('newUserEmail').value = '';
     document.getElementById('newUserPassword').value = '';
   } catch (error) {
     console.error(error);
     let msg = 'Error al crear el usuario.';
-    if(error.code === 'auth/email-already-in-use') msg = 'Ese email ya está registrado en Firebase Auth.';
+    if(error.code === 'auth/email-already-in-use') msg = 'Ese email ya está registrado.';
     else if(error.code === 'auth/invalid-email') msg = 'Email inválido.';
     else if(error.code === 'auth/weak-password') msg = 'Contraseña demasiado débil.';
     toast('❌ ' + msg,'error');
   } finally {
-    if(secondaryApp){
-      try { await deleteApp(secondaryApp); } catch(_){}
-    }
+    if(secondaryApp){ try { await deleteApp(secondaryApp); } catch(_){} }
   }
 }
 
 async function removeUser(uid, email){
-  if(uid === auth.currentUser?.uid){
-    toast('No podés eliminarte a vos mismo.','error'); return;
-  }
-  if(!confirm(`¿Eliminar el acceso de "${email}"?\n\nImportante: la cuenta seguirá existiendo en Firebase Auth. Para borrarla definitivamente, hacelo desde la Consola de Firebase.`)) return;
+  if(uid === auth.currentUser?.uid){ toast('No podés eliminarte a vos mismo.','error'); return; }
+  if(!confirm(`¿Eliminar el acceso de "${email}"?\n\nLa cuenta sigue en Firebase Auth. Para borrarla definitivamente, andá a la Consola de Firebase.`)) return;
 
   try {
     await deleteDoc(doc(db, ADMINS_COL, uid));
-    toast('🗑️ Usuario eliminado del panel.','success');
+    await logAction('delete_user', `Usuario eliminado: ${email} (UID: ${uid})`);
+    toast('🗑️ Usuario eliminado.','success');
   } catch(err){
     console.error(err);
     toast('❌ Error al eliminar.','error');
@@ -689,29 +695,70 @@ async function removeUser(uid, email){
 }
 
 /* ========== MODALES ========== */
-function showUsersModal(){
-  document.getElementById('usersModal').classList.add('show');
-  renderUsers();
-}
-function hideUsersModal(){
-  document.getElementById('usersModal').classList.remove('show');
-}
+function showUsersModal(){ document.getElementById('usersModal').classList.add('show'); renderUsers(); }
+function hideUsersModal(){ document.getElementById('usersModal').classList.remove('show'); }
 function showChangePasswordModal(){
   document.getElementById('changePasswordModal').classList.add('show');
   document.getElementById('oldPassword').value = '';
   document.getElementById('newPassword').value = '';
   document.getElementById('confirmPassword').value = '';
 }
-function hideChangePasswordModal(){
-  document.getElementById('changePasswordModal').classList.remove('show');
-}
+function hideChangePasswordModal(){ document.getElementById('changePasswordModal').classList.remove('show'); }
 
-document.getElementById('usersModal').addEventListener('click', (e)=>{
-  if(e.target.id === 'usersModal') hideUsersModal();
-});
-document.getElementById('changePasswordModal').addEventListener('click', (e)=>{
-  if(e.target.id === 'changePasswordModal') hideChangePasswordModal();
-});
+document.getElementById('usersModal').addEventListener('click', (e)=>{ if(e.target.id==='usersModal') hideUsersModal(); });
+document.getElementById('changePasswordModal').addEventListener('click', (e)=>{ if(e.target.id==='changePasswordModal') hideChangePasswordModal(); });
+document.getElementById('logsModal').addEventListener('click', (e)=>{ if(e.target.id==='logsModal') hideLogsModal(); });
+
+/* ========== HISTORIAL ========== */
+async function showLogsModal(){
+  document.getElementById('logsModal').classList.add('show');
+  const list = document.getElementById('logList');
+  list.innerHTML = '<div class="log-empty">Cargando...</div>';
+
+  try {
+    const q = query(collection(db, LOGS_COL), orderBy('timestamp','desc'), limit(100));
+    const snap = await getDocs(q);
+
+    if(snap.empty){
+      list.innerHTML = '<div class="log-empty">Todavía no hay registros.</div>';
+      return;
+    }
+
+    list.innerHTML = snap.docs.map(d => {
+      const log = d.data();
+      const ts = log.timestamp?.toDate
+        ? log.timestamp.toDate().toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'})
+        : '—';
+
+      const meta = {
+        create_event: { icon:'➕', cls:'create', label:'Evento creado' },
+        update_event: { icon:'✎', cls:'update', label:'Evento editado' },
+        delete_event: { icon:'✕', cls:'delete', label:'Evento eliminado' },
+        reorder_events:{ icon:'↕', cls:'reorder', label:'Eventos reordenados' },
+        create_user:  { icon:'👤', cls:'create', label:'Usuario creado' },
+        delete_user:  { icon:'🗑️', cls:'delete', label:'Usuario eliminado' },
+        change_password:{ icon:'🔑', cls:'update', label:'Contraseña cambiada' },
+        logout:       { icon:'🚪', cls:'update', label:'Cierre de sesión' }
+      }[log.action] || { icon:'•', cls:'update', label: log.action };
+
+      return `
+        <div class="log-item">
+          <div class="log-icon ${meta.cls}">${meta.icon}</div>
+          <div class="log-body">
+            <div class="log-action">${meta.label}</div>
+            ${log.details ? `<div class="log-detail">${escapeHtml(log.details)}</div>` : ''}
+            <div class="log-meta">🕐 ${ts} · <strong>${escapeHtml(log.userEmail||'—')}</strong></div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(err){
+    console.error('[Logs]', err.code, err.message);
+    list.innerHTML = `<div class="log-empty" style="border-color:var(--rojo);color:var(--rojo);">
+      Error al cargar el historial: ${err.code}<br>Verificá que la colección <code>logs</code> y sus reglas estén publicadas.
+    </div>`;
+  }
+}
+function hideLogsModal(){ document.getElementById('logsModal').classList.remove('show'); }
 
 /* ========== CAMBIO DE CONTRASEÑA ========== */
 async function changePassword(event){
@@ -720,19 +767,16 @@ async function changePassword(event){
   const newPass = document.getElementById('newPassword').value;
   const confirmPass = document.getElementById('confirmPassword').value;
 
-  if(newPass !== confirmPass){
-    toast('Las contraseñas nuevas no coinciden.','error'); return;
-  }
-  if(newPass.length < 6){
-    toast('La nueva contraseña debe tener al menos 6 caracteres.','error'); return;
-  }
+  if(newPass !== confirmPass){ toast('Las contraseñas no coinciden.','error'); return; }
+  if(newPass.length < 6){ toast('Mínimo 6 caracteres.','error'); return; }
   const user = auth.currentUser;
-  if(!user){ toast('No hay sesión activa.','error'); return; }
+  if(!user){ toast('No hay sesión.','error'); return; }
 
   try {
     const credential = EmailAuthProvider.credential(user.email, oldPass);
     await reauthenticateWithCredential(user, credential);
     await updatePassword(user, newPass);
+    await logAction('change_password', `Contraseña cambiada por ${user.email}`);
     toast('✅ Contraseña actualizada.','success');
     hideChangePasswordModal();
   } catch (error) {
@@ -742,7 +786,7 @@ async function changePassword(event){
   }
 }
 
-/* ========== FIRESTORE: escucha de eventos ========== */
+/* ========== EVENTOS ========== */
 function subscribeEvents(){
   try {
     unsubscribe = onSnapshot(collection(db, COL), (snap) => {
@@ -757,34 +801,27 @@ function subscribeEvents(){
       renderEvents();
       initSortable();
     }, (err) => {
-      console.error('[Eventos] onSnapshot error:', err.code, err.message);
+      console.error('[Eventos]', err.code, err.message);
+      document.getElementById('eventsList').innerHTML =
+        `<div class="empty-state" style="border-color:var(--rojo);color:var(--rojo);">
+          Error al leer eventos: ${err.code}<br>Verificá las reglas de Firestore.
+        </div>`;
     });
-  } catch(e){
-    console.error('[Eventos] No se pudo suscribir:', e);
-  }
+  } catch(e){ console.error('[Eventos]', e); }
 }
 
-/* ========== SORTABLE ========== */
 function initSortable(){
   const el = document.getElementById('eventsList');
   if(!el) return;
-
   safeDestroySortable();
-
   if(!events.length) return;
 
   try {
     sortableInstance = Sortable.create(el, {
-      animation: 180,
-      handle: '.drag-handle',
-      ghostClass: 'drag-ghost',
-      dragClass: 'dragging',
-      forceFallback: true,
-      fallbackOnBody: true,
-      fallbackClass: 'drag-ghost',
-      delay: 150,
-      delayOnTouchOnly: true,
-      touchStartThreshold: 8,
+      animation: 180, handle: '.drag-handle',
+      ghostClass: 'drag-ghost', dragClass: 'dragging',
+      forceFallback: true, fallbackOnBody: true, fallbackClass: 'drag-ghost',
+      delay: 150, delayOnTouchOnly: true, touchStartThreshold: 8,
       onEnd: async (evt) => {
         if(evt.oldIndex === evt.newIndex) return;
         const [moved] = events.splice(evt.oldIndex, 1);
@@ -797,6 +834,7 @@ function initSortable(){
             batch.update(doc(db, COL, ev.id), { orden: i });
           });
           await batch.commit();
+          await logAction('reorder_events', `Nuevo orden: "${moved.titulo}" movido a posición ${evt.newIndex+1}`);
           toast('✅ Orden guardado','success');
         } catch(err){
           console.error(err);
@@ -806,12 +844,10 @@ function initSortable(){
         }
       }
     });
-  } catch(e){
-    console.error('[Sortable] No se pudo inicializar:', e);
-  }
+  } catch(e){ console.error('[Sortable]', e); }
 }
 
-/* ========== GOOGLE MAPS HELPERS ========== */
+/* ========== MAPS ========== */
 function verificarEnMaps(){
   const lugar = document.getElementById('lugar').value.trim();
   if(!lugar){ toast('Escribí una dirección primero','error'); return; }
@@ -820,11 +856,11 @@ function verificarEnMaps(){
 function probarMapsUrl(){
   const url = document.getElementById('mapsUrl').value.trim();
   if(!url){ toast('Pegá primero una URL','error'); return; }
-  if(!/^https?:\/\//i.test(url)){ toast('La URL debe empezar con https://','error'); return; }
+  if(!/^https?:\/\//i.test(url)){ toast('Debe empezar con https://','error'); return; }
   window.open(url, '_blank');
 }
 
-/* ========== FORM EVENTOS ========== */
+/* ========== FORM ========== */
 function handleFlyer(e){
   const file = e.target.files[0];
   if(!file) return;
@@ -844,7 +880,6 @@ function removeFlyer(){
   document.getElementById('flyerPreview').classList.remove('show');
   document.getElementById('flyerImg').src = '';
 }
-
 function resetForm(){
   document.getElementById('editId').value = '';
   document.getElementById('fecha').value = '';
@@ -886,18 +921,25 @@ async function saveEvent(e){
   if(!data.fecha || !data.titulo || !data.lugar){
     toast('Completá los campos obligatorios','error'); return;
   }
+
   try {
     if(id){
       await updateDoc(doc(db, COL, id), data);
+      await logAction('update_event', `"${data.titulo}" · ${data.fecha} · ${data.lugar}`);
       toast('✅ Evento actualizado','success');
     } else {
       await addDoc(collection(db, COL), data);
+      await logAction('create_event', `"${data.titulo}" · ${data.fecha} · ${data.lugar}`);
       toast('✅ Evento agregado','success');
     }
     resetForm();
   } catch(err){
-    console.error(err);
-    toast('❌ Error al guardar','error');
+    console.error('[saveEvent]', err.code, err.message);
+    if(err.code === 'permission-denied'){
+      toast('❌ Sin permisos. Verificá las reglas de Firestore.','error');
+    } else {
+      toast('❌ Error al guardar','error');
+    }
   }
 }
 
@@ -914,25 +956,25 @@ function editEvent(id){
     flyerBase64 = ev.flyer;
     document.getElementById('flyerImg').src = ev.flyer;
     document.getElementById('flyerPreview').classList.add('show');
-  } else {
-    removeFlyer();
-  }
+  } else { removeFlyer(); }
   document.getElementById('formTitle').innerHTML = 'EDITAR <span>EVENTO</span>';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
 async function deleteEvent(id){
-  if(!confirm('¿Eliminar este evento?')) return;
+  const ev = events.find(x=>x.id===id);
+  if(!confirm(`¿Eliminar "${ev?.titulo || 'este evento'}"?`)) return;
   try {
     await deleteDoc(doc(db, COL, id));
+    await logAction('delete_event', `"${ev?.titulo || id}" · ${ev?.fecha || ''} · ${ev?.lugar || ''}`);
     toast('🗑️ Evento eliminado','success');
   } catch(err){
-    console.error(err);
+    console.error('[deleteEvent]', err.code, err.message);
     toast('❌ Error al eliminar','error');
   }
 }
 
-/* ========== RENDER EVENTOS ========== */
+/* ========== RENDER ========== */
 function renderEvents(){
   const list = document.getElementById('eventsList');
   const count = document.getElementById('eventsCount');
@@ -951,7 +993,7 @@ function renderEvents(){
     const mapsUrl = ev.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.lugar || '')}`;
     return `
       <div class="event-item" data-id="${ev.id}">
-        <div class="drag-handle" title="Arrastrar para reordenar">⋮⋮</div>
+        <div class="drag-handle" title="Arrastrar">⋮⋮</div>
         ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false">` : ''}
         <div class="info">
           <span class="date">${dd} ${mm} ${yy}${ev.hora?' · '+ev.hora:''}</span>
@@ -959,7 +1001,7 @@ function renderEvents(){
           <div class="place">${escapeHtml(ev.lugar)}</div>
         </div>
         <div class="actions">
-          <button class="map" title="Ver en Google Maps" onclick="window.open('${mapsUrl.replace(/'/g,"\\'")}','_blank')">📍</button>
+          <button class="map" title="Ver en Maps" onclick="window.open('${mapsUrl.replace(/'/g,"\\'")}','_blank')">📍</button>
           <button class="edit" title="Editar" onclick="editEvent('${ev.id}')">✎</button>
           <button class="del" title="Eliminar" onclick="deleteEvent('${ev.id}')">✕</button>
         </div>
@@ -984,7 +1026,7 @@ function toast(msg, type=''){
   toastTimer = setTimeout(()=> el.classList.remove('show'), 3000);
 }
 
-/* ========== Exponer globales ========== */
+/* ========== Exponer ========== */
 window.tryLogin = tryLogin;
 window.logout = logout;
 window.showUsersModal = showUsersModal;
@@ -994,6 +1036,8 @@ window.removeUser = removeUser;
 window.showChangePasswordModal = showChangePasswordModal;
 window.hideChangePasswordModal = hideChangePasswordModal;
 window.changePassword = changePassword;
+window.showLogsModal = showLogsModal;
+window.hideLogsModal = hideLogsModal;
 window.handleFlyer = handleFlyer;
 window.removeFlyer = removeFlyer;
 window.resetForm = resetForm;
