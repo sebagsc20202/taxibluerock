@@ -13,7 +13,7 @@
   --negro:#0a0a0a; --negro-suave:#111; --gris-oscuro:#1a1a1a;
   --gris-medio:#2a2a2a; --gris-claro:#888; --blanco:#f0f0f0;
   --azul:#0066ff; --azul-neon:#00a8ff; --rojo:#e63946; --verde:#25D366;
-  --amarillo:#f5a623;
+  --amarillo:#f5a623; --dorado:#ffd700;
   --fuente-titulo:'Bebas Neue',sans-serif; --fuente-cuerpo:'Inter',sans-serif;
   --trans:all .3s cubic-bezier(.25,.46,.45,.94);
 }
@@ -73,8 +73,14 @@ a{color:inherit;text-decoration:none;}
 .topbar-user{
   font-size:.75rem;color:var(--gris-claro);padding:.4rem .8rem;
   background:var(--gris-oscuro);border:1px solid var(--gris-medio);border-radius:20px;
+  display:inline-flex;align-items:center;gap:.4rem;
 }
 .topbar-user strong{color:var(--azul-neon);font-weight:600;}
+.crown-badge{
+  display:inline-block;background:rgba(255,215,0,.15);color:var(--dorado);
+  font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+  padding:.15rem .5rem;border-radius:20px;
+}
 
 .btn{
   padding:.7rem 1.4rem;font-size:.75rem;font-weight:700;text-transform:uppercase;
@@ -86,14 +92,13 @@ a{color:inherit;text-decoration:none;}
 .btn-primary:hover{background:var(--azul-neon);box-shadow:0 0 20px rgba(0,102,255,.5);}
 .btn-outline{background:transparent;border-color:var(--gris-medio);color:var(--blanco);}
 .btn-outline:hover{border-color:var(--azul);color:var(--azul-neon);}
-.btn-danger{background:transparent;border-color:var(--rojo);color:var(--rojo);}
-.btn-danger:hover{background:var(--rojo);color:#fff;}
 
 .section-title{font-family:var(--fuente-titulo);font-size:2rem;letter-spacing:2px;margin-bottom:.3rem;}
 .section-title span{color:var(--azul);}
 .section-sub{color:var(--gris-claro);font-size:.85rem;margin-bottom:1.5rem;}
 
 .admin-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:2rem;align-items:start;}
+.admin-grid.solo{grid-template-columns:1fr;max-width:720px;margin:0 auto;}
 
 .card{background:var(--gris-oscuro);border:1px solid var(--gris-medio);border-radius:12px;padding:1.8rem;}
 .form-group{margin-bottom:1.2rem;}
@@ -213,6 +218,7 @@ a{color:inherit;text-decoration:none;}
   background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;
   padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;
 }
+.user-item.super{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.03);}
 .user-item .info{flex:1;min-width:0;}
 .user-item .email{
   font-size:.85rem;font-weight:600;color:var(--blanco);
@@ -221,6 +227,11 @@ a{color:inherit;text-decoration:none;}
 .user-item .meta{font-size:.68rem;color:var(--gris-claro);letter-spacing:.5px;margin-top:.15rem;}
 .user-item .badge-you{
   display:inline-block;background:rgba(0,102,255,.15);color:var(--azul-neon);
+  font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+  padding:.2rem .55rem;border-radius:20px;margin-left:.5rem;
+}
+.user-item .badge-super{
+  display:inline-block;background:rgba(255,215,0,.15);color:var(--dorado);
   font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
   padding:.2rem .55rem;border-radius:20px;margin-left:.5rem;
 }
@@ -308,14 +319,14 @@ a{color:inherit;text-decoration:none;}
     <div class="logo">TAXI <span>BLUE</span> · ADMIN</div>
     <div class="topbar-actions">
       <span class="topbar-user" id="topbarUser">—</span>
-      <button class="btn btn-outline" onclick="showLogsModal()">📜 Historial</button>
-      <button class="btn btn-outline" onclick="showUsersModal()">👥 Usuarios</button>
+      <button class="btn btn-outline" id="btnHistorial" style="display:none;" onclick="showLogsModal()">📜 Historial</button>
+      <button class="btn btn-outline" id="btnUsuarios" style="display:none;" onclick="showUsersModal()">👥 Usuarios</button>
       <button class="btn btn-outline" onclick="showChangePasswordModal()">🔑 Mi Contraseña</button>
       <button class="btn btn-outline" onclick="logout()">Salir</button>
     </div>
   </div>
 
-  <div class="admin-grid">
+  <div class="admin-grid" id="adminGrid">
     <!-- FORM -->
     <div class="card">
       <h2 class="section-title" id="formTitle">NUEVO <span>EVENTO</span></h2>
@@ -393,11 +404,11 @@ a{color:inherit;text-decoration:none;}
   <div class="modal">
     <button class="modal-close" onclick="hideUsersModal()">✕</button>
     <h2 class="section-title">Gestión de <span>Usuarios</span></h2>
-    <p class="section-sub">Administradores con acceso al panel.</p>
+    <p class="section-sub">Administradores con acceso al panel. Solo vos podés gestionarlos.</p>
     <div class="user-list" id="userList"><div class="empty-state">Cargando usuarios...</div></div>
     <div class="divider"></div>
     <h3 style="font-family:var(--fuente-titulo);font-size:1.3rem;letter-spacing:2px;margin-bottom:.3rem;">AGREGAR <span style="color:var(--azul);">USUARIO</span></h3>
-    <p class="section-sub">Se creará una cuenta con acceso completo al panel.</p>
+    <p class="section-sub">Se creará con permisos para gestionar eventos (no usuarios).</p>
     <form onsubmit="addUser(event)">
       <div class="form-group">
         <label>Email *</label>
@@ -491,6 +502,7 @@ let unsubscribeAdmins = null;
 let sortableInstance = null;
 let isReordering = false;
 let adminsList = [];
+let currentRole = 'admin'; // 'admin' o 'super'
 
 /* ========== SAFE DESTROY ========== */
 function safeDestroySortable(){
@@ -500,7 +512,7 @@ function safeDestroySortable(){
   }
 }
 
-/* ========== LOG DE ACCIONES ========== */
+/* ========== LOG ========== */
 async function logAction(action, details){
   try {
     const user = auth.currentUser;
@@ -513,18 +525,15 @@ async function logAction(action, details){
       timestamp: serverTimestamp()
     });
   } catch(e){
-    console.warn('[Log] No se pudo registrar la acción:', e.code, e.message);
+    console.warn('[Log] No se pudo registrar:', e.code, e.message);
   }
 }
 
-/* ========== AUTENTICACIÓN ========== */
+/* ========== LOGIN ========== */
 async function tryLogin(){
   const email = document.getElementById('emailInput').value.trim();
   const password = document.getElementById('passInput').value.trim();
-  if(!email || !password){
-    showLoginError('Completá todos los campos.');
-    return;
-  }
+  if(!email || !password){ showLoginError('Completá todos los campos.'); return; }
 
   let cred;
   try {
@@ -549,6 +558,9 @@ async function tryLogin(){
       );
       return;
     }
+    // Determinar rol
+    const data = adminDoc.data();
+    currentRole = (data.role === 'super') ? 'super' : 'admin';
     hideLoginError();
   } catch (error) {
     console.error('[Login verify]', error.code, error.message);
@@ -572,11 +584,19 @@ function hideLoginError(){
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    document.getElementById('topbarUser').innerHTML = `👤 <strong>${user.email}</strong>`;
+    // Mostrar info del usuario + rol
+    const isSuper = currentRole === 'super';
+    document.getElementById('topbarUser').innerHTML =
+      `👤 <strong>${user.email}</strong>${isSuper ? ' <span class="crown-badge">👑 Super</span>' : ''}`;
+
+    // Mostrar/ocultar botones según rol
+    document.getElementById('btnUsuarios').style.display = isSuper ? '' : 'none';
+    document.getElementById('btnHistorial').style.display = isSuper ? '' : 'none';
+
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('panel').classList.add('active');
     subscribeEvents();
-    subscribeAdmins();
+    if(isSuper) subscribeAdmins();
   } else {
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('panel').classList.remove('active');
@@ -603,12 +623,10 @@ function subscribeAdmins(){
       console.error('[Admins]', err.code, err.message);
       document.getElementById('userList').innerHTML =
         `<div class="empty-state" style="border-color:var(--rojo);color:var(--rojo);">
-          Error al cargar usuarios: ${err.code}<br>Verificá las reglas de Firestore.
+          Error al cargar usuarios: ${err.code}
         </div>`;
     });
-  } catch(e){
-    console.error('[Admins]', e);
-  }
+  } catch(e){ console.error('[Admins]', e); }
 }
 
 function renderUsers(){
@@ -621,20 +639,25 @@ function renderUsers(){
   const myUid = auth.currentUser?.uid;
   list.innerHTML = adminsList.map(u => {
     const isMe = u.uid === myUid;
+    const isSuper = u.role === 'super';
     const created = u.createdAt?.toDate
       ? u.createdAt.toDate().toLocaleDateString('es-AR')
       : '—';
     return `
-      <div class="user-item">
+      <div class="user-item${isSuper ? ' super' : ''}">
         <div class="info">
           <div class="email">${escapeHtml(u.email||'(sin email)')}
+            ${isSuper ? '<span class="badge-super">👑 Super</span>' : ''}
             ${isMe ? '<span class="badge-you">Vos</span>' : ''}
           </div>
           <div class="meta">Alta: ${created}</div>
         </div>
         <button class="del-user"
-          onclick="removeUser('${u.uid}','${escapeJs(u.email||'')}')"
-          ${isMe ? 'disabled title="No podés eliminarte a vos mismo"' : 'title="Eliminar usuario"'}>🗑️</button>
+          onclick="removeUser('${u.uid}','${escapeJs(u.email||'')}','${u.role||''}')"
+          ${isMe ? 'disabled title="No podés eliminarte a vos mismo"' :
+            (isSuper ? 'disabled title="No podés eliminar a un super admin"' : 'title="Eliminar usuario"')}>
+          🗑️
+        </button>
       </div>`;
   }).join('');
 }
@@ -659,6 +682,7 @@ async function addUser(event){
     const newUid = cred.user.uid;
     await signOut(secondaryAuth);
 
+    // Crear en admins SIN rol → será admin normal
     await setDoc(doc(db, ADMINS_COL, newUid), {
       email: email,
       createdAt: serverTimestamp()
@@ -680,8 +704,9 @@ async function addUser(event){
   }
 }
 
-async function removeUser(uid, email){
+async function removeUser(uid, email, role){
   if(uid === auth.currentUser?.uid){ toast('No podés eliminarte a vos mismo.','error'); return; }
+  if(role === 'super'){ toast('No podés eliminar a otro super admin.','error'); return; }
   if(!confirm(`¿Eliminar el acceso de "${email}"?\n\nLa cuenta sigue en Firebase Auth. Para borrarla definitivamente, andá a la Consola de Firebase.`)) return;
 
   try {
@@ -754,13 +779,13 @@ async function showLogsModal(){
   } catch(err){
     console.error('[Logs]', err.code, err.message);
     list.innerHTML = `<div class="log-empty" style="border-color:var(--rojo);color:var(--rojo);">
-      Error al cargar el historial: ${err.code}<br>Verificá que la colección <code>logs</code> y sus reglas estén publicadas.
+      Error al cargar el historial: ${err.code}
     </div>`;
   }
 }
 function hideLogsModal(){ document.getElementById('logsModal').classList.remove('show'); }
 
-/* ========== CAMBIO DE CONTRASEÑA ========== */
+/* ========== CAMBIO CONTRASEÑA ========== */
 async function changePassword(event){
   event.preventDefault();
   const oldPass = document.getElementById('oldPassword').value;
@@ -804,7 +829,7 @@ function subscribeEvents(){
       console.error('[Eventos]', err.code, err.message);
       document.getElementById('eventsList').innerHTML =
         `<div class="empty-state" style="border-color:var(--rojo);color:var(--rojo);">
-          Error al leer eventos: ${err.code}<br>Verificá las reglas de Firestore.
+          Error al leer eventos: ${err.code}
         </div>`;
     });
   } catch(e){ console.error('[Eventos]', e); }
@@ -834,7 +859,7 @@ function initSortable(){
             batch.update(doc(db, COL, ev.id), { orden: i });
           });
           await batch.commit();
-          await logAction('reorder_events', `Nuevo orden: "${moved.titulo}" movido a posición ${evt.newIndex+1}`);
+          await logAction('reorder_events', `"${moved.titulo}" movido a posición ${evt.newIndex+1}`);
           toast('✅ Orden guardado','success');
         } catch(err){
           console.error(err);
