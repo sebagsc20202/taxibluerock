@@ -98,7 +98,6 @@ a{color:inherit;text-decoration:none;}
 .section-sub{color:var(--gris-claro);font-size:.85rem;margin-bottom:1.5rem;}
 
 .admin-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:2rem;align-items:start;}
-.admin-grid.solo{grid-template-columns:1fr;max-width:720px;margin:0 auto;}
 
 .card{background:var(--gris-oscuro);border:1px solid var(--gris-medio);border-radius:12px;padding:1.8rem;}
 .form-group{margin-bottom:1.2rem;}
@@ -218,7 +217,7 @@ a{color:inherit;text-decoration:none;}
   background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;
   padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;
 }
-.user-item.super{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.03);}
+.user-item.owner{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.03);}
 .user-item .info{flex:1;min-width:0;}
 .user-item .email{
   font-size:.85rem;font-weight:600;color:var(--blanco);
@@ -230,7 +229,7 @@ a{color:inherit;text-decoration:none;}
   font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
   padding:.2rem .55rem;border-radius:20px;margin-left:.5rem;
 }
-.user-item .badge-super{
+.user-item .badge-owner{
   display:inline-block;background:rgba(255,215,0,.15);color:var(--dorado);
   font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
   padding:.2rem .55rem;border-radius:20px;margin-left:.5rem;
@@ -319,14 +318,14 @@ a{color:inherit;text-decoration:none;}
     <div class="logo">TAXI <span>BLUE</span> · ADMIN</div>
     <div class="topbar-actions">
       <span class="topbar-user" id="topbarUser">—</span>
-      <button class="btn btn-outline" id="btnHistorial" style="display:none;" onclick="showLogsModal()">📜 Historial</button>
-      <button class="btn btn-outline" id="btnUsuarios" style="display:none;" onclick="showUsersModal()">👥 Usuarios</button>
+      <button class="btn btn-outline" onclick="showLogsModal()">📜 Historial</button>
+      <button class="btn btn-outline" onclick="showUsersModal()">👥 Usuarios</button>
       <button class="btn btn-outline" onclick="showChangePasswordModal()">🔑 Mi Contraseña</button>
       <button class="btn btn-outline" onclick="logout()">Salir</button>
     </div>
   </div>
 
-  <div class="admin-grid" id="adminGrid">
+  <div class="admin-grid">
     <!-- FORM -->
     <div class="card">
       <h2 class="section-title" id="formTitle">NUEVO <span>EVENTO</span></h2>
@@ -404,11 +403,11 @@ a{color:inherit;text-decoration:none;}
   <div class="modal">
     <button class="modal-close" onclick="hideUsersModal()">✕</button>
     <h2 class="section-title">Gestión de <span>Usuarios</span></h2>
-    <p class="section-sub">Administradores con acceso al panel. Solo vos podés gestionarlos.</p>
+    <p class="section-sub">Todos los admins pueden crear usuarios. Solo el owner puede eliminarlos.</p>
     <div class="user-list" id="userList"><div class="empty-state">Cargando usuarios...</div></div>
     <div class="divider"></div>
     <h3 style="font-family:var(--fuente-titulo);font-size:1.3rem;letter-spacing:2px;margin-bottom:.3rem;">AGREGAR <span style="color:var(--azul);">USUARIO</span></h3>
-    <p class="section-sub">Se creará con permisos para gestionar eventos (no usuarios).</p>
+    <p class="section-sub">Se creará con acceso al panel completo.</p>
     <form onsubmit="addUser(event)">
       <div class="form-group">
         <label>Email *</label>
@@ -493,6 +492,7 @@ const COL = "eventos";
 const ADMINS_COL = "admins";
 const LOGS_COL = "logs";
 
+const OWNER_EMAIL = 'sebagsc2020@gmail.com';
 const MAX_FLYER_KB = 800;
 
 let flyerBase64 = null;
@@ -502,7 +502,7 @@ let unsubscribeAdmins = null;
 let sortableInstance = null;
 let isReordering = false;
 let adminsList = [];
-let currentRole = 'admin'; // 'admin' o 'super'
+let currentUserEmail = '';
 
 /* ========== SAFE DESTROY ========== */
 function safeDestroySortable(){
@@ -558,9 +558,7 @@ async function tryLogin(){
       );
       return;
     }
-    // Determinar rol
-    const data = adminDoc.data();
-    currentRole = (data.role === 'super') ? 'super' : 'admin';
+    currentUserEmail = cred.user.email || '';
     hideLoginError();
   } catch (error) {
     console.error('[Login verify]', error.code, error.message);
@@ -584,19 +582,15 @@ function hideLoginError(){
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    // Mostrar info del usuario + rol
-    const isSuper = currentRole === 'super';
+    currentUserEmail = user.email || '';
+    const isOwner = currentUserEmail === OWNER_EMAIL;
     document.getElementById('topbarUser').innerHTML =
-      `👤 <strong>${user.email}</strong>${isSuper ? ' <span class="crown-badge">👑 Super</span>' : ''}`;
-
-    // Mostrar/ocultar botones según rol
-    document.getElementById('btnUsuarios').style.display = isSuper ? '' : 'none';
-    document.getElementById('btnHistorial').style.display = isSuper ? '' : 'none';
+      `👤 <strong>${user.email}</strong>${isOwner ? ' <span class="crown-badge">👑 Owner</span>' : ''}`;
 
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('panel').classList.add('active');
     subscribeEvents();
-    if(isSuper) subscribeAdmins();
+    subscribeAdmins();
   } else {
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('panel').classList.remove('active');
@@ -637,25 +631,43 @@ function renderUsers(){
     return;
   }
   const myUid = auth.currentUser?.uid;
+  const iAmOwner = currentUserEmail === OWNER_EMAIL;
+
   list.innerHTML = adminsList.map(u => {
     const isMe = u.uid === myUid;
-    const isSuper = u.role === 'super';
+    const isOwner = (u.email || '').toLowerCase() === OWNER_EMAIL.toLowerCase();
     const created = u.createdAt?.toDate
       ? u.createdAt.toDate().toLocaleDateString('es-AR')
       : '—';
+
+    // Reglas para el botón eliminar:
+    // 1. No puedo eliminarme a mí mismo
+    // 2. Solo el owner puede eliminar
+    // 3. El owner no puede ser eliminado por nadie
+    let disabled = true;
+    let title = 'Solo el owner puede eliminar usuarios';
+    if(isMe){
+      disabled = true; title = 'No podés eliminarte a vos mismo';
+    } else if(!iAmOwner){
+      disabled = true; title = 'Solo el owner puede eliminar usuarios';
+    } else if(isOwner){
+      disabled = true; title = 'No podés eliminar al owner';
+    } else {
+      disabled = false; title = 'Eliminar usuario';
+    }
+
     return `
-      <div class="user-item${isSuper ? ' super' : ''}">
+      <div class="user-item${isOwner ? ' owner' : ''}">
         <div class="info">
           <div class="email">${escapeHtml(u.email||'(sin email)')}
-            ${isSuper ? '<span class="badge-super">👑 Super</span>' : ''}
-            ${isMe ? '<span class="badge-you">Vos</span>' : ''}
+            ${isOwner ? '<span class="badge-owner">👑 Owner</span>' : ''}
+            ${isMe && !isOwner ? '<span class="badge-you">Vos</span>' : ''}
           </div>
           <div class="meta">Alta: ${created}</div>
         </div>
         <button class="del-user"
-          onclick="removeUser('${u.uid}','${escapeJs(u.email||'')}','${u.role||''}')"
-          ${isMe ? 'disabled title="No podés eliminarte a vos mismo"' :
-            (isSuper ? 'disabled title="No podés eliminar a un super admin"' : 'title="Eliminar usuario"')}>
+          onclick="removeUser('${u.uid}','${escapeJs(u.email||'')}')"
+          ${disabled ? `disabled title="${title}"` : `title="${title}"`}>
           🗑️
         </button>
       </div>`;
@@ -682,7 +694,6 @@ async function addUser(event){
     const newUid = cred.user.uid;
     await signOut(secondaryAuth);
 
-    // Crear en admins SIN rol → será admin normal
     await setDoc(doc(db, ADMINS_COL, newUid), {
       email: email,
       createdAt: serverTimestamp()
@@ -698,15 +709,23 @@ async function addUser(event){
     if(error.code === 'auth/email-already-in-use') msg = 'Ese email ya está registrado.';
     else if(error.code === 'auth/invalid-email') msg = 'Email inválido.';
     else if(error.code === 'auth/weak-password') msg = 'Contraseña demasiado débil.';
+    else if(error.code === 'permission-denied') msg = 'Sin permisos. Verificá las reglas de Firestore.';
     toast('❌ ' + msg,'error');
   } finally {
     if(secondaryApp){ try { await deleteApp(secondaryApp); } catch(_){} }
   }
 }
 
-async function removeUser(uid, email, role){
-  if(uid === auth.currentUser?.uid){ toast('No podés eliminarte a vos mismo.','error'); return; }
-  if(role === 'super'){ toast('No podés eliminar a otro super admin.','error'); return; }
+async function removeUser(uid, email){
+  if(currentUserEmail !== OWNER_EMAIL){
+    toast('Solo el owner puede eliminar usuarios.','error'); return;
+  }
+  if(uid === auth.currentUser?.uid){
+    toast('No podés eliminarte a vos mismo.','error'); return;
+  }
+  if((email||'').toLowerCase() === OWNER_EMAIL.toLowerCase()){
+    toast('No podés eliminar al owner.','error'); return;
+  }
   if(!confirm(`¿Eliminar el acceso de "${email}"?\n\nLa cuenta sigue en Firebase Auth. Para borrarla definitivamente, andá a la Consola de Firebase.`)) return;
 
   try {
@@ -715,7 +734,11 @@ async function removeUser(uid, email, role){
     toast('🗑️ Usuario eliminado.','success');
   } catch(err){
     console.error(err);
-    toast('❌ Error al eliminar.','error');
+    if(err.code === 'permission-denied'){
+      toast('❌ Sin permisos. Verificá las reglas de Firestore.','error');
+    } else {
+      toast('❌ Error al eliminar.','error');
+    }
   }
 }
 
