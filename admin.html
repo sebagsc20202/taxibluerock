@@ -427,7 +427,7 @@ a{color:inherit;text-decoration:none;}
   <div class="modal" style="max-width:640px;">
     <button class="modal-close" onclick="hideLogsModal()">✕</button>
     <h2 class="section-title">Historial de <span>Cambios</span></h2>
-    <p class="section-sub">Últimas acciones registradas (máx. 100).</p>
+    <p class="section-sub">Últimas acciones de los administradores (máx. 100).</p>
     <div class="log-list" id="logList"><div class="log-empty">Cargando...</div></div>
   </div>
 </div>
@@ -494,6 +494,8 @@ const LOGS_COL = "logs";
 
 const OWNER_EMAIL = 'sebagsc2020@gmail.com';
 const MAX_FLYER_KB = 800;
+const LOGS_FETCH_LIMIT = 300;  // traemos más
+const LOGS_DISPLAY_LIMIT = 100; // mostramos los últimos 100
 
 let flyerBase64 = null;
 let events = [];
@@ -583,7 +585,7 @@ function hideLoginError(){
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUserEmail = user.email || '';
-    const isOwner = currentUserEmail === OWNER_EMAIL;
+    const isOwner = currentUserEmail.toLowerCase() === OWNER_EMAIL.toLowerCase();
     document.getElementById('topbarUser').innerHTML =
       `👤 <strong>${user.email}</strong>${isOwner ? ' <span class="crown-badge">👑 Owner</span>' : ''}`;
 
@@ -631,7 +633,7 @@ function renderUsers(){
     return;
   }
   const myUid = auth.currentUser?.uid;
-  const iAmOwner = currentUserEmail === OWNER_EMAIL;
+  const iAmOwner = currentUserEmail.toLowerCase() === OWNER_EMAIL.toLowerCase();
 
   list.innerHTML = adminsList.map(u => {
     const isMe = u.uid === myUid;
@@ -640,10 +642,6 @@ function renderUsers(){
       ? u.createdAt.toDate().toLocaleDateString('es-AR')
       : '—';
 
-    // Reglas para el botón eliminar:
-    // 1. No puedo eliminarme a mí mismo
-    // 2. Solo el owner puede eliminar
-    // 3. El owner no puede ser eliminado por nadie
     let disabled = true;
     let title = 'Solo el owner puede eliminar usuarios';
     if(isMe){
@@ -717,7 +715,7 @@ async function addUser(event){
 }
 
 async function removeUser(uid, email){
-  if(currentUserEmail !== OWNER_EMAIL){
+  if(currentUserEmail.toLowerCase() !== OWNER_EMAIL.toLowerCase()){
     toast('Solo el owner puede eliminar usuarios.','error'); return;
   }
   if(uid === auth.currentUser?.uid){
@@ -757,22 +755,30 @@ document.getElementById('usersModal').addEventListener('click', (e)=>{ if(e.targ
 document.getElementById('changePasswordModal').addEventListener('click', (e)=>{ if(e.target.id==='changePasswordModal') hideChangePasswordModal(); });
 document.getElementById('logsModal').addEventListener('click', (e)=>{ if(e.target.id==='logsModal') hideLogsModal(); });
 
-/* ========== HISTORIAL ========== */
+/* ========== HISTORIAL (SIN ACCIONES DEL OWNER) ========== */
 async function showLogsModal(){
   document.getElementById('logsModal').classList.add('show');
   const list = document.getElementById('logList');
   list.innerHTML = '<div class="log-empty">Cargando...</div>';
 
   try {
-    const q = query(collection(db, LOGS_COL), orderBy('timestamp','desc'), limit(100));
+    // Traemos más registros para poder filtrar los del owner y mostrar 100 reales
+    const q = query(collection(db, LOGS_COL), orderBy('timestamp','desc'), limit(LOGS_FETCH_LIMIT));
     const snap = await getDocs(q);
 
-    if(snap.empty){
-      list.innerHTML = '<div class="log-empty">Todavía no hay registros.</div>';
+    // ✨ FILTRO: excluimos las acciones hechas por el owner
+    const ownerLower = OWNER_EMAIL.toLowerCase();
+    const filtered = snap.docs.filter(d => {
+      const log = d.data();
+      return (log.userEmail || '').toLowerCase() !== ownerLower;
+    }).slice(0, LOGS_DISPLAY_LIMIT);
+
+    if(filtered.length === 0){
+      list.innerHTML = '<div class="log-empty">Todavía no hay registros de otros administradores.</div>';
       return;
     }
 
-    list.innerHTML = snap.docs.map(d => {
+    list.innerHTML = filtered.map(d => {
       const log = d.data();
       const ts = log.timestamp?.toDate
         ? log.timestamp.toDate().toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'})
