@@ -67,9 +67,11 @@ a{color:inherit;text-decoration:none;}
 .stat-card{background:var(--gris-oscuro);border:1px solid var(--gris-medio);border-radius:10px;padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.2rem;transition:var(--trans);}
 .stat-card:hover{border-color:var(--azul);transform:translateY(-2px);}
 .stat-card.highlight{border-color:var(--azul);background:linear-gradient(135deg,var(--gris-oscuro),rgba(0,102,255,.08));}
+.stat-card.gold{border-color:var(--dorado);background:linear-gradient(135deg,var(--gris-oscuro),rgba(255,215,0,.06));}
 .stat-label{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gris-claro);font-weight:600;}
 .stat-value{font-family:var(--fuente-titulo);font-size:1.8rem;color:var(--blanco);line-height:1;}
 .stat-card.highlight .stat-value{color:var(--azul-neon);}
+.stat-card.gold .stat-value{color:var(--dorado);}
 .stat-sub{font-size:.72rem;color:var(--gris-claro);margin-top:.2rem;}
 .stat-card.warn .stat-value{color:var(--amarillo);}
 
@@ -130,8 +132,11 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .event-item.estado-confirmado{border-left:4px solid var(--verde);}
 .event-item.estado-cancelado{border-left:4px solid var(--rojo);opacity:.65;}
 .event-item.estado-cancelado .title{text-decoration:line-through;}
+.event-item.cat-remarcado{background:linear-gradient(135deg,var(--negro),rgba(255,215,0,.04));border-color:rgba(255,215,0,.35);}
+.event-item.cat-remarcado:hover{border-color:var(--dorado);}
 .event-item .info{flex:1;min-width:0;}
 .event-item .date{font-family:var(--fuente-titulo);font-size:1.2rem;color:var(--azul);letter-spacing:1px;display:block;line-height:1.1;}
+.event-item.cat-remarcado .date{color:var(--dorado);}
 .event-item .title{font-size:.9rem;font-weight:600;margin:.1rem 0;}
 .event-item .place{font-size:.72rem;color:var(--gris-claro);text-transform:uppercase;letter-spacing:.8px;}
 .event-item .badges{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.3rem;}
@@ -143,6 +148,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .badge.cat-homenaje{background:rgba(168,85,247,.15);color:var(--violeta);}
 .badge.cat-festival{background:rgba(251,146,60,.15);color:var(--naranja);}
 .badge.cat-privado{background:rgba(136,136,136,.15);color:var(--gris-claro);}
+.badge.cat-remarcado{background:rgba(255,215,0,.18);color:var(--dorado);font-weight:800;}
 .badge.warn{background:rgba(245,166,35,.15);color:var(--amarillo);}
 .event-item .actions{display:flex;gap:.3rem;flex-wrap:wrap;}
 .event-item .actions button{width:32px;height:32px;border-radius:6px;background:var(--gris-oscuro);border:1px solid var(--gris-medio);color:var(--blanco);cursor:pointer;font-size:.85rem;transition:var(--trans);}
@@ -153,6 +159,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .event-item .actions .prev:hover{border-color:var(--amarillo);color:var(--amarillo);}
 .event-item .actions .wa:hover{border-color:var(--verde);color:var(--verde);}
 .event-thumb{width:46px;height:46px;border-radius:6px;object-fit:cover;flex-shrink:0;border:1px solid var(--gris-medio);-webkit-user-drag:none;user-drag:none;pointer-events:none;}
+.event-item.cat-remarcado .event-thumb{border-color:rgba(255,215,0,.5);}
 .drag-handle{cursor:grab;color:var(--gris-claro);font-size:1rem;letter-spacing:-3px;padding:.4rem .3rem;user-select:none;-webkit-user-select:none;touch-action:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .drag-handle:active{cursor:grabbing;color:var(--azul);}
 .event-item.dragging{opacity:.4;}
@@ -168,6 +175,22 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .modal-close{float:right;background:transparent;border:1px solid var(--gris-medio);color:var(--blanco);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;font-weight:700;transition:var(--trans);}
 .modal-close:hover{border-color:var(--rojo);color:var(--rojo);}
 .divider{height:1px;background:var(--gris-medio);margin:1.2rem 0;}
+
+/* MODAL CONFIRMACIÓN */
+.confirm-box{max-width:420px;text-align:center;padding:2rem 1.8rem;}
+.confirm-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem;}
+.confirm-icon.danger{background:rgba(230,57,70,.15);color:var(--rojo);}
+.confirm-icon.warn{background:rgba(245,166,35,.15);color:var(--amarillo);}
+.confirm-icon.info{background:rgba(0,102,255,.15);color:var(--azul-neon);}
+.confirm-title{font-family:var(--fuente-titulo);font-size:1.6rem;letter-spacing:1.5px;margin-bottom:.5rem;color:var(--blanco);}
+.confirm-message{font-size:.9rem;color:var(--gris-claro);line-height:1.5;margin-bottom:1.8rem;word-break:break-word;}
+.confirm-message strong{color:var(--blanco);font-weight:600;}
+.confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+.confirm-actions .btn{justify-content:center;padding:.9rem 1.4rem;font-size:.8rem;}
+.btn-confirm-yes{background:var(--rojo);color:#fff;border-color:var(--rojo);}
+.btn-confirm-yes:hover{background:#c92d3a;box-shadow:0 0 20px rgba(230,57,70,.5);}
+.btn-confirm-yes.warn{background:var(--amarillo);border-color:var(--amarillo);color:#0a0a0a;}
+.btn-confirm-yes.warn:hover{background:#d99420;box-shadow:0 0 20px rgba(245,166,35,.5);}
 
 /* USERS */
 .user-list{display:flex;flex-direction:column;gap:.6rem;}
@@ -196,14 +219,14 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .log-meta strong{color:var(--azul-neon);font-weight:600;}
 .log-empty{text-align:center;padding:2rem 1rem;color:var(--gris-claro);font-size:.85rem;border:1px dashed var(--gris-medio);border-radius:10px;}
 
-/* GALERÍA DE FLYERS */
+/* GALERÍA */
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.8rem;}
 .gallery-item{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--gris-medio);aspect-ratio:1;cursor:pointer;transition:var(--trans);background:var(--negro);}
 .gallery-item:hover{transform:scale(1.03);border-color:var(--azul);z-index:2;}
 .gallery-item img{width:100%;height:100%;object-fit:cover;}
 .gallery-item .caption{position:absolute;bottom:0;left:0;right:0;padding:.4rem .6rem;background:linear-gradient(transparent,rgba(0,0,0,.9));font-size:.65rem;color:#fff;line-height:1.2;}
 
-/* PREVIEW PÚBLICA */
+/* PREVIEW */
 .preview-box{background:#0a0a0a;border-radius:10px;padding:1.5rem;color:#f0f0f0;font-family:var(--fuente-cuerpo);}
 .preview-box .pv-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:1.2rem;display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:center;}
 .preview-box .pv-flyer{width:100px;height:100px;border-radius:8px;object-fit:cover;border:1px solid #2a2a2a;}
@@ -212,6 +235,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .preview-box h4{font-family:var(--fuente-titulo);font-size:1.4rem;letter-spacing:1px;margin-bottom:.3rem;color:#f0f0f0;}
 .preview-box .pv-lugar{color:#00a8ff;font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:.3rem;}
 .preview-box .pv-extra{color:#888;font-size:.85rem;}
+.preview-box .pv-card.remarcado{border-color:#ffd700;box-shadow:0 0 30px rgba(255,215,0,.2);}
 
 /* TOAST */
 .toast{position:fixed;bottom:2rem;right:2rem;background:var(--gris-oscuro);border:1px solid var(--azul);color:var(--blanco);padding:1rem 1.5rem;border-radius:8px;font-size:.85rem;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.5);transform:translateY(150%);transition:var(--trans);z-index:5000;display:flex;align-items:center;gap:.6rem;max-width:400px;}
@@ -220,7 +244,6 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .toast.error{border-color:var(--rojo);}
 .toast.warn{border-color:var(--amarillo);}
 
-/* RESPONSIVE */
 @media (max-width:900px){ .admin-grid{grid-template-columns:1fr;} }
 @media (max-width:600px){
   .panel{padding:1rem .8rem 3rem;}
@@ -236,6 +259,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
   .section-title{font-size:1.5rem;}
   .modal{padding:1.3rem;}
   .dashboard{grid-template-columns:1fr 1fr;}
+  .confirm-actions{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -269,11 +293,9 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
     </div>
   </div>
 
-  <!-- DASHBOARD -->
   <div class="dashboard" id="dashboard"></div>
 
   <div class="admin-grid">
-    <!-- FORM -->
     <div class="card">
       <h2 class="section-title" id="formTitle">NUEVO <span>EVENTO</span></h2>
       <p class="section-sub">Completá los datos y guardá. El flyer se comprime automáticamente.</p>
@@ -291,9 +313,9 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
           <div class="form-group">
             <label>Estado *</label>
             <select id="estado" required>
-              <option value="confirmado">✅ Confirmado</option>
-              <option value="borrador">🟡 Borrador (no se publica)</option>
-              <option value="cancelado">🔴 Cancelado</option>
+              <option value="confirmado">✅ Confirmado (visible)</option>
+              <option value="borrador">🟡 Borrador (NO visible)</option>
+              <option value="cancelado">🔴 Cancelado (NO visible)</option>
             </select>
           </div>
         </div>
@@ -305,10 +327,11 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
           <div class="form-group">
             <label>Categoría</label>
             <select id="categoria">
-              <option value="covers">Covers</option>
-              <option value="homenaje">Homenaje Cerati</option>
-              <option value="festival">Festival</option>
-              <option value="privado">Evento Privado</option>
+              <option value="covers">🎸 Covers</option>
+              <option value="remarcado">⭐ Remarcado (destacado)</option>
+              <option value="homenaje">🎤 Homenaje Cerati</option>
+              <option value="festival">🎪 Festival</option>
+              <option value="privado">🎩 Evento Privado</option>
             </select>
           </div>
         </div>
@@ -356,7 +379,6 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
       </form>
     </div>
 
-    <!-- LIST -->
     <div class="card">
       <h2 class="section-title">EVENTOS <span>CARGADOS</span></h2>
       <p class="section-sub" id="eventsCount">Cargando...</p>
@@ -369,6 +391,14 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
           <option value="confirmado">✅ Confirmados</option>
           <option value="cancelado">🔴 Cancelados</option>
         </select>
+        <select id="filterCategoria" onchange="applyFilters()">
+          <option value="">Todas las categorías</option>
+          <option value="remarcado">⭐ Remarcados</option>
+          <option value="covers">🎸 Covers</option>
+          <option value="homenaje">🎤 Homenaje</option>
+          <option value="festival">🎪 Festival</option>
+          <option value="privado">🎩 Privado</option>
+        </select>
         <select id="filterTiempo" onchange="applyFilters()">
           <option value="">Todos</option>
           <option value="proximos">Próximos</option>
@@ -378,7 +408,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
           <option value="manual">Orden manual</option>
           <option value="fecha-asc">Fecha ↑</option>
           <option value="fecha-desc">Fecha ↓</option>
-          <option value="recientes">Modificados recientes</option>
+          <option value="recientes">Recientes</option>
         </select>
       </div>
 
@@ -429,23 +459,36 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
   </div>
 </div>
 
-<!-- MODAL GALERÍA DE FLYERS -->
+<!-- MODAL GALERÍA -->
 <div class="modal-backdrop" id="galleryModal">
   <div class="modal" style="max-width:900px;">
     <button class="modal-close" onclick="hideModal('galleryModal')">✕</button>
     <h2 class="section-title">Galería de <span>Flyers</span></h2>
-    <p class="section-sub">Todos los flyers subidos (más recientes primero).</p>
+    <p class="section-sub">Todos los flyers subidos.</p>
     <div class="gallery-grid" id="galleryGrid"><div class="empty-state">Cargando...</div></div>
   </div>
 </div>
 
-<!-- MODAL PREVIEW PÚBLICA -->
+<!-- MODAL PREVIEW -->
 <div class="modal-backdrop" id="previewModal">
   <div class="modal">
     <button class="modal-close" onclick="hideModal('previewModal')">✕</button>
     <h2 class="section-title">Vista <span>Pública</span></h2>
     <p class="section-sub">Así se verá el evento en la web.</p>
     <div class="preview-box" id="previewBox"></div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal confirm-box">
+    <div class="confirm-icon danger" id="confirmIcon">⚠️</div>
+    <h3 class="confirm-title" id="confirmTitle">¿Estás seguro?</h3>
+    <p class="confirm-message" id="confirmMessage">Esta acción no se puede deshacer.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" id="confirmCancel">Cancelar</button>
+      <button class="btn btn-confirm-yes" id="confirmOk">Sí, continuar</button>
+    </div>
   </div>
 </div>
 
@@ -487,7 +530,14 @@ const OWNER_EMAIL = 'sebagsc2020@gmail.com';
 const MAX_FLYER_KB = 800;
 const LOGS_FETCH_LIMIT = 300;
 const LOGS_DISPLAY_LIMIT = 100;
-const CATEGORIA_LABEL = { covers:'Covers', homenaje:'Homenaje', festival:'Festival', privado:'Privado' };
+
+const CATEGORIA_LABEL = {
+  covers:'🎸 Covers',
+  remarcado:'⭐ Remarcado',
+  homenaje:'🎤 Homenaje',
+  festival:'🎪 Festival',
+  privado:'🎩 Privado'
+};
 
 let flyerBase64 = null;
 let events = [];
@@ -509,6 +559,58 @@ function todayStart(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
 function showModal(id){ document.getElementById(id).classList.add('show'); }
 function hideModal(id){ document.getElementById(id).classList.remove('show'); }
 
+/* ====== CONFIRMACIÓN PERSONALIZADA ====== */
+function showConfirm(opts){
+  return new Promise((resolve) => {
+    const {
+      title = '¿Estás seguro?',
+      message = 'Esta acción no se puede deshacer.',
+      confirmText = 'Sí, continuar',
+      cancelText = 'Cancelar',
+      variant = 'danger',
+      icon = null
+    } = opts || {};
+
+    const modal = document.getElementById('confirmModal');
+    const iconEl = document.getElementById('confirmIcon');
+    const titleEl = document.getElementById('confirmTitle');
+    const msgEl = document.getElementById('confirmMessage');
+    const okBtn = document.getElementById('confirmOk');
+    const cancelBtn = document.getElementById('confirmCancel');
+
+    iconEl.className = `confirm-icon ${variant}`;
+    iconEl.textContent = icon || (variant === 'danger' ? '⚠️' : variant === 'warn' ? '❓' : 'ℹ️');
+    titleEl.textContent = title;
+    msgEl.innerHTML = message;
+    okBtn.textContent = confirmText;
+    okBtn.className = `btn btn-confirm-yes${variant === 'warn' ? ' warn' : ''}`;
+    cancelBtn.textContent = cancelText;
+
+    const cleanup = () => {
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      modal.removeEventListener('click', onBackdrop);
+      document.removeEventListener('keydown', onKey);
+      hideModal('confirmModal');
+    };
+    const onOk = () => { cleanup(); resolve(true); };
+    const onCancel = () => { cleanup(); resolve(false); };
+    const onBackdrop = (e) => { if(e.target.id === 'confirmModal') onCancel(); };
+    const onKey = (e) => {
+      if(e.key === 'Escape') onCancel();
+      else if(e.key === 'Enter') onOk();
+    };
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    modal.addEventListener('click', onBackdrop);
+    document.addEventListener('keydown', onKey);
+
+    showModal('confirmModal');
+    setTimeout(() => cancelBtn.focus(), 50);
+  });
+}
+
 /* ====== TEMA ====== */
 function applyTheme(){
   const saved = localStorage.getItem('tbTheme') || 'dark';
@@ -521,7 +623,6 @@ function toggleTheme(){
   localStorage.setItem('tbTheme', next);
   applyTheme();
 }
-window.toggleTheme = toggleTheme;
 applyTheme();
 
 /* ====== COMPRESIÓN ====== */
@@ -610,7 +711,20 @@ onAuthStateChanged(auth, (user) => {
     safeDestroySortable();
   }
 });
-function logout(){ logAction('logout','Cierre de sesión'); signOut(auth); }
+
+async function logout(){
+  const ok = await showConfirm({
+    title: 'Cerrar sesión',
+    message: '¿Querés salir del panel de administración?',
+    confirmText: 'Sí, salir',
+    cancelText: 'Quedarme',
+    variant: 'info',
+    icon: '🚪'
+  });
+  if(!ok) return;
+  logAction('logout','Cierre de sesión');
+  signOut(auth);
+}
 
 /* ====== USUARIOS ====== */
 function subscribeAdmins(){
@@ -680,7 +794,17 @@ async function removeUser(uid, email){
   if(currentUserEmail.toLowerCase() !== OWNER_EMAIL.toLowerCase()){ toast('Solo el owner.','error'); return; }
   if(uid === auth.currentUser?.uid){ toast('No podés eliminarte.','error'); return; }
   if((email||'').toLowerCase() === OWNER_EMAIL.toLowerCase()){ toast('No podés eliminar al owner.','error'); return; }
-  if(!confirm(`¿Eliminar acceso de "${email}"?`)) return;
+
+  const ok = await showConfirm({
+    title: 'Eliminar usuario',
+    message: `¿Querés quitarle el acceso a <strong>${escapeHtml(email)}</strong>?<br><br>La cuenta seguirá existiendo en Firebase Auth. Para borrarla definitivamente, usá la Consola de Firebase.`,
+    confirmText: 'Sí, eliminar',
+    cancelText: 'Cancelar',
+    variant: 'danger',
+    icon: '🗑️'
+  });
+  if(!ok) return;
+
   try{
     await deleteDoc(doc(db, ADMINS_COL, uid));
     await logAction('delete_user', `Usuario: ${email}`);
@@ -745,7 +869,7 @@ async function showLogsModal(){
   }catch(err){ console.error(err); list.innerHTML = `<div class="log-empty" style="border-color:var(--rojo);color:var(--rojo);">Error: ${err.code}</div>`; }
 }
 
-/* ====== GALERÍA DE FLYERS ====== */
+/* ====== GALERÍA ====== */
 function showGalleryModal(){
   showModal('galleryModal');
   const grid = document.getElementById('galleryGrid');
@@ -758,7 +882,7 @@ function showGalleryModal(){
     </div>`).join('');
 }
 
-/* ====== PREVIEW PÚBLICA ====== */
+/* ====== PREVIEW ====== */
 function showPreview(id){
   const ev = events.find(e => e.id === id); if(!ev) return;
   const d = new Date(ev.fecha + 'T00:00:00');
@@ -767,14 +891,17 @@ function showPreview(id){
   const yy = d.getFullYear();
   const flyer = ev.flyer ? `<img class="pv-flyer" src="${ev.flyer}">` : '';
   const extra = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
+  const isRemarcado = (ev.categoria||'') === 'remarcado';
+  const catLabel = CATEGORIA_LABEL[ev.categoria||'covers'] || '🎸 Covers';
   document.getElementById('previewBox').innerHTML = `
-    <div class="pv-card" style="${ev.flyer?'grid-template-columns:auto auto 1fr':'grid-template-columns:auto 1fr'}">
+    <div class="pv-card${isRemarcado?' remarcado':''}" style="${ev.flyer?'grid-template-columns:auto auto 1fr':'grid-template-columns:auto 1fr'}">
       ${flyer}
       <div style="text-align:center">
         <div class="pv-date">${dd}</div>
         <div class="pv-month">${mm} ${yy}</div>
       </div>
       <div>
+        <div style="font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:.3rem">${catLabel}</div>
         <h4>${escapeHtml(ev.titulo)}</h4>
         <div class="pv-lugar">📍 ${escapeHtml(ev.lugar)}</div>
         ${extra?`<div class="pv-extra">${escapeHtml(extra)}</div>`:''}
@@ -876,6 +1003,7 @@ function subscribeEvents(){
 function applyFilters(){
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
   const fEstado = document.getElementById('filterEstado').value;
+  const fCategoria = document.getElementById('filterCategoria').value;
   const fTiempo = document.getElementById('filterTiempo').value;
   const fOrder = document.getElementById('filterOrder').value;
   const hoy = todayStart();
@@ -883,12 +1011,20 @@ function applyFilters(){
   let arr = events.slice();
   if(q) arr = arr.filter(e => (e.titulo||'').toLowerCase().includes(q) || (e.lugar||'').toLowerCase().includes(q));
   if(fEstado) arr = arr.filter(e => (e.estado||'confirmado') === fEstado);
+  if(fCategoria) arr = arr.filter(e => (e.categoria||'covers') === fCategoria);
   if(fTiempo === 'proximos') arr = arr.filter(e => new Date(e.fecha+'T00:00:00') >= hoy);
   if(fTiempo === 'pasados') arr = arr.filter(e => new Date(e.fecha+'T00:00:00') < hoy);
   if(fOrder === 'fecha-asc') arr.sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
   else if(fOrder === 'fecha-desc') arr.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
   else if(fOrder === 'recientes') arr.sort((a,b)=>((b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0)));
-  // 'manual' mantiene el orden original
+  else {
+    arr.sort((a,b) => {
+      const ra = (a.categoria||'') === 'remarcado' ? 0 : 1;
+      const rb = (b.categoria||'') === 'remarcado' ? 0 : 1;
+      if(ra !== rb) return ra - rb;
+      return 0;
+    });
+  }
 
   eventsFiltered = arr;
   renderEvents();
@@ -920,14 +1056,13 @@ function renderEvents(){
     const cat = ev.categoria || 'covers';
     const esPasado = d < hoy;
 
-    // Alertas de datos faltantes
     const alertas = [];
     if(!ev.flyer) alertas.push('<span class="badge warn">⚠️ Sin flyer</span>');
-    if(!ev.mapsUrl && (!ev.lugar || ev.lugar.length < 10)) alertas.push('<span class="badge warn">⚠️ Dirección incompleta</span>');
+    if(!ev.mapsUrl && (!ev.lugar || ev.lugar.length < 10)) alertas.push('<span class="badge warn">⚠️ Dirección</span>');
     if(!ev.hora) alertas.push('<span class="badge warn">⚠️ Sin hora</span>');
 
     return `
-      <div class="event-item estado-${estado}" data-id="${ev.id}">
+      <div class="event-item estado-${estado} cat-${cat}" data-id="${ev.id}">
         <div class="drag-handle" title="Arrastrar">⋮⋮</div>
         ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false">` : ''}
         <div class="info">
@@ -936,7 +1071,7 @@ function renderEvents(){
           <div class="place">${escapeHtml(ev.lugar)}</div>
           <div class="badges">
             <span class="badge ${estado}">${estado==='borrador'?'🟡 Borrador':estado==='cancelado'?'🔴 Cancelado':'✅ Confirmado'}</span>
-            <span class="badge cat-${cat}">${CATEGORIA_LABEL[cat]||'Covers'}</span>
+            <span class="badge cat-${cat}">${CATEGORIA_LABEL[cat]||'🎸 Covers'}</span>
             ${alertas.join('')}
           </div>
         </div>
@@ -957,6 +1092,7 @@ function renderDashboard(){
   const proximos = events.filter(e => (e.estado||'confirmado')==='confirmado' && new Date(e.fecha+'T00:00:00') >= hoy).length;
   const borradores = events.filter(e => (e.estado||'confirmado')==='borrador').length;
   const cancelados = events.filter(e => (e.estado||'confirmado')==='cancelado').length;
+  const remarcados = events.filter(e => (e.categoria||'')==='remarcado' && (e.estado||'confirmado')==='confirmado').length;
   const sinFlyer = events.filter(e => (e.estado||'confirmado')==='confirmado' && !e.flyer).length;
 
   const proximo = events
@@ -974,6 +1110,11 @@ function renderDashboard(){
       <div class="stat-label">Próximo show</div>
       <div class="stat-value" style="font-size:1.2rem">${proximoTxt}</div>
       <div class="stat-sub">${escapeHtml(proximoSub)}</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-label">⭐ Remarcados</div>
+      <div class="stat-value">${remarcados}</div>
+      <div class="stat-sub">destacados</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Confirmados</div>
@@ -993,7 +1134,7 @@ function renderDashboard(){
     <div class="stat-card ${sinFlyer?'warn':''}">
       <div class="stat-label">Sin flyer</div>
       <div class="stat-value">${sinFlyer}</div>
-      <div class="stat-sub">eventos confirmados</div>
+      <div class="stat-sub">confirmados</div>
     </div>
   `;
 }
@@ -1002,7 +1143,6 @@ function initSortable(){
   const el = document.getElementById('eventsList');
   if(!el) return;
   safeDestroySortable();
-  // Solo habilitamos drag&drop si el orden es manual
   if(document.getElementById('filterOrder').value !== 'manual') return;
   if(!eventsFiltered.length) return;
 
@@ -1117,13 +1257,22 @@ async function duplicateEvent(id){
   try{
     await addDoc(collection(db, COL), data);
     await logAction('duplicate_event', `Copia de "${ev.titulo}"`);
-    toast('📋 Copia creada (borrador). Completá la fecha.','success');
+    toast('📋 Copia creada (borrador).','success');
   }catch(err){ console.error(err); toast('❌ Error al duplicar.','error'); }
 }
 
 async function deleteEvent(id){
   const ev = events.find(x=>x.id===id);
-  if(!confirm(`¿Eliminar "${ev?.titulo || 'evento'}"?`)) return;
+  const ok = await showConfirm({
+    title: 'Eliminar evento',
+    message: `¿Querés eliminar <strong>"${escapeHtml(ev?.titulo || 'este evento')}"</strong>?<br><br>Esta acción no se puede deshacer.`,
+    confirmText: 'Sí, eliminar',
+    cancelText: 'Cancelar',
+    variant: 'danger',
+    icon: '⚠️'
+  });
+  if(!ok) return;
+
   try{
     await deleteDoc(doc(db, COL, id));
     await logAction('delete_event', `"${ev?.titulo || id}" · ${ev?.fecha || ''}`);
@@ -1136,7 +1285,8 @@ function shareWhatsApp(id){
   const d = new Date(ev.fecha + 'T00:00:00');
   const fechaTxt = d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
   const mapsLink = ev.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.lugar)}`;
-  const texto = `🎸 *TAXI BLUE ROCK*\n\n*${ev.titulo}*\n📅 ${fechaTxt}${ev.hora?' · '+ev.hora:''}\n📍 ${ev.lugar}\n🗺️ ${mapsLink}${ev.descripcion?'\n\n'+ev.descripcion:''}\n\n¡Te esperamos!`;
+  const catLabel = CATEGORIA_LABEL[ev.categoria||'covers'] || '';
+  const texto = `🎸 *TAXI BLUE ROCK*\n${catLabel?'\n'+catLabel:''}\n\n*${ev.titulo}*\n📅 ${fechaTxt}${ev.hora?' · '+ev.hora:''}\n📍 ${ev.lugar}\n🗺️ ${mapsLink}${ev.descripcion?'\n\n'+ev.descripcion:''}\n\n¡Te esperamos!`;
   window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
 }
 
@@ -1155,12 +1305,7 @@ async function exportBackup(){
     });
     const admins = adminsList.map(a => ({ email: a.email, createdAt: a.createdAt?.toDate ? a.createdAt.toDate().toISOString() : null }));
     const eventos = events.map(e => ({ ...e, updatedAt: undefined, createdAt: undefined }));
-
-    const data = {
-      exportedAt: new Date().toISOString(),
-      exportedBy: currentUserEmail,
-      eventos, admins, logs
-    };
+    const data = { exportedAt: new Date().toISOString(), exportedBy: currentUserEmail, eventos, admins, logs };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1169,10 +1314,7 @@ async function exportBackup(){
     a.click();
     URL.revokeObjectURL(url);
     toast('✅ Backup descargado.','success');
-  }catch(err){
-    console.error(err);
-    toast('❌ Error al exportar.','error');
-  }
+  }catch(err){ console.error(err); toast('❌ Error al exportar.','error'); }
 }
 
 /* ====== TOAST ====== */
@@ -1185,15 +1327,13 @@ function toast(msg, type=''){
   toastTimer = setTimeout(()=> el.classList.remove('show'), 3200);
 }
 
-/* ====== Cerrar modales al clickear backdrop ====== */
 ['usersModal','logsModal','changePasswordModal','galleryModal','previewModal'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => { if(e.target.id === id) hideModal(id); });
 });
 
-/* ====== Exponer globales ====== */
 Object.assign(window, {
   tryLogin, logout, addUser, removeUser, changePassword,
-  showLogsModal, showGalleryModal, showPreview,
+  showLogsModal, showGalleryModal, showPreview, toggleTheme,
   hideModal: (id) => hideModal(id),
   saveEvent, editEvent, deleteEvent, duplicateEvent, shareWhatsApp,
   handleFlyer, removeFlyer, resetForm, updateMiniMapDebounced,
