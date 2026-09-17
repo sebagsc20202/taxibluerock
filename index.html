@@ -22,6 +22,7 @@
             --rojo-rock: #e63946;
             --rojo-live: #ff1744;
             --verde-maps: #34a853;
+            --dorado: #ffd700;
             --fuente-titulo: 'Bebas Neue', sans-serif;
             --fuente-cuerpo: 'Inter', sans-serif;
             --transicion: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -252,6 +253,35 @@
         .event-card.past:hover::before { opacity: 0.6; }
         .event-card.past .event-date .day { color: var(--gris-claro); }
 
+        /* REMARCADO */
+        .event-card.remarcado{
+            border-color: rgba(255,215,0,.5);
+            background: linear-gradient(135deg, var(--gris-oscuro), rgba(255,215,0,.06));
+            box-shadow: 0 0 25px rgba(255,215,0,.15);
+        }
+        .event-card.remarcado:hover{
+            border-color: #ffd700;
+            box-shadow: 0 0 40px rgba(255,215,0,.3);
+            background: linear-gradient(135deg, var(--gris-medio), rgba(255,215,0,.1));
+        }
+        .event-card.remarcado::before{ background: #ffd700; opacity: 1; }
+        .event-card.remarcado .event-date .day{ color: #ffd700; }
+        .event-card.remarcado .venue-link{ color: #ffd700; }
+        .event-card.remarcado .venue-text{ color: #ffd700; }
+        .event-card.remarcado .directions-link{
+            background: rgba(255,215,0,.12);
+            border-color: rgba(255,215,0,.5);
+            color: #ffd700;
+        }
+        .event-card.remarcado .directions-link:hover{
+            background: #ffd700; border-color: #ffd700; color: #0a0a0a;
+            box-shadow: 0 4px 14px rgba(255,215,0,.5);
+        }
+        .event-card.remarcado .event-flyer:hover{
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255,215,0,.5);
+        }
+
         /* BADGES */
         .past-badge {
             display: inline-flex; align-items: center; gap: 0.4rem;
@@ -267,6 +297,34 @@
         .past-badge::before {
             content: ''; width: 6px; height: 6px; border-radius: 50%;
             background: var(--gris-claro); flex-shrink: 0;
+        }
+
+        /* Badge de categoría */
+        .categoria-badge{
+            display: inline-block;
+            font-size: .62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            padding: .25rem .7rem;
+            border-radius: 20px;
+            margin-bottom: .5rem;
+        }
+        .categoria-badge.cat-covers{ background: rgba(0,102,255,.15); color: #00a8ff; }
+        .categoria-badge.cat-homenaje{ background: rgba(168,85,247,.15); color: #a855f7; }
+        .categoria-badge.cat-festival{ background: rgba(251,146,60,.15); color: #fb923c; }
+        .categoria-badge.cat-privado{ background: rgba(136,136,136,.15); color: #888; }
+        .categoria-badge.cat-remarcado{
+            background: linear-gradient(135deg, rgba(255,215,0,.25), rgba(255,140,0,.2));
+            color: #ffd700;
+            font-weight: 800;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255,215,0,.35);
+            animation: remarcadoPulse 2s ease-in-out infinite;
+        }
+        @keyframes remarcadoPulse{
+            0%, 100%{ box-shadow: 0 0 15px rgba(255,215,0,.35); }
+            50%{ box-shadow: 0 0 25px rgba(255,215,0,.7); }
         }
 
         .live-block {
@@ -874,7 +932,401 @@
                     </svg>
                 </a>
             </div>
-            <p class="copyright">© 2025 Taxi Blue Rock. Todos los derechos reservados.</p>
             <p class="copyright">© 2026 Taxi Blue Rock. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar">✕</button>
+        <img id="lightboxImg" alt="Flyer ampliado">
+        <div class="lightbox-hint">Tocá o deslizá para cerrar</div>
+    </div>
+
+    <script>
+        /* ========== NAVBAR SCROLL ========== */
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+        });
+
+        /* ========== MENÚ MÓVIL ========== */
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => navLinks.classList.remove('active'));
+        });
+
+        /* ========== FORMULARIO WHATSAPP ========== */
+        const WHATSAPP_NUMBER = '5493541381626';
+
+        function toggleFechaField() {
+            const tipo = document.getElementById('tipo').value;
+            const fechaGroup = document.getElementById('fechaGroup');
+            if (tipo === 'Contratación de show') fechaGroup.classList.remove('hidden');
+            else fechaGroup.classList.add('hidden');
+        }
+
+        function sendToWhatsApp(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('nombre').value.trim();
+            const tipo = document.getElementById('tipo').value;
+            const fecha = document.getElementById('fecha').value;
+            const mensaje = document.getElementById('mensaje').value.trim();
+
+            if (!nombre || !tipo) {
+                alert('Por favor, completá los campos obligatorios.');
+                return;
+            }
+
+            let texto = `*Consulta desde la web - Taxi Blue Rock*\n\n`;
+            texto += `👤 *Nombre:* ${nombre}\n`;
+            texto += `📋 *Tipo de consulta:* ${tipo}\n`;
+
+            if (tipo === 'Contratación de show' && fecha) {
+                const fechaObj = new Date(fecha + 'T00:00:00');
+                const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+                const fechaLegible = fechaObj.toLocaleDateString('es-AR', opciones);
+                texto += `📅 *Fecha tentativa:* ${fechaLegible}\n`;
+            }
+
+            if (mensaje) texto += `\n💬 *Mensaje:*\n${mensaje}`;
+
+            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        }
+
+        /* ========== SCROLL SUAVE ========== */
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                const target = document.querySelector(targetId);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        /* ========== HELPERS ========== */
+        function escapeHtml(s){
+            return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function escapeJs(s){
+            return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
+        }
+
+        function sendEventWhatsApp(eventInfo){
+            const texto = `*Consulta sobre evento - Taxi Blue Rock*\n\n🎸 *Evento:* ${eventInfo}\n\nHola, me gustaría recibir más información sobre este show.`;
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        /* ========== GOOGLE MAPS HELPERS ========== */
+        function getDirectionsUrl(ev){
+            if(!ev.lugar) return null;
+            let destino = ev.lugar;
+            if(ev.mapsUrl){
+                const coords = extraerCoordsDeMapsUrl(ev.mapsUrl);
+                if(coords) destino = coords;
+            }
+            return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destino)}`;
+        }
+
+        function extraerCoordsDeMapsUrl(url){
+            let m = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if(m) return `${m[1]},${m[2]}`;
+            m = url.match(/[?&](?:q|query|destination)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if(m) return `${m[1]},${m[2]}`;
+            return null;
+        }
+
+        /* ========== LIGHTBOX ========== */
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxClose = document.getElementById('lightboxClose');
+
+        let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+        let imgStartX = 0, imgStartY = 0, isDragging = false;
+
+        function openLightbox(src, alt) {
+            lightboxImg.src = src;
+            lightboxImg.alt = alt || 'Flyer ampliado';
+            lightbox.classList.add('open');
+            lightbox.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('no-scroll');
+        }
+
+        function closeLightbox() {
+            if (isDragging) {
+                lightboxImg.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+                lightboxImg.style.transform = `translate(${imgStartX}px, ${imgStartY}px) scale(0.7)`;
+                lightboxImg.style.opacity = '0';
+                setTimeout(() => {
+                    lightboxImg.style.transition = '';
+                    lightboxImg.style.transform = '';
+                    lightboxImg.style.opacity = '';
+                }, 260);
+            }
+            lightbox.classList.remove('open');
+            lightbox.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('no-scroll');
+            isDragging = false;
+        }
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox || e.target === lightboxClose) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+        });
+
+        lightbox.addEventListener('touchstart', (e) => {
+            if (!lightbox.classList.contains('open')) return;
+            const t = e.touches[0];
+            touchStartX = t.clientX; touchStartY = t.clientY;
+            touchStartTime = Date.now();
+            imgStartX = 0; imgStartY = 0;
+            isDragging = true;
+            lightboxImg.style.transition = 'none';
+        }, { passive: true });
+
+        lightbox.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const t = e.touches[0];
+            const dx = t.clientX - touchStartX;
+            const dy = t.clientY - touchStartY;
+            imgStartX = dx; imgStartY = dy;
+            const opacity = Math.max(0.3, 1 - Math.abs(dx + dy) / 800);
+            lightboxImg.style.transform = `translate(${dx}px, ${dy}px) scale(${Math.max(0.85, 1 - Math.abs(dx + dy) / 1500)})`;
+            lightboxImg.style.opacity = opacity;
+            lightbox.style.background = `rgba(0, 0, 0, ${0.95 * opacity})`;
+        }, { passive: true });
+
+        lightbox.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            const elapsed = Date.now() - touchStartTime;
+            const dist = Math.sqrt(imgStartX * imgStartX + imgStartY * imgStartY);
+            const velocity = dist / Math.max(elapsed, 1);
+            lightbox.style.background = '';
+            if (dist > 80 || velocity > 0.5) {
+                closeLightbox();
+            } else {
+                lightboxImg.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+                lightboxImg.style.transform = '';
+                lightboxImg.style.opacity = '';
+                setTimeout(() => { lightboxImg.style.transition = ''; }, 260);
+                isDragging = false;
+            }
+        });
+
+        lightbox.addEventListener('touchmove', (e) => {
+            if (e.cancelable) e.preventDefault();
+        }, { passive: false });
+
+        window.openLightbox = openLightbox;
+
+        /* ========== VENTANA TEMPORAL DE EVENTO ========== */
+        const LIVE_DURATION_MS = 2.5 * 60 * 60 * 1000;
+
+        function getEventWindow(fecha, hora) {
+            const inicio = new Date(fecha + 'T00:00:00');
+            let duracionMs = 24 * 60 * 60 * 1000;
+            if (hora) {
+                const m = String(hora).match(/(\d{1,2})[:.](\d{1,2})/);
+                if (m) {
+                    const h = parseInt(m[1], 10);
+                    const min = parseInt(m[2], 10);
+                    if (!isNaN(h) && !isNaN(min)) {
+                        inicio.setHours(h, min, 0, 0);
+                        duracionMs = LIVE_DURATION_MS;
+                    }
+                }
+            }
+            const fin = new Date(inicio.getTime() + duracionMs);
+            return { inicio, fin };
+        }
+
+        function getEstado(ev, ahora) {
+            const { inicio, fin } = getEventWindow(ev.fecha, ev.hora);
+            if (ahora < inicio) return 'proximo';
+            if (ahora < fin) return 'live';
+            return 'pasado';
+        }
+
+        /* ========== RENDER EVENTOS ========== */
+        let cachedEventos = [];
+
+        function renderEventos() {
+            const list = document.getElementById('eventsList');
+            if (!list) return;
+
+            if (!cachedEventos.length) {
+                list.innerHTML = `<div class="events-empty">
+                    Próximamente nuevas fechas. ¡Seguinos en Instagram para enterarte primero!
+                </div>`;
+                return;
+            }
+
+            const ahora = new Date();
+            const CAT_LABEL = {
+                covers: '🎸 Covers',
+                remarcado: '⭐ DESTACADO',
+                homenaje: '🎤 Homenaje Cerati',
+                festival: '🎪 Festival',
+                privado: '🎩 Evento Privado'
+            };
+
+            list.innerHTML = cachedEventos.map(ev => {
+                const d = new Date(ev.fecha + 'T00:00:00');
+                const dd = String(d.getDate()).padStart(2,'0');
+                const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
+                const yy = d.getFullYear();
+                const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
+
+                const estado = getEstado(ev, ahora);
+                const cat = ev.categoria || 'covers';
+                const isRemarcado = cat === 'remarcado';
+                const catLabel = CAT_LABEL[cat] || '';
+
+                const flyerHtml = ev.flyer
+                    ? `<img class="event-flyer"
+                          src="${ev.flyer}"
+                          alt="Flyer ${escapeHtml(ev.titulo)}"
+                          onclick="openLightbox(this.src, this.alt)">`
+                    : '';
+
+                const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
+
+                // Dirección → ruta más corta (solo si NO es pasado)
+                const directionsUrl = getDirectionsUrl(ev);
+                const lugarHtml = (estado !== 'pasado' && directionsUrl)
+                    ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="venue-link" title="Trazar ruta más corta en Google Maps">
+                           <svg class="venue-pin" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
+                           </svg>
+                           ${escapeHtml(ev.lugar)}
+                       </a>`
+                    : `<span class="venue-text">${escapeHtml(ev.lugar)}</span>`;
+
+                const directionsHtml = (estado !== 'pasado' && directionsUrl)
+                    ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="directions-link" title="Ruta más corta en Google Maps">
+                           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                               <path d="M21.71 11.29l-9-9a.996.996 0 00-1.41 0l-9 9a.996.996 0 000 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 000-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/>
+                           </svg>
+                           Cómo llegar
+                       </a>`
+                    : '';
+
+                let accionHtml = '';
+                if (estado === 'proximo') {
+                    accionHtml = `<button class="event-cta"
+                        onclick="sendEventWhatsApp('${escapeJs(fechaTxt)} - ${escapeJs(ev.lugar)}')">
+                        Consultar
+                    </button>`;
+                } else if (estado === 'live') {
+                    accionHtml = `
+                        <div class="live-block">
+                            <span class="live-badge">EN VIVO AHORA</span>
+                            <span class="live-text">¡Vení, te esperamos!</span>
+                        </div>`;
+                } else {
+                    accionHtml = `<span class="past-badge">Realizado</span>`;
+                }
+
+                const claseEstado = estado === 'live' ? ' live' : (estado === 'pasado' ? ' past' : '');
+                const claseRemarcado = isRemarcado ? ' remarcado' : '';
+
+                return `
+                    <div class="event-card${ev.flyer ? ' has-flyer' : ''}${claseEstado}${claseRemarcado}">
+                        ${flyerHtml}
+                        <div class="event-date">
+                            <div class="day">${dd}</div>
+                            <div class="month">${mm} ${yy}</div>
+                        </div>
+                        <div class="event-info">
+                            ${catLabel ? `<div class="categoria-badge cat-${cat}">${catLabel}</div>` : ''}
+                            <h4>${escapeHtml(ev.titulo)}</h4>
+                            ${lugarHtml}
+                            ${extraInfo ? `<p>${escapeHtml(extraInfo)}</p>` : ''}
+                            ${directionsHtml}
+                        </div>
+                        ${accionHtml}
+                    </div>`;
+            }).join('');
+        }
+
+        function scheduleRefresh() {
+            setInterval(() => {
+                if (!lightbox.classList.contains('open')) {
+                    renderEventos();
+                }
+            }, 60000);
+        }
+
+        /* ========== CARGAR DESDE FIRESTORE ========== */
+        async function loadEventos() {
+            const list = document.getElementById('eventsList');
+            if (!list) return;
+
+            try {
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+                const { getFirestore, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+                const firebaseConfig = {
+                    apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
+                    authDomain: "taxiblue-87289.firebaseapp.com",
+                    projectId: "taxiblue-87289",
+                    storageBucket: "taxiblue-87289.firebasestorage.app",
+                    messagingSenderId: "886873440517",
+                    appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
+                    measurementId: "G-M04PSGFYDM"
+                };
+
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+
+                const snap = await getDocs(collection(db, "eventos"));
+                const todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // ✨ Filtro: solo eventos CONFIRMADOS
+                // Borradores y cancelados NO se muestran al público
+                const eventos = todos.filter(e => {
+                    const est = e.estado || 'confirmado';
+                    return est === 'confirmado';
+                });
+
+                // Ordenar por campo `orden` (drag&drop del admin), fallback a fecha
+                eventos.sort((a, b) => {
+                    const oa = typeof a.orden === 'number' ? a.orden : Infinity;
+                    const ob = typeof b.orden === 'number' ? b.orden : Infinity;
+                    if (oa !== ob) return oa - ob;
+                    return (a.fecha || '').localeCompare(b.fecha || '');
+                });
+
+                // ✨ Remarcados primero
+                eventos.sort((a, b) => {
+                    const ra = (a.categoria || '') === 'remarcado' ? 0 : 1;
+                    const rb = (b.categoria || '') === 'remarcado' ? 0 : 1;
+                    return ra - rb;
+                });
+
+                cachedEventos = eventos;
+                renderEventos();
+                scheduleRefresh();
+
+            } catch (err) {
+                console.error('Error al cargar eventos desde Firestore:', err);
+                list.innerHTML = `<div class="events-empty" style="border-color:#e63946;color:#e63946;">
+                    No se pudieron cargar los eventos. Revisá la consola.
+                </div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadEventos);
+    </script>
+</body>
+</html>
