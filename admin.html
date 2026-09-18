@@ -180,7 +180,20 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 
 /* EVENT ITEMS */
 .events-list{display:flex;flex-direction:column;gap:.7rem;}
-.event-item{background:var(--negro);border:1px solid var(--gris-medio);border-radius:10px;padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;position:relative;transition:var(--trans);}
+
+/* ⚠️ SIN TRANSICIÓN en .event-item para que el drag funcione bien en mobile */
+.event-item{
+  background:var(--negro);
+  border:1px solid var(--gris-medio);
+  border-radius:10px;
+  padding:.9rem 1rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:.8rem;
+  position:relative;
+  /* NO transition aquí */
+}
 .event-item:hover{border-color:var(--azul);}
 .event-item.estado-borrador{border-left:4px solid var(--amarillo);}
 .event-item.estado-confirmado{border-left:4px solid var(--verde);}
@@ -220,7 +233,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
   align-items:flex-start;
   gap:.4rem;
   cursor:pointer;
-  transition:var(--trans);
+  transition:background .2s,color .2s;
 }
 .nota-preview:hover{background:rgba(0,102,255,.12);color:var(--blanco);}
 .nota-preview .icon{flex-shrink:0;font-size:.85rem;line-height:1.2;}
@@ -245,11 +258,44 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .event-item .actions .notes.has-notes{border-color:var(--azul);color:var(--azul-neon);background:rgba(0,102,255,.1);}
 .event-thumb{width:46px;height:46px;border-radius:6px;object-fit:cover;flex-shrink:0;border:1px solid var(--gris-medio);-webkit-user-drag:none;user-drag:none;pointer-events:none;}
 .event-item.cat-remarcado .event-thumb{border-color:rgba(255,215,0,.5);}
-.drag-handle{cursor:grab;color:var(--gris-claro);font-size:1rem;letter-spacing:-3px;padding:.4rem .3rem;user-select:none;-webkit-user-select:none;touch-action:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ⚠️ HANDLE optimizado para touch */
+.drag-handle{
+  cursor:grab;
+  color:var(--gris-claro);
+  font-size:1.2rem;
+  letter-spacing:-3px;
+  padding:.6rem .5rem;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  touch-action:none; /* ← crítico: evita scroll al tocar el handle */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  min-width:32px;
+  min-height:44px;
+}
 .drag-handle:active{cursor:grabbing;color:var(--azul);}
-.event-item.dragging{opacity:.4;}
-.event-item.drag-ghost{background:var(--azul)!important;border-color:var(--azul-neon)!important;box-shadow:0 0 25px rgba(0,102,255,.6);transform:scale(1.02);}
-.event-item.drag-ghost .date,.event-item.drag-ghost .title,.event-item.drag-ghost .place{color:#fff!important;}
+.drag-handle::before{
+  content:'⋮⋮';
+  font-size:1.1rem;
+  line-height:1;
+}
+
+.event-item.dragging{opacity:.5;}
+.event-item.dragging .drag-handle{color:var(--azul-neon);}
+.event-item.drag-ghost{
+  background:var(--azul)!important;
+  border-color:var(--azul-neon)!important;
+  box-shadow:0 0 25px rgba(0,102,255,.6);
+  transform:scale(1.02);
+}
+.event-item.drag-ghost .date,
+.event-item.drag-ghost .title,
+.event-item.drag-ghost .place,
+.event-item.drag-ghost .drag-handle{color:#fff!important;}
 
 .empty-state{text-align:center;padding:2rem 1rem;color:var(--gris-claro);font-size:.85rem;border:1px dashed var(--gris-medio);border-radius:10px;}
 
@@ -263,27 +309,8 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .modal-close:hover{border-color:var(--rojo);color:var(--rojo);}
 .divider{height:1px;background:var(--gris-medio);margin:1.2rem 0;}
 
-/* MODAL NOTAS RÁPIDO */
-.notas-modal-header{
-  display:flex;
-  align-items:center;
-  gap:.8rem;
-  margin-bottom:1rem;
-  padding-bottom:1rem;
-  border-bottom:1px solid var(--gris-medio);
-}
-.notas-modal-header .icon-big{
-  width:48px;
-  height:48px;
-  border-radius:10px;
-  background:rgba(0,102,255,.15);
-  color:var(--azul-neon);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:1.4rem;
-  flex-shrink:0;
-}
+.notas-modal-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--gris-medio);}
+.notas-modal-header .icon-big{width:48px;height:48px;border-radius:10px;background:rgba(0,102,255,.15);color:var(--azul-neon);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
 .notas-modal-header .titulo{flex:1;min-width:0;}
 .notas-modal-header .titulo strong{display:block;font-size:.95rem;color:var(--blanco);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .notas-modal-header .titulo span{font-size:.75rem;color:var(--gris-claro);}
@@ -291,7 +318,6 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .notas-modal textarea:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,102,255,.15);}
 .notas-modal .hint{font-size:.72rem;color:var(--gris-claro);margin-top:.5rem;line-height:1.5;}
 
-/* MODAL CONFIRMACIÓN */
 .confirm-box{max-width:420px;text-align:center;padding:2rem 1.8rem;}
 .confirm-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem;}
 .confirm-icon.danger{background:rgba(230,57,70,.15);color:var(--rojo);}
@@ -359,18 +385,31 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .toast.error{border-color:var(--rojo);}
 .toast.warn{border-color:var(--amarillo);}
 
+/* RESPONSIVE */
 @media (max-width:768px){
   .panel{padding:1rem .8rem 3rem;}
   .topbar{flex-direction:column;align-items:flex-start;}
   .topbar-actions{width:100%;}
   .btn-new-event{width:100%;justify-content:center;}
-  .events-card{padding:1.2rem;}
+  .events-card{padding:1rem;}
   .form-row,.form-row-3{grid-template-columns:1fr;}
-  .event-item{flex-wrap:wrap;gap:.6rem;}
-  .event-item .info{flex:1 1 100%;order:3;padding-left:2rem;}
-  .event-item .drag-handle{order:1;}
+
+  /* En mobile, el handle va primero y destacado */
+  .event-item{flex-wrap:wrap;gap:.6rem;padding-left:.6rem;}
+  .event-item .drag-handle{
+    order:1;
+    min-width:40px;
+    min-height:44px;
+    padding:.6rem .8rem;
+    background:rgba(0,102,255,.08);
+    border-radius:8px;
+    color:var(--azul-neon);
+    margin-right:.3rem;
+  }
   .event-item .event-thumb{order:2;width:40px;height:40px;}
+  .event-item .info{flex:1 1 100%;order:3;}
   .event-item .actions{order:4;margin-left:auto;width:100%;justify-content:flex-end;}
+
   .toast{left:1rem;right:1rem;bottom:1rem;max-width:none;}
   .section-title{font-size:1.5rem;}
   .modal{padding:1.3rem;}
@@ -449,7 +488,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
       </select>
     </div>
 
-    <div class="drag-hint" id="dragHint">✋ Arrastrá desde <strong>⋮⋮</strong> para cambiar el orden</div>
+    <div class="drag-hint" id="dragHint">✋ Mantené presionado <strong>⋮⋮</strong> y arrastrá para cambiar el orden</div>
     <div class="events-list" id="eventsList"></div>
   </div>
 </div>
@@ -725,77 +764,55 @@ function showModal(id){ document.getElementById(id).classList.add('show'); }
 function hideModal(id){ document.getElementById(id).classList.remove('show'); }
 
 /* ====== HORARIOS ====== */
-// Convierte "21:00", "9:00", "2100", "21 hs", "21:00 Hs." → "21:00 Hs."
 function formatHora(hora){
   if(!hora) return '';
   const s = String(hora).trim();
-
-  // Formato HH:MM (2 dígitos + 2 dígitos)
   let m = s.match(/^(\d{1,2})[:.](\d{1,2})/);
   if(m){
     const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
     const min = String(Math.min(59, parseInt(m[2], 10) || 0)).padStart(2, '0');
     return `${h}:${min} Hs.`;
   }
-
-  // Formato "2100" (4 dígitos sin separador)
   m = s.match(/^(\d{2})(\d{2})$/);
   if(m){
     const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
     const min = String(Math.min(59, parseInt(m[2], 10) || 0)).padStart(2, '0');
     return `${h}:${min} Hs.`;
   }
-
-  // Formato "21" (solo hora)
   m = s.match(/^(\d{1,2})\s*(?:hs?\.?)?$/i);
   if(m){
     const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
     return `${h}:00 Hs.`;
   }
-
-  return s; // no reconocido, devolvemos tal cual
+  return s;
 }
-
-// Convierte cualquier formato a "HH:MM" para el <input type="time">
 function parseHoraToInput(hora){
   if(!hora) return '';
   const s = String(hora).trim();
-
-  // HH:MM
   let m = s.match(/(\d{1,2})[:.](\d{1,2})/);
   if(m){
     const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
     const min = String(Math.min(59, parseInt(m[2], 10) || 0)).padStart(2, '0');
     return `${h}:${min}`;
   }
-
-  // "2100"
   m = s.match(/^(\d{2})(\d{2})$/);
   if(m){
     const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
     const min = String(Math.min(59, parseInt(m[2], 10) || 0)).padStart(2, '0');
     return `${h}:${min}`;
   }
-
-  // "21"
   m = s.match(/^(\d{1,2})\s*(?:hs?\.?)?$/i);
   if(m){
     const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
     return `${h}:00`;
   }
-
   return '';
 }
-
-// Actualiza el preview del horario cuando el usuario cambia el input
 function updateHoraPreview(){
   const hora = document.getElementById('hora').value;
   const box = document.getElementById('horaPreview');
   const txt = document.getElementById('horaPreviewText');
-  if(!hora){
-    box.style.display = 'none';
-    return;
-  }
+  if(!hora){ box.style.display = 'none'; return; }
   txt.textContent = formatHora(hora);
   box.style.display = 'inline-flex';
 }
@@ -807,46 +824,34 @@ function openEventModal(){
   showModal('eventModal');
   setTimeout(() => document.getElementById('fecha')?.focus(), 100);
 }
-function closeEventModal(){
-  hideModal('eventModal');
-}
+function closeEventModal(){ hideModal('eventModal'); }
 
-/* ====== MODAL NOTAS RÁPIDO ====== */
+/* ====== MODAL NOTAS ====== */
 function openNotasModal(id){
   const ev = events.find(e => e.id === id);
   if(!ev) return;
-
   document.getElementById('notasEventId').value = id;
   document.getElementById('notasTitulo').textContent = ev.titulo || 'Notas del evento';
-
   const d = new Date(ev.fecha + 'T00:00:00');
   const fechaTxt = d.toLocaleDateString('es-AR', {day:'numeric', month:'long', year:'numeric'});
   document.getElementById('notasFecha').textContent = fechaTxt + (ev.hora ? ` · ${ev.hora}` : '');
-
   document.getElementById('notasTexto').value = ev.notasInternas || '';
-
   showModal('notasModal');
   setTimeout(() => document.getElementById('notasTexto')?.focus(), 100);
 }
-function closeNotasModal(){
-  hideModal('notasModal');
-}
+function closeNotasModal(){ hideModal('notasModal'); }
 
 async function saveNotas(){
   const id = document.getElementById('notasEventId').value;
   const texto = document.getElementById('notasTexto').value.trim();
-
   if(!id){ toast('Error: evento no encontrado.','error'); return; }
-
   try{
     await updateDoc(doc(db, COL, id), {
       notasInternas: texto,
       updatedAt: serverTimestamp()
     });
-
     const ev = events.find(e => e.id === id);
     await logAction('update_notes', `Notas actualizadas en "${ev?.titulo || id}"`);
-
     toast(texto ? '✅ Notas guardadas' : '✅ Notas eliminadas', 'success');
     closeNotasModal();
   }catch(err){
@@ -866,14 +871,12 @@ function showConfirm(opts){
       variant = 'danger',
       icon = null
     } = opts || {};
-
     const modal = document.getElementById('confirmModal');
     const iconEl = document.getElementById('confirmIcon');
     const titleEl = document.getElementById('confirmTitle');
     const msgEl = document.getElementById('confirmMessage');
     const okBtn = document.getElementById('confirmOk');
     const cancelBtn = document.getElementById('confirmCancel');
-
     iconEl.className = `confirm-icon ${variant}`;
     iconEl.textContent = icon || (variant === 'danger' ? '⚠️' : variant === 'warn' ? '❓' : 'ℹ️');
     titleEl.textContent = title;
@@ -881,7 +884,6 @@ function showConfirm(opts){
     okBtn.textContent = confirmText;
     okBtn.className = `btn btn-confirm-yes${variant === 'warn' ? ' warn' : ''}`;
     cancelBtn.textContent = cancelText;
-
     const cleanup = () => {
       okBtn.removeEventListener('click', onOk);
       cancelBtn.removeEventListener('click', onCancel);
@@ -896,12 +898,10 @@ function showConfirm(opts){
       if(e.key === 'Escape') onCancel();
       else if(e.key === 'Enter') onOk();
     };
-
     okBtn.addEventListener('click', onOk);
     cancelBtn.addEventListener('click', onCancel);
     modal.addEventListener('click', onBackdrop);
     document.addEventListener('keydown', onKey);
-
     showModal('confirmModal');
     setTimeout(() => cancelBtn.focus(), 50);
   });
@@ -1090,7 +1090,6 @@ async function removeUser(uid, email){
   if(currentUserEmail.toLowerCase() !== OWNER_EMAIL.toLowerCase()){ toast('Solo el owner.','error'); return; }
   if(uid === auth.currentUser?.uid){ toast('No podés eliminarte.','error'); return; }
   if((email||'').toLowerCase() === OWNER_EMAIL.toLowerCase()){ toast('No podés eliminar al owner.','error'); return; }
-
   const ok = await showConfirm({
     title: 'Eliminar usuario',
     message: `¿Querés quitarle el acceso a <strong>${escapeHtml(email)}</strong>?<br><br>La cuenta seguirá existiendo en Firebase Auth. Para borrarla definitivamente, usá la Consola de Firebase.`,
@@ -1100,7 +1099,6 @@ async function removeUser(uid, email){
     icon: '🗑️'
   });
   if(!ok) return;
-
   try{
     await deleteDoc(doc(db, ADMINS_COL, uid));
     await logAction('delete_user', `Usuario: ${email}`);
@@ -1351,8 +1349,6 @@ function renderEvents(){
     const estado = ev.estado || 'confirmado';
     const cat = ev.categoria || 'covers';
     const esPasado = d < hoy;
-
-    // Hora formateada
     const horaFmt = ev.hora ? formatHora(ev.hora) : '';
 
     const alertas = [];
@@ -1373,7 +1369,7 @@ function renderEvents(){
 
     return `
       <div class="event-item estado-${estado} cat-${cat}" data-id="${ev.id}">
-        <div class="drag-handle" title="Arrastrar">⋮⋮</div>
+        <div class="drag-handle" title="Mantené y arrastrá para reordenar"></div>
         ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false">` : ''}
         <div class="info">
           <span class="date">${dd} ${mm} ${yy}${horaFmt?' · '+horaFmt:''}${esPasado?' · ⚫':''}</span>
@@ -1447,19 +1443,41 @@ function renderDashboard(){
   `;
 }
 
+/* ====== SORTABLE - CONFIG OPTIMIZADA PARA MOBILE ====== */
 function initSortable(){
   const el = document.getElementById('eventsList');
   if(!el) return;
   safeDestroySortable();
+
+  // Solo activar drag si el orden es "manual"
   if(document.getElementById('filterOrder').value !== 'manual') return;
   if(!eventsFiltered.length) return;
 
   try{
     sortableInstance = Sortable.create(el, {
-      animation: 180, handle: '.drag-handle',
-      ghostClass: 'drag-ghost', dragClass: 'dragging',
-      forceFallback: true, fallbackOnBody: true, fallbackClass: 'drag-ghost',
-      delay: 150, delayOnTouchOnly: true, touchStartThreshold: 8,
+      animation: 180,
+      handle: '.drag-handle',
+
+      // Clases visuales
+      ghostClass: 'drag-ghost',
+      dragClass: 'dragging',
+      chosenClass: 'dragging',
+
+      // Fallback (clave para móvil)
+      forceFallback: true,
+      fallbackOnBody: true,
+      fallbackClass: 'drag-ghost',
+      fallbackTolerance: 3,
+
+      // ⚠️ SIN delay: arranca el drag apenas toca el handle
+      delay: 0,
+      delayOnTouchOnly: false,
+      touchStartThreshold: 3,
+
+      // Otras opciones
+      preventOnFilter: false,
+      draggable: '.event-item',
+
       onEnd: async (evt) => {
         if(evt.oldIndex === evt.newIndex) return;
         const [moved] = eventsFiltered.splice(evt.oldIndex, 1);
@@ -1474,11 +1492,15 @@ function initSortable(){
           await batch.commit();
           await logAction('reorder_events', `"${moved.titulo}" → posición ${evt.newIndex+1}`);
           toast('✅ Orden guardado','success');
-        }catch(err){ console.error(err); toast('❌ Error al guardar orden.','error'); }
-        finally{ setTimeout(()=>{ isReordering=false; }, 700); }
+        }catch(err){
+          console.error(err);
+          toast('❌ Error al guardar orden.','error');
+        }finally{
+          setTimeout(()=>{ isReordering=false; }, 700);
+        }
       }
     });
-  }catch(e){ console.error(e); }
+  }catch(e){ console.error('[Sortable]', e); }
 }
 
 async function saveEvent(e){
@@ -1493,7 +1515,6 @@ async function saveEvent(e){
     orden = events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0;
   }
 
-  // Normalizamos la hora a formato "HH:MM Hs."
   const horaRaw = document.getElementById('hora').value.trim();
   const hora = horaRaw ? formatHora(horaRaw) : '';
 
@@ -1537,7 +1558,6 @@ function editEvent(id){
   resetForm();
   document.getElementById('editId').value = ev.id;
   document.getElementById('fecha').value = ev.fecha;
-  // Parseamos el horario guardado a formato HH:MM para el input
   document.getElementById('hora').value = parseHoraToInput(ev.hora || '');
   updateHoraPreview();
   document.getElementById('estado').value = ev.estado || 'confirmado';
@@ -1588,7 +1608,6 @@ async function deleteEvent(id){
     icon: '⚠️'
   });
   if(!ok) return;
-
   try{
     await deleteDoc(doc(db, COL, id));
     await logAction('delete_event', `"${ev?.titulo || id}" · ${ev?.fecha || ''}`);
@@ -1643,12 +1662,10 @@ function toast(msg, type=''){
   toastTimer = setTimeout(()=> el.classList.remove('show'), 3200);
 }
 
-/* ====== Cerrar modales al clickear backdrop ====== */
 ['usersModal','logsModal','changePasswordModal','galleryModal','previewModal','eventModal','notasModal'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => { if(e.target.id === id) hideModal(id); });
 });
 
-/* ====== Teclas ESC ====== */
 document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape'){
     if(document.getElementById('eventModal').classList.contains('show')) closeEventModal();
@@ -1656,7 +1673,6 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-/* ====== Guardar notas con Ctrl+Enter ====== */
 document.addEventListener('keydown', (e) => {
   if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
     if(document.getElementById('notasModal').classList.contains('show')){
