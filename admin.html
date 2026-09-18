@@ -93,6 +93,36 @@ a{color:inherit;text-decoration:none;}
 .field-hint{font-size:.7rem;color:var(--gris-claro);margin-top:.3rem;line-height:1.4;}
 .field-hint strong{color:var(--azul-neon);font-weight:600;}
 
+/* TIME INPUT */
+input[type="time"]{
+  font-family: var(--fuente-cuerpo);
+  font-size: 1rem !important;
+  letter-spacing: 2px;
+  font-weight: 600;
+  color-scheme: dark;
+}
+body[data-theme="light"] input[type="time"]{ color-scheme: light; }
+input[type="time"]::-webkit-calendar-picker-indicator{
+  filter: invert(70%) sepia(60%) saturate(700%) hue-rotate(180deg);
+  cursor: pointer;
+  opacity: 0.8;
+}
+input[type="time"]::-webkit-calendar-picker-indicator:hover{ opacity: 1; }
+.hora-preview{
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  margin-top: .4rem;
+  font-size: .75rem;
+  color: var(--azul-neon);
+  font-weight: 600;
+  background: rgba(0,102,255,.08);
+  border: 1px solid rgba(0,102,255,.25);
+  padding: .25rem .7rem;
+  border-radius: 20px;
+  letter-spacing: 1px;
+}
+
 /* NOTAS */
 .notas-group{
   background:rgba(0,102,255,.05);
@@ -177,7 +207,6 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .badge.notas-badge{background:rgba(0,102,255,.15);color:var(--azul-neon);cursor:pointer;}
 .badge.notas-badge:hover{background:rgba(0,102,255,.3);}
 
-/* Preview de nota dentro del evento */
 .nota-preview{
   margin-top:.5rem;
   padding:.5rem .7rem;
@@ -255,47 +284,12 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
   font-size:1.4rem;
   flex-shrink:0;
 }
-.notas-modal-header .titulo{
-  flex:1;
-  min-width:0;
-}
-.notas-modal-header .titulo strong{
-  display:block;
-  font-size:.95rem;
-  color:var(--blanco);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.notas-modal-header .titulo span{
-  font-size:.75rem;
-  color:var(--gris-claro);
-}
-.notas-modal textarea{
-  width:100%;
-  min-height:180px;
-  padding:1rem;
-  background:var(--negro);
-  border:1px solid var(--gris-medio);
-  border-radius:8px;
-  color:var(--blanco);
-  font-family:var(--fuente-cuerpo);
-  font-size:.9rem;
-  line-height:1.7;
-  outline:none;
-  transition:var(--trans);
-  resize:vertical;
-}
-.notas-modal textarea:focus{
-  border-color:var(--azul);
-  box-shadow:0 0 0 3px rgba(0,102,255,.15);
-}
-.notas-modal .hint{
-  font-size:.72rem;
-  color:var(--gris-claro);
-  margin-top:.5rem;
-  line-height:1.5;
-}
+.notas-modal-header .titulo{flex:1;min-width:0;}
+.notas-modal-header .titulo strong{display:block;font-size:.95rem;color:var(--blanco);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.notas-modal-header .titulo span{font-size:.75rem;color:var(--gris-claro);}
+.notas-modal textarea{width:100%;min-height:180px;padding:1rem;background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;color:var(--blanco);font-family:var(--fuente-cuerpo);font-size:.9rem;line-height:1.7;outline:none;transition:var(--trans);resize:vertical;}
+.notas-modal textarea:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,102,255,.15);}
+.notas-modal .hint{font-size:.72rem;color:var(--gris-claro);margin-top:.5rem;line-height:1.5;}
 
 /* MODAL CONFIRMACIÓN */
 .confirm-box{max-width:420px;text-align:center;padding:2rem 1.8rem;}
@@ -475,8 +469,11 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
           <input type="date" id="fecha" required>
         </div>
         <div class="form-group">
-          <label>Hora</label>
-          <input type="text" id="hora" placeholder="Ej: 21:00">
+          <label>Hora (formato 24 h)</label>
+          <input type="time" id="hora" onchange="updateHoraPreview()" step="60">
+          <div class="hora-preview" id="horaPreview" style="display:none;">
+            🕐 <span id="horaPreviewText"></span>
+          </div>
         </div>
         <div class="form-group">
           <label>Estado *</label>
@@ -528,7 +525,6 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
         <textarea id="descripcion" placeholder="Breve descripción del show..."></textarea>
       </div>
 
-      <!-- NOTAS / RECORDATORIOS -->
       <div class="form-group notas-group">
         <label>📝 Notas y recordatorios (solo admin)</label>
         <textarea id="notasInternas" placeholder="Ej:
@@ -728,6 +724,82 @@ function todayStart(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
 function showModal(id){ document.getElementById(id).classList.add('show'); }
 function hideModal(id){ document.getElementById(id).classList.remove('show'); }
 
+/* ====== HORARIOS ====== */
+// Convierte "21:00", "9:00", "2100", "21 hs", "21:00 Hs." → "21:00 Hs."
+function formatHora(hora){
+  if(!hora) return '';
+  const s = String(hora).trim();
+
+  // Formato HH:MM (2 dígitos + 2 dígitos)
+  let m = s.match(/^(\d{1,2})[:.](\d{1,2})/);
+  if(m){
+    const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
+    const min = String(Math.min(59, parseInt(m[2], 10) || 0)).padStart(2, '0');
+    return `${h}:${min} Hs.`;
+  }
+
+  // Formato "2100" (4 dígitos sin separador)
+  m = s.match(/^(\d{2})(\d{2})$/);
+  if(m){
+    const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
+    const min = String(Math.min(59, parseInt(m[2], 10) || 0)).padStart(2, '0');
+    return `${h}:${min} Hs.`;
+  }
+
+  // Formato "21" (solo hora)
+  m = s.match(/^(\d{1,2})\s*(?:hs?\.?)?$/i);
+  if(m){
+    const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
+    return `${h}:00 Hs.`;
+  }
+
+  return s; // no reconocido, devolvemos tal cual
+}
+
+// Convierte cualquier formato a "HH:MM" para el <input type="time">
+function parseHoraToInput(hora){
+  if(!hora) return '';
+  const s = String(hora).trim();
+
+  // HH:MM
+  let m = s.match(/(\d{1,2})[:.](\d{1,2})/);
+  if(m){
+    const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
+    const min = String(Math.min(59, parseInt(m[2], 10) || 0)).padStart(2, '0');
+    return `${h}:${min}`;
+  }
+
+  // "2100"
+  m = s.match(/^(\d{2})(\d{2})$/);
+  if(m){
+    const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
+    const min = String(Math.min(59, parseInt(m[2], 10) || 0)).padStart(2, '0');
+    return `${h}:${min}`;
+  }
+
+  // "21"
+  m = s.match(/^(\d{1,2})\s*(?:hs?\.?)?$/i);
+  if(m){
+    const h = String(Math.min(23, parseInt(m[1], 10) || 0)).padStart(2, '0');
+    return `${h}:00`;
+  }
+
+  return '';
+}
+
+// Actualiza el preview del horario cuando el usuario cambia el input
+function updateHoraPreview(){
+  const hora = document.getElementById('hora').value;
+  const box = document.getElementById('horaPreview');
+  const txt = document.getElementById('horaPreviewText');
+  if(!hora){
+    box.style.display = 'none';
+    return;
+  }
+  txt.textContent = formatHora(hora);
+  box.style.display = 'inline-flex';
+}
+
 /* ====== MODAL EVENTO ====== */
 function openEventModal(){
   resetForm();
@@ -747,12 +819,10 @@ function openNotasModal(id){
   document.getElementById('notasEventId').value = id;
   document.getElementById('notasTitulo').textContent = ev.titulo || 'Notas del evento';
 
-  // Formatear fecha
   const d = new Date(ev.fecha + 'T00:00:00');
   const fechaTxt = d.toLocaleDateString('es-AR', {day:'numeric', month:'long', year:'numeric'});
   document.getElementById('notasFecha').textContent = fechaTxt + (ev.hora ? ` · ${ev.hora}` : '');
 
-  // Cargar notas existentes
   document.getElementById('notasTexto').value = ev.notasInternas || '';
 
   showModal('notasModal');
@@ -1193,6 +1263,7 @@ function resetForm(){
   document.getElementById('editId').value = '';
   document.getElementById('fecha').value = '';
   document.getElementById('hora').value = '';
+  document.getElementById('horaPreview').style.display = 'none';
   document.getElementById('estado').value = 'confirmado';
   document.getElementById('categoria').value = 'covers';
   document.getElementById('titulo').value = '';
@@ -1281,12 +1352,14 @@ function renderEvents(){
     const cat = ev.categoria || 'covers';
     const esPasado = d < hoy;
 
+    // Hora formateada
+    const horaFmt = ev.hora ? formatHora(ev.hora) : '';
+
     const alertas = [];
     if(!ev.flyer) alertas.push('<span class="badge warn">⚠️ Sin flyer</span>');
     if(!ev.mapsUrl && (!ev.lugar || ev.lugar.length < 10)) alertas.push('<span class="badge warn">⚠️ Dirección</span>');
     if(!ev.hora) alertas.push('<span class="badge warn">⚠️ Sin hora</span>');
 
-    // Notas
     const tieneNotas = !!(ev.notasInternas && ev.notasInternas.trim());
     const notasHtml = tieneNotas
       ? `<div class="nota-preview" onclick="openNotasModal('${ev.id}')" title="Click para ver/editar notas">
@@ -1303,7 +1376,7 @@ function renderEvents(){
         <div class="drag-handle" title="Arrastrar">⋮⋮</div>
         ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false">` : ''}
         <div class="info">
-          <span class="date">${dd} ${mm} ${yy}${ev.hora?' · '+ev.hora:''}${esPasado?' · ⚫':''}</span>
+          <span class="date">${dd} ${mm} ${yy}${horaFmt?' · '+horaFmt:''}${esPasado?' · ⚫':''}</span>
           <div class="title">${escapeHtml(ev.titulo)}</div>
           <div class="place">${escapeHtml(ev.lugar)}</div>
           <div class="badges">
@@ -1341,7 +1414,7 @@ function renderDashboard(){
 
   const proximoTxt = proximo ? (() => {
     const d = new Date(proximo.fecha + 'T00:00:00');
-    return d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}) + (proximo.hora ? ` · ${proximo.hora}` : '');
+    return d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}) + (proximo.hora ? ` · ${formatHora(proximo.hora)}` : '');
   })() : '—';
   const proximoSub = proximo ? proximo.titulo : 'Sin eventos';
 
@@ -1420,9 +1493,13 @@ async function saveEvent(e){
     orden = events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0;
   }
 
+  // Normalizamos la hora a formato "HH:MM Hs."
+  const horaRaw = document.getElementById('hora').value.trim();
+  const hora = horaRaw ? formatHora(horaRaw) : '';
+
   const data = {
     fecha: document.getElementById('fecha').value,
-    hora: document.getElementById('hora').value.trim(),
+    hora: hora,
     estado: document.getElementById('estado').value,
     categoria: document.getElementById('categoria').value,
     titulo: document.getElementById('titulo').value.trim(),
@@ -1460,7 +1537,9 @@ function editEvent(id){
   resetForm();
   document.getElementById('editId').value = ev.id;
   document.getElementById('fecha').value = ev.fecha;
-  document.getElementById('hora').value = ev.hora || '';
+  // Parseamos el horario guardado a formato HH:MM para el input
+  document.getElementById('hora').value = parseHoraToInput(ev.hora || '');
+  updateHoraPreview();
   document.getElementById('estado').value = ev.estado || 'confirmado';
   document.getElementById('categoria').value = ev.categoria || 'covers';
   document.getElementById('titulo').value = ev.titulo;
@@ -1595,6 +1674,7 @@ Object.assign(window, {
   saveEvent, editEvent, deleteEvent, duplicateEvent, shareWhatsApp,
   handleFlyer, removeFlyer, resetForm, updateMiniMapDebounced,
   verificarEnMaps, probarMapsUrl, exportBackup,
+  updateHoraPreview, formatHora, parseHoraToInput,
   showUsersModal: () => showModal('usersModal'),
   showChangePasswordModal: () => showModal('changePasswordModal'),
   applyFilters
