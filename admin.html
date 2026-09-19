@@ -64,6 +64,7 @@ a{color:inherit;text-decoration:none;}
 .section-title span{color:var(--azul);}
 .section-sub{color:var(--gris-claro);font-size:.85rem;margin-bottom:1.2rem;}
 
+/* DASHBOARD */
 .dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem;margin-bottom:1.5rem;}
 .stat-card{background:var(--gris-oscuro);border:1px solid var(--gris-medio);border-radius:10px;padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.2rem;transition:var(--trans);}
 .stat-card:hover{border-color:var(--azul);transform:translateY(-2px);}
@@ -194,187 +195,35 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .modal-close:hover{border-color:var(--rojo);color:var(--rojo);}
 .divider{height:1px;background:var(--gris-medio);margin:1.2rem 0;}
 
-/* ═══════ INSTAGRAM MODAL (NUEVO) ═══════ */
-.ig-editando{
-  background: linear-gradient(135deg, rgba(214,36,159,.15), rgba(0,102,255,.1));
-  border: 1px solid rgba(214,36,159,.4);
-  border-radius: 10px;
-  padding: .8rem 1rem;
-  margin-bottom: 1rem;
-  display: none;
-  align-items: center;
-  gap: .7rem;
-}
+.ig-editando{background: linear-gradient(135deg, rgba(214,36,159,.15), rgba(0,102,255,.1));border: 1px solid rgba(214,36,159,.4);border-radius: 10px;padding: .8rem 1rem;margin-bottom: 1rem;display: none;align-items: center;gap: .7rem;}
 .ig-editando.show{ display: flex; }
-.ig-editando .icon-edit{
-  width:36px; height:36px; border-radius:50%;
-  background: rgba(214,36,159,.2); color:#d6249f;
-  display:flex; align-items:center; justify-content:center;
-  font-size: 1.1rem; flex-shrink:0;
-}
-.ig-editando .txt{
-  flex: 1; min-width: 0;
-  font-size: .82rem; color: var(--blanco);
-  line-height: 1.35;
-}
-.ig-editando .txt strong{
-  display:block;
-  color:#d6249f;
-  font-size:.7rem;
-  text-transform:uppercase;
-  letter-spacing:1.5px;
-  margin-bottom:.15rem;
-}
-.ig-editando .txt span{
-  display:block;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  color: var(--gris-claro);
-  font-size: .78rem;
-}
+.ig-editando .icon-edit{width:36px; height:36px; border-radius:50%;background: rgba(214,36,159,.2); color:#d6249f;display:flex; align-items:center; justify-content:center;font-size: 1.1rem; flex-shrink:0;}
+.ig-editando .txt{flex: 1; min-width: 0;font-size: .82rem; color: var(--blanco);line-height: 1.35;}
+.ig-editando .txt strong{display:block;color:#d6249f;font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.15rem;}
+.ig-editando .txt span{display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;color: var(--gris-claro);font-size: .78rem;}
 
-/* Input con botón limpiar */
-.ig-input-wrapper{
-  position: relative;
-}
-.ig-input-wrapper input{
-  padding-right: 3rem !important;
-}
-.ig-clear-btn{
-  position: absolute;
-  right: .75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.1);
-  color: var(--gris-claro);
-  cursor: pointer;
-  font-size: .75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--trans);
-  z-index: 2;
-}
-.ig-clear-btn:hover{
-  background: var(--rojo);
-  border-color: var(--rojo);
-  color: #fff;
-  transform: translateY(-50%) rotate(90deg);
-}
+.ig-input-wrapper{position: relative;}
+.ig-input-wrapper input{padding-right: 3rem !important;}
+.ig-clear-btn{position: absolute;right: .75rem;top: 50%;transform: translateY(-50%);width: 26px; height: 26px;border-radius: 50%;background: rgba(255,255,255,.08);border: 1px solid rgba(255,255,255,.1);color: var(--gris-claro);cursor: pointer;font-size: .75rem;display: flex;align-items: center;justify-content: center;transition: var(--trans);z-index: 2;}
+.ig-clear-btn:hover{background: var(--rojo);border-color: var(--rojo);color: #fff;transform: translateY(-50%) rotate(90deg);}
 
-/* Chips de recientes */
-.ig-recientes{
-  margin-bottom: 1rem;
-  padding: .9rem 1rem;
-  background: rgba(214,36,159,.04);
-  border: 1px dashed rgba(214,36,159,.25);
-  border-radius: 10px;
-}
-.ig-recientes > label{
-  display: block;
-  font-size: .68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #d6249f;
-  margin-bottom: .6rem;
-}
-.ig-chips{
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-}
-.ig-chip{
-  padding: .4rem .85rem;
-  background: rgba(214,36,159,.1);
-  border: 1px solid rgba(214,36,159,.35);
-  color: #d6249f;
-  border-radius: 20px;
-  font-size: .72rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--trans);
-  display: inline-flex;
-  align-items: center;
-  gap: .35rem;
-  max-width: 100%;
-  overflow: hidden;
-  font-family: var(--fuente-cuerpo);
-}
-.ig-chip:hover{
-  background: rgba(214,36,159,.25);
-  border-color: #d6249f;
-  color: var(--blanco);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(214,36,159,.3);
-}
-.ig-chip .chip-tipo{
-  font-size: .58rem;
-  opacity: .8;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  background: rgba(255,255,255,.1);
-  padding: .1rem .35rem;
-  border-radius: 8px;
-}
-.ig-chip .chip-text{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 180px;
-}
+.ig-recientes{margin-bottom: 1rem;padding: .9rem 1rem;background: rgba(214,36,159,.04);border: 1px dashed rgba(214,36,159,.25);border-radius: 10px;}
+.ig-recientes > label{display: block;font-size: .68rem;font-weight: 700;text-transform: uppercase;letter-spacing: 1.5px;color: #d6249f;margin-bottom: .6rem;}
+.ig-chips{display: flex;flex-wrap: wrap;gap: .5rem;}
+.ig-chip{padding: .4rem .85rem;background: rgba(214,36,159,.1);border: 1px solid rgba(214,36,159,.35);color: #d6249f;border-radius: 20px;font-size: .72rem;font-weight: 600;cursor: pointer;transition: var(--trans);display: inline-flex;align-items: center;gap: .35rem;max-width: 100%;overflow: hidden;font-family: var(--fuente-cuerpo);}
+.ig-chip:hover{background: rgba(214,36,159,.25);border-color: #d6249f;color: var(--blanco);transform: translateY(-2px);box-shadow: 0 4px 12px rgba(214,36,159,.3);}
+.ig-chip .chip-tipo{font-size: .58rem;opacity: .8;text-transform: uppercase;letter-spacing: .5px;background: rgba(255,255,255,.1);padding: .1rem .35rem;border-radius: 8px;}
+.ig-chip .chip-text{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 180px;}
 
-/* Preview en vivo */
-.ig-preview-container{
-  margin-bottom: 1rem;
-  animation: fadeIn .3s;
-}
-.ig-preview-container > label{
-  display: block;
-  font-size: .7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--azul-neon);
-  margin-bottom: .5rem;
-}
-.ig-preview{
-  display: flex;
-  justify-content: center;
-  background: rgba(0,0,0,.35);
-  border: 1px dashed rgba(0,102,255,.35);
-  border-radius: 10px;
-  padding: 1rem;
-  min-height: 80px;
-  transition: var(--trans);
-}
-.ig-preview .instagram-media{
-  margin: 0 !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  background: #1a1a1a !important;
-  border: 1px solid #2a2a2a !important;
-  border-radius: 10px !important;
-}
-.ig-preview .ig-preview-loading{
-  text-align: center;
-  color: var(--gris-claro);
-  font-size: .82rem;
-  padding: 1rem;
-}
-.ig-preview-status{
-  font-size: .72rem;
-  text-align: center;
-  margin-top: .5rem;
-  color: var(--gris-claro);
-  min-height: 1rem;
-}
+.ig-preview-container{margin-bottom: 1rem;animation: fadeIn .3s;}
+.ig-preview-container > label{display: block;font-size: .7rem;font-weight: 700;text-transform: uppercase;letter-spacing: 1.5px;color: var(--azul-neon);margin-bottom: .5rem;}
+.ig-preview{display: flex;justify-content: center;background: rgba(0,0,0,.35);border: 1px dashed rgba(0,102,255,.35);border-radius: 10px;padding: 1rem;min-height: 80px;transition: var(--trans);}
+.ig-preview .instagram-media{margin: 0 !important;max-width: 100% !important;min-width: 0 !important;background: #1a1a1a !important;border: 1px solid #2a2a2a !important;border-radius: 10px !important;}
+.ig-preview .ig-preview-loading{text-align: center;color: var(--gris-claro);font-size: .82rem;padding: 1rem;}
+.ig-preview-status{font-size: .72rem;text-align: center;margin-top: .5rem;color: var(--gris-claro);min-height: 1rem;}
 .ig-preview-status.ok{ color: var(--verde); font-weight: 600; }
 .ig-preview-status.error{ color: var(--rojo); font-weight: 600; }
 
-/* USERS */
 .user-list{display:flex;flex-direction:column;gap:.6rem;}
 .user-item{background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;}
 .user-item.owner{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.03);}
@@ -715,9 +564,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- MODAL INSTAGRAM (con preview en vivo y chips)      -->
-<!-- ═══════════════════════════════════════════════════ -->
+<!-- MODAL INSTAGRAM -->
 <div class="modal-backdrop" id="instagramModal">
   <div class="modal modal-lg">
     <button class="modal-close" onclick="hideModal('instagramModal')">✕</button>
@@ -733,7 +580,6 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
     <h3 class="section-title" style="font-size:1.3rem;" id="igFormTitle">AGREGAR <span>PUBLICACIÓN</span></h3>
     <p class="section-sub" id="igFormSub">Pegá el link de Instagram. Al detectarlo, verás la vista previa para confirmar.</p>
 
-    <!-- Banner edición -->
     <div class="ig-editando" id="igEditando">
       <div class="icon-edit">✏️</div>
       <div class="txt">
@@ -745,13 +591,11 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
     <form onsubmit="saveIgPost(event)">
       <input type="hidden" id="igEditId">
 
-      <!-- Chips de recientes -->
       <div class="ig-recientes" id="igRecientes" style="display:none;">
         <label>⚡ Recientes — tocá uno para cargarlo</label>
         <div class="ig-chips" id="igChips"></div>
       </div>
 
-      <!-- Input con botón limpiar -->
       <div class="form-group">
         <label>URL de Instagram *</label>
         <div class="ig-input-wrapper">
@@ -768,7 +612,6 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
         <input type="text" id="igTitulo" placeholder="Ej: En vivo en La Bodega">
       </div>
 
-      <!-- Preview en vivo -->
       <div class="ig-preview-container" id="igPreviewContainer" style="display:none;">
         <label>👁️ Vista previa</label>
         <div class="ig-preview" id="igPreview"></div>
@@ -1302,10 +1145,7 @@ function showGalleryModal(){
     </div>`).join('');
 }
 
-/* ═══════════════════════════════════════════════════ */
-/* ========== INSTAGRAM ========== */
-/* ═══════════════════════════════════════════════════ */
-
+/* ====== INSTAGRAM ====== */
 function subscribeInstagram(){
   try {
     unsubscribeIg = onSnapshot(collection(db, IG_COL), (snap) => {
@@ -1342,19 +1182,16 @@ function renderIgList(){
   `).join('');
 }
 
-/* Chips de recientes */
 function renderIgChips(){
   const wrap = document.getElementById('igRecientes');
   const chips = document.getElementById('igChips');
   if (!wrap || !chips) return;
 
-  // Solo mostrar si hay al menos 1 post guardado
   if (!igPosts.length) {
     wrap.style.display = 'none';
     return;
   }
 
-  // Tomamos los últimos 6 posts (excluyendo el que estamos editando)
   const currentEditId = document.getElementById('igEditId')?.value || '';
   const recientes = igPosts
     .filter(p => p.id !== currentEditId)
@@ -1368,7 +1205,6 @@ function renderIgChips(){
 
   wrap.style.display = 'block';
   chips.innerHTML = recientes.map(p => {
-    // Detectar tipo por la URL
     const tipo = p.url.match(/\/(reel|reels)\//i) ? 'Reel'
                : p.url.match(/\/tv\//i) ? 'IGTV'
                : 'Post';
@@ -1385,51 +1221,43 @@ function usarChipIg(id){
   if (!post) return;
   document.getElementById('igUrl').value = post.url || '';
   document.getElementById('igTitulo').value = post.titulo || '';
-  handleIgInput(); // refresca preview
+  handleIgInput();
   toast('📋 Publicación cargada. Ajustá si querés y guardá.','success');
   document.getElementById('igUrl').focus();
 }
 
-/* Extrae URL de Instagram de cualquier texto */
 function limpiarIgUrl(raw){
   if (!raw) return null;
   const str = String(raw);
 
-  // 1. Intentar extraer del data-instgrm-permalink del código embed
   let m = str.match(/data-instgrm-permalink=["']([^"']+)["']/i);
   if (m) {
     const inner = m[1].match(/(https?:\/\/(?:www\.)?instagram\.com\/(?:p|reel|reels|tv)\/[A-Za-z0-9_-]+)/i);
     if (inner) return inner[1] + '/';
   }
 
-  // 2. Cualquier URL de Instagram dentro del texto
   m = str.match(/(https?:\/\/(?:www\.)?instagram\.com\/(?:p|reel|reels|tv)\/[A-Za-z0-9_-]+)/i);
   if (m) return m[1] + '/';
 
-  // 3. URL corta instagr.am
   m = str.match(/(https?:\/\/instagr\.am\/(?:p|reel|reels|tv)\/[A-Za-z0-9_-]+)/i);
   if (m) return m[1] + '/';
 
   return null;
 }
 
-/* Preview en vivo */
 function handleIgInput(){
   const input = document.getElementById('igUrl');
   const clearBtn = document.getElementById('igClearBtn');
   const raw = input.value.trim();
 
-  // Mostrar/ocultar botón limpiar
   clearBtn.style.display = raw ? 'flex' : 'none';
 
-  // Debounce para no renderizar embed en cada tecla
   clearTimeout(igPreviewTimer);
   igPreviewTimer = setTimeout(() => {
     const url = limpiarIgUrl(raw);
     if (url) {
       mostrarPreviewIg(url);
     } else if (raw.length > 10) {
-      // Texto largo pero sin URL válida
       mostrarPreviewError('No detecté una URL de Instagram válida. Asegurate de que sea un link de reel, post o IGTV.');
     } else {
       ocultarPreviewIg();
@@ -1447,7 +1275,6 @@ function mostrarPreviewIg(url){
   status.textContent = '';
   status.className = 'ig-preview-status';
 
-  // Renderizar el blockquote
   setTimeout(() => {
     preview.innerHTML = `
       <blockquote class="instagram-media"
@@ -1456,7 +1283,6 @@ function mostrarPreviewIg(url){
         style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;margin:0;max-width:540px;min-width:280px;padding:0;width:99.375%;">
       </blockquote>`;
 
-    // Procesar con el script de Instagram
     if (window.instgrm && window.instgrm.Embeds) {
       window.instgrm.Embeds.process();
       setTimeout(() => {
@@ -1498,7 +1324,6 @@ function clearIgInput(){
   document.getElementById('igUrl').focus();
 }
 
-/* Guardar / Editar */
 async function saveIgPost(event){
   event.preventDefault();
 
@@ -1512,7 +1337,6 @@ async function saveIgPost(event){
     return;
   }
 
-  // Validar duplicado (excepto si es la misma que estamos editando)
   const duplicado = igPosts.some(p => p.url === url && p.id !== editId);
   if (duplicado) {
     toast('⚠️ Esa publicación ya está cargada', 'error');
@@ -1538,7 +1362,6 @@ async function saveIgPost(event){
       });
       await logAction('create_ig', `Instagram agregado: ${url}`);
       toast('✅ Publicación agregada', 'success');
-      // Limpiar form
       document.getElementById('igUrl').value = '';
       document.getElementById('igTitulo').value = '';
       document.getElementById('igClearBtn').style.display = 'none';
@@ -1569,10 +1392,8 @@ function editIgPost(id){
   document.getElementById('igSubmitBtn').innerHTML = '💾 Guardar cambios';
   document.getElementById('igCancelBtn').style.display = 'inline-flex';
 
-  // Render chips sin el que estamos editando
   renderIgChips();
 
-  // Preview del que estamos editando
   if (post.url) mostrarPreviewIg(post.url);
 
   setTimeout(() => {
@@ -1629,7 +1450,6 @@ function showInstagramModal(){
   showModal('instagramModal');
   renderIgList();
   renderIgChips();
-  // Foco automático en el input al abrir
   setTimeout(() => document.getElementById('igUrl')?.focus(), 200);
 }
 
@@ -1892,4 +1712,257 @@ function renderDashboard(){
     <div class="stat-card">
       <div class="stat-label">📝 Con notas</div>
       <div class="stat-value">${conNotas}</div>
-      <div class="stat-sub">recordatorios
+      <div class="stat-sub">recordatorios</div>
+    </div>
+  `;
+}
+
+/* ====== SORTABLE ====== */
+function initSortable(){
+  const el = document.getElementById('eventsList');
+  if(!el) return;
+  safeDestroySortable();
+
+  if(document.getElementById('filterOrder').value !== 'manual') return;
+  if(!eventsFiltered.length) return;
+
+  try{
+    sortableInstance = Sortable.create(el, {
+      animation: 180,
+      handle: '.drag-handle',
+      ghostClass: 'drag-ghost',
+      dragClass: 'dragging',
+      chosenClass: 'dragging',
+      forceFallback: true,
+      fallbackOnBody: true,
+      fallbackClass: 'drag-ghost',
+      fallbackTolerance: 3,
+      delay: 0,
+      delayOnTouchOnly: false,
+      touchStartThreshold: 3,
+      preventOnFilter: false,
+      draggable: '.event-item',
+      filter: '.actions, .info, button, a',
+      onEnd: async (evt) => {
+        if(evt.oldIndex === evt.newIndex) return;
+        const [moved] = eventsFiltered.splice(evt.oldIndex, 1);
+        eventsFiltered.splice(evt.newIndex, 0, moved);
+        isReordering = true;
+        try{
+          const batch = writeBatch(db);
+          eventsFiltered.forEach((ev, i) => {
+            ev.orden = i;
+            batch.update(doc(db, COL, ev.id), { orden: i, updatedAt: serverTimestamp() });
+          });
+          await batch.commit();
+          await logAction('reorder_events', `"${moved.titulo}" → posición ${evt.newIndex+1}`);
+          toast('✅ Orden guardado','success');
+        }catch(err){
+          console.error(err);
+          toast('❌ Error al guardar orden.','error');
+        }finally{
+          setTimeout(()=>{ isReordering=false; }, 700);
+        }
+      }
+    });
+  }catch(e){ console.error('[Sortable]', e); }
+}
+
+async function saveEvent(e){
+  e.preventDefault();
+  const id = document.getElementById('editId').value;
+
+  let orden;
+  if(id){
+    const ex = events.find(x => x.id === id);
+    orden = ex && typeof ex.orden === 'number' ? ex.orden : (events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0);
+  } else {
+    orden = events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0;
+  }
+
+  const horaRaw = document.getElementById('hora').value.trim();
+  const hora = horaRaw ? formatHora(horaRaw) : '';
+
+  const data = {
+    fecha: document.getElementById('fecha').value,
+    hora: hora,
+    estado: document.getElementById('estado').value,
+    categoria: document.getElementById('categoria').value,
+    titulo: document.getElementById('titulo').value.trim(),
+    lugar: document.getElementById('lugar').value.trim(),
+    mapsUrl: document.getElementById('mapsUrl').value.trim() || null,
+    descripcion: document.getElementById('descripcion').value.trim(),
+    notasInternas: document.getElementById('notasInternas').value.trim(),
+    flyer: flyerBase64 || null,
+    orden,
+    updatedAt: serverTimestamp()
+  };
+  if(!data.fecha || !data.titulo || !data.lugar){ toast('Completá los obligatorios.','error'); return; }
+
+  try{
+    if(id){
+      await updateDoc(doc(db, COL, id), data);
+      await logAction('update_event', `"${data.titulo}" · ${data.fecha} · ${data.lugar}`);
+      toast('✅ Evento actualizado','success');
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db, COL), data);
+      await logAction('create_event', `"${data.titulo}" · ${data.fecha} · ${data.lugar}`);
+      toast('✅ Evento agregado','success');
+    }
+    closeEventModal();
+  }catch(err){
+    console.error(err);
+    if(err.code === 'permission-denied') toast('❌ Sin permisos.','error');
+    else toast('❌ Error al guardar.','error');
+  }
+}
+
+function editEvent(id){
+  const ev = events.find(x=>x.id===id); if(!ev) return;
+  resetForm();
+  document.getElementById('editId').value = ev.id;
+  document.getElementById('fecha').value = ev.fecha;
+  document.getElementById('hora').value = parseHoraToInput(ev.hora || '');
+  updateHoraPreview();
+  document.getElementById('estado').value = ev.estado || 'confirmado';
+  document.getElementById('categoria').value = ev.categoria || 'covers';
+  document.getElementById('titulo').value = ev.titulo;
+  document.getElementById('lugar').value = ev.lugar;
+  document.getElementById('mapsUrl').value = ev.mapsUrl || '';
+  document.getElementById('descripcion').value = ev.descripcion || '';
+  document.getElementById('notasInternas').value = ev.notasInternas || '';
+  if(ev.flyer){
+    flyerBase64 = ev.flyer;
+    document.getElementById('flyerImg').src = ev.flyer;
+    document.getElementById('flyerPreview').classList.add('show');
+    const aprox = Math.round(ev.flyer.length * 0.75);
+    document.getElementById('flyerInfo').style.display = 'block';
+    document.getElementById('flyerInfo').innerHTML = `📎 Flyer actual: <strong>${formatBytes(aprox)}</strong>`;
+  } else { removeFlyer(); }
+  updateMiniMap();
+  document.getElementById('formTitle').innerHTML = 'EDITAR <span>EVENTO</span>';
+  showModal('eventModal');
+  setTimeout(() => document.getElementById('titulo')?.focus(), 100);
+}
+
+async function duplicateEvent(id){
+  const ev = events.find(x=>x.id===id); if(!ev) return;
+  const data = {
+    fecha: '', hora: ev.hora || '', estado: 'borrador', categoria: ev.categoria || 'covers',
+    titulo: ev.titulo + ' (copia)', lugar: ev.lugar, mapsUrl: ev.mapsUrl || null,
+    descripcion: ev.descripcion || '', notasInternas: ev.notasInternas || '',
+    flyer: null, orden: events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0,
+    createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+  };
+  try{
+    await addDoc(collection(db, COL), data);
+    await logAction('duplicate_event', `Copia de "${ev.titulo}"`);
+    toast('📋 Copia creada (borrador).','success');
+  }catch(err){ console.error(err); toast('❌ Error al duplicar.','error'); }
+}
+
+async function deleteEvent(id){
+  const ev = events.find(x=>x.id===id);
+  const ok = await showConfirm({
+    title: 'Eliminar evento',
+    message: `¿Querés eliminar <strong>"${escapeHtml(ev?.titulo || 'este evento')}"</strong>?<br><br>Esta acción no se puede deshacer.`,
+    confirmText: 'Sí, eliminar',
+    cancelText: 'Cancelar',
+    variant: 'danger',
+    icon: '⚠️'
+  });
+  if(!ok) return;
+  try{
+    await deleteDoc(doc(db, COL, id));
+    await logAction('delete_event', `"${ev?.titulo || id}" · ${ev?.fecha || ''}`);
+    toast('🗑️ Eliminado','success');
+  }catch(err){ console.error(err); toast('❌ Error.','error'); }
+}
+
+function shareWhatsApp(id){
+  const ev = events.find(x=>x.id===id); if(!ev) return;
+  const d = new Date(ev.fecha + 'T00:00:00');
+  const fechaTxt = d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+  const mapsLink = ev.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.lugar)}`;
+  const catLabel = CATEGORIA_LABEL[ev.categoria||'covers'] || '';
+  const texto = `🎸 *TAXI BLUE ROCK*\n${catLabel?'\n'+catLabel:''}\n\n*${ev.titulo}*\n📅 ${fechaTxt}${ev.hora?' · '+ev.hora:''}\n📍 ${ev.lugar}\n🗺️ ${mapsLink}${ev.descripcion?'\n\n'+ev.descripcion:''}\n\n¡Te esperamos!`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+}
+
+/* ====== BACKUP ====== */
+async function exportBackup(){
+  try{
+    toast('📦 Preparando backup...');
+    const logsSnap = await getDocs(query(collection(db, LOGS_COL), orderBy('timestamp','desc'), limit(500)));
+    const logs = logsSnap.docs.map(d => {
+      const data = d.data();
+      return {
+        action: data.action, details: data.details,
+        userEmail: data.userEmail,
+        timestamp: data.timestamp?.toDate ? data.timestamp.toDate().toISOString() : null
+      };
+    });
+    const admins = adminsList.map(a => ({ email: a.email, createdAt: a.createdAt?.toDate ? a.createdAt.toDate().toISOString() : null }));
+    const eventos = events.map(e => ({ ...e, updatedAt: undefined, createdAt: undefined }));
+    const ig = igPosts.map(p => ({ ...p, createdAt: undefined, updatedAt: undefined }));
+    const data = { exportedAt: new Date().toISOString(), exportedBy: currentUserEmail, eventos, admins, ig, logs };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `taxiblue-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('✅ Backup descargado.','success');
+  }catch(err){ console.error(err); toast('❌ Error al exportar.','error'); }
+}
+
+/* ====== TOAST ====== */
+let toastTimer;
+function toast(msg, type=''){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.classList.remove('show'), 3200);
+}
+
+['usersModal','logsModal','changePasswordModal','galleryModal','previewModal','eventModal','notasModal','instagramModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => { if(e.target.id === id) hideModal(id); });
+});
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){
+    if(document.getElementById('eventModal').classList.contains('show')) closeEventModal();
+    if(document.getElementById('notasModal').classList.contains('show')) closeNotasModal();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    if(document.getElementById('notasModal').classList.contains('show')){
+      saveNotas();
+    }
+  }
+});
+
+Object.assign(window, {
+  tryLogin, logout, addUser, removeUser, changePassword,
+  showLogsModal, showGalleryModal, showPreview, toggleTheme,
+  hideModal: (id) => hideModal(id),
+  openEventModal, closeEventModal,
+  openNotasModal, closeNotasModal, saveNotas,
+  saveEvent, editEvent, deleteEvent, duplicateEvent, shareWhatsApp,
+  handleFlyer, removeFlyer, resetForm, updateMiniMapDebounced,
+  verificarEnMaps, probarMapsUrl, exportBackup,
+  updateHoraPreview, formatHora, parseHoraToInput,
+  showInstagramModal, saveIgPost, removeIgPost, editIgPost, cancelEditIg,
+  handleIgInput, clearIgInput, usarChipIg,
+  showUsersModal: () => showModal('usersModal'),
+  showChangePasswordModal: () => showModal('changePasswordModal'),
+  applyFilters
+});
+</script>
+</body>
+</html>
