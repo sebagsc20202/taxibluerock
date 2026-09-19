@@ -139,18 +139,10 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 
 /* EVENT ITEMS */
 .events-list{display:flex;flex-direction:column;gap:.7rem;}
-
 .event-item{
-  background:var(--negro);
-  border:1px solid var(--gris-medio);
-  border-radius:10px;
-  padding:.9rem 1rem;
-  display:flex;
-  justify-content:space-between;
-  align-items:stretch;
-  gap:.8rem;
-  position:relative;
-  min-height:84px;
+  background:var(--negro);border:1px solid var(--gris-medio);border-radius:10px;
+  padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:stretch;
+  gap:.8rem;position:relative;min-height:84px;
 }
 .event-item:hover{border-color:var(--azul);}
 .event-item.estado-borrador{border-left:4px solid var(--amarillo);}
@@ -247,6 +239,44 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .modal-close:hover{border-color:var(--rojo);color:var(--rojo);}
 .divider{height:1px;background:var(--gris-medio);margin:1.2rem 0;}
 
+/* INSTAGRAM MODAL */
+.ig-editando{
+  background: linear-gradient(135deg, rgba(214,36,159,.15), rgba(0,102,255,.1));
+  border: 1px solid rgba(214,36,159,.4);
+  border-radius: 10px;
+  padding: .8rem 1rem;
+  margin-bottom: 1rem;
+  display: none;
+  align-items: center;
+  gap: .7rem;
+}
+.ig-editando.show{ display: flex; }
+.ig-editando .icon-edit{
+  width:36px; height:36px; border-radius:50%;
+  background: rgba(214,36,159,.2); color:#d6249f;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 1.1rem; flex-shrink:0;
+}
+.ig-editando .txt{
+  flex: 1; min-width: 0;
+  font-size: .82rem; color: var(--blanco);
+  line-height: 1.35;
+}
+.ig-editando .txt strong{
+  display:block;
+  color:#d6249f;
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-bottom:.15rem;
+}
+.ig-editando .txt span{
+  display:block;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  color: var(--gris-claro);
+  font-size: .78rem;
+}
+
 .notas-modal-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--gris-medio);}
 .notas-modal-header .icon-big{width:48px;height:48px;border-radius:10px;background:rgba(0,102,255,.15);color:var(--azul-neon);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
 .notas-modal-header .titulo{flex:1;min-width:0;}
@@ -275,11 +305,14 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .user-list{display:flex;flex-direction:column;gap:.6rem;}
 .user-item{background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;}
 .user-item.owner{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.03);}
+.user-item .info{flex:1;min-width:0;}
 .user-item .email{font-size:.85rem;font-weight:600;color:var(--blanco);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .user-item .meta{font-size:.68rem;color:var(--gris-claro);margin-top:.15rem;}
 .user-item .badge-you{display:inline-block;background:rgba(0,102,255,.15);color:var(--azul-neon);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:.2rem .55rem;border-radius:20px;margin-left:.5rem;}
 .user-item .badge-owner{display:inline-block;background:rgba(255,215,0,.15);color:var(--dorado);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:.2rem .55rem;border-radius:20px;margin-left:.5rem;}
-.user-item .del-user{background:transparent;border:1px solid var(--gris-medio);color:var(--gris-claro);width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:.9rem;transition:var(--trans);flex-shrink:0;}
+.user-item .actions-row{display:flex;gap:.35rem;flex-shrink:0;}
+.user-item .del-user, .user-item .edit-user{background:transparent;border:1px solid var(--gris-medio);color:var(--gris-claro);width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:.9rem;transition:var(--trans);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.user-item .edit-user:hover{border-color:var(--azul);color:var(--azul-neon);}
 .user-item .del-user:hover{border-color:var(--rojo);color:var(--rojo);}
 .user-item .del-user:disabled{opacity:.3;cursor:not-allowed;}
 
@@ -627,9 +660,20 @@ Ej:
 
     <div class="divider"></div>
 
-    <h3 class="section-title" style="font-size:1.3rem;">AGREGAR <span>PUBLICACIÓN</span></h3>
-    <p class="section-sub">Pegá el link de Instagram (reel, post o video).</p>
-    <form onsubmit="addIgPost(event)">
+    <h3 class="section-title" style="font-size:1.3rem;" id="igFormTitle">AGREGAR <span>PUBLICACIÓN</span></h3>
+    <p class="section-sub" id="igFormSub">Pegá el link de Instagram (reel, post o video).</p>
+
+    <!-- Banner de edición -->
+    <div class="ig-editando" id="igEditando">
+      <div class="icon-edit">✏️</div>
+      <div class="txt">
+        <strong>Modo edición</strong>
+        <span id="igEditandoUrl">—</span>
+      </div>
+    </div>
+
+    <form onsubmit="saveIgPost(event)">
+      <input type="hidden" id="igEditId">
       <div class="form-group">
         <label>URL de Instagram *</label>
         <input type="url" id="igUrl" placeholder="https://www.instagram.com/reel/XXXXX/" required>
@@ -639,9 +683,14 @@ Ej:
         <label>Título (opcional)</label>
         <input type="text" id="igTitulo" placeholder="Ej: En vivo en La Bodega">
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
-        ➕ Agregar publicación
-      </button>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+        <button type="submit" class="btn btn-primary" id="igSubmitBtn" style="flex:1;justify-content:center;">
+          ➕ Agregar publicación
+        </button>
+        <button type="button" class="btn btn-outline" id="igCancelBtn" onclick="cancelEditIg()" style="display:none;">
+          Cancelar edición
+        </button>
+      </div>
     </form>
   </div>
 </div>
@@ -1124,7 +1173,9 @@ async function showLogsModal(){
       create_user:{i:'👤',c:'create',l:'Usuario creado'}, delete_user:{i:'🗑️',c:'delete',l:'Usuario eliminado'},
       change_password:{i:'🔑',c:'update',l:'Contraseña cambiada'}, logout:{i:'🚪',c:'update',l:'Cierre de sesión'},
       duplicate_event:{i:'📋',c:'create',l:'Evento duplicado'}, update_notes:{i:'📝',c:'update',l:'Notas actualizadas'},
-      create_ig:{i:'📸',c:'create',l:'Instagram agregado'}, delete_ig:{i:'🗑️',c:'delete',l:'Instagram eliminado'}
+      create_ig:{i:'📸',c:'create',l:'Instagram agregado'},
+      update_ig:{i:'✏️',c:'update',l:'Instagram editado'},
+      delete_ig:{i:'🗑️',c:'delete',l:'Instagram eliminado'}
     };
     list.innerHTML = filtered.map(d=>{
       const log = d.data();
@@ -1183,7 +1234,10 @@ function renderIgList(){
         <div class="email">📸 ${escapeHtml(p.titulo || 'Sin título')}</div>
         <div class="meta" style="word-break:break-all;">${escapeHtml(p.url)}</div>
       </div>
-      <button class="del-user" onclick="removeIgPost('${p.id}')" title="Eliminar">🗑️</button>
+      <div class="actions-row">
+        <button class="edit-user" onclick="editIgPost('${p.id}')" title="Editar">✏️</button>
+        <button class="del-user" onclick="removeIgPost('${p.id}')" title="Eliminar">🗑️</button>
+      </div>
     </div>
   `).join('');
 }
@@ -1194,8 +1248,11 @@ function limpiarIgUrl(raw){
   return m ? m[1] + '/' : null;
 }
 
-async function addIgPost(event){
+/* ====== INSTAGRAM: AGREGAR / EDITAR ====== */
+async function saveIgPost(event){
   event.preventDefault();
+
+  const editId = document.getElementById('igEditId').value;
   const rawUrl = document.getElementById('igUrl').value.trim();
   const titulo = document.getElementById('igTitulo').value.trim();
   const url = limpiarIgUrl(rawUrl);
@@ -1204,26 +1261,90 @@ async function addIgPost(event){
     toast('❌ URL de Instagram inválida', 'error');
     return;
   }
-  if (igPosts.some(p => p.url === url)) {
+
+  // Validar duplicado (excepto si es la misma que estamos editando)
+  const duplicado = igPosts.some(p => p.url === url && p.id !== editId);
+  if (duplicado) {
     toast('⚠️ Esa publicación ya está cargada', 'error');
     return;
   }
 
   try {
-    await addDoc(collection(db, IG_COL), {
-      url,
-      titulo,
-      orden: igPosts.length,
-      createdAt: serverTimestamp()
-    });
-    await logAction('create_ig', `Instagram: ${url}`);
-    toast('✅ Publicación agregada', 'success');
-    document.getElementById('igUrl').value = '';
-    document.getElementById('igTitulo').value = '';
+    if (editId) {
+      // ====== MODO EDICIÓN ======
+      await updateDoc(doc(db, IG_COL, editId), {
+        url,
+        titulo,
+        updatedAt: serverTimestamp()
+      });
+      await logAction('update_ig', `Instagram editado: "${titulo || url}"`);
+      toast('✅ Publicación actualizada', 'success');
+      cancelEditIg();
+    } else {
+      // ====== MODO AGREGAR ======
+      await addDoc(collection(db, IG_COL), {
+        url,
+        titulo,
+        orden: igPosts.length,
+        createdAt: serverTimestamp()
+      });
+      await logAction('create_ig', `Instagram agregado: ${url}`);
+      toast('✅ Publicación agregada', 'success');
+      document.getElementById('igUrl').value = '';
+      document.getElementById('igTitulo').value = '';
+    }
   } catch(err){
     console.error(err);
-    toast('❌ Error al agregar', 'error');
+    toast('❌ Error al guardar', 'error');
   }
+}
+
+function editIgPost(id){
+  const post = igPosts.find(p => p.id === id);
+  if (!post) return;
+
+  // Cargar datos en el form
+  document.getElementById('igEditId').value = id;
+  document.getElementById('igUrl').value = post.url || '';
+  document.getElementById('igTitulo').value = post.titulo || '';
+
+  // Cambiar títulos del form
+  document.getElementById('igFormTitle').innerHTML = 'EDITAR <span>PUBLICACIÓN</span>';
+  document.getElementById('igFormSub').textContent = 'Modificá el título o la URL y guardá los cambios.';
+
+  // Mostrar banner de edición
+  const banner = document.getElementById('igEditando');
+  banner.classList.add('show');
+  document.getElementById('igEditandoUrl').textContent = post.url || '';
+
+  // Cambiar botones
+  document.getElementById('igSubmitBtn').innerHTML = '💾 Guardar cambios';
+  document.getElementById('igCancelBtn').style.display = 'inline-flex';
+
+  // Scroll suave hacia el form
+  setTimeout(() => {
+    document.getElementById('igUrl')?.focus();
+    document.getElementById('igUrl')?.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 100);
+}
+
+function cancelEditIg(){
+  // Limpiar el form
+  document.getElementById('igEditId').value = '';
+  document.getElementById('igUrl').value = '';
+  document.getElementById('igTitulo').value = '';
+
+  // Restaurar títulos
+  document.getElementById('igFormTitle').innerHTML = 'AGREGAR <span>PUBLICACIÓN</span>';
+  document.getElementById('igFormSub').textContent = 'Pegá el link de Instagram (reel, post o video).';
+
+  // Ocultar banner
+  document.getElementById('igEditando').classList.remove('show');
+  document.getElementById('igEditandoUrl').textContent = '—';
+
+  // Restaurar botones
+  document.getElementById('igSubmitBtn').innerHTML = '➕ Agregar publicación';
+  document.getElementById('igCancelBtn').style.display = 'none';
 }
 
 async function removeIgPost(id){
@@ -1239,8 +1360,12 @@ async function removeIgPost(id){
   if (!ok) return;
   try {
     await deleteDoc(doc(db, IG_COL, id));
-    await logAction('delete_ig', `Instagram: ${post?.url || id}`);
+    await logAction('delete_ig', `Instagram eliminado: ${post?.url || id}`);
     toast('🗑️ Publicación eliminada', 'success');
+    // Si estabamos editando esa misma, cancelar el form
+    if (document.getElementById('igEditId').value === id) {
+      cancelEditIg();
+    }
   } catch(err){
     console.error(err);
     toast('❌ Error al eliminar', 'error');
@@ -1248,6 +1373,8 @@ async function removeIgPost(id){
 }
 
 function showInstagramModal(){
+  // Resetear el form al abrir
+  cancelEditIg();
   showModal('instagramModal');
   renderIgList();
 }
@@ -1704,7 +1831,7 @@ async function exportBackup(){
     });
     const admins = adminsList.map(a => ({ email: a.email, createdAt: a.createdAt?.toDate ? a.createdAt.toDate().toISOString() : null }));
     const eventos = events.map(e => ({ ...e, updatedAt: undefined, createdAt: undefined }));
-    const ig = igPosts.map(p => ({ ...p, createdAt: undefined }));
+    const ig = igPosts.map(p => ({ ...p, createdAt: undefined, updatedAt: undefined }));
     const data = { exportedAt: new Date().toISOString(), exportedBy: currentUserEmail, eventos, admins, ig, logs };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1756,7 +1883,7 @@ Object.assign(window, {
   handleFlyer, removeFlyer, resetForm, updateMiniMapDebounced,
   verificarEnMaps, probarMapsUrl, exportBackup,
   updateHoraPreview, formatHora, parseHoraToInput,
-  showInstagramModal, addIgPost, removeIgPost,
+  showInstagramModal, saveIgPost, removeIgPost, editIgPost, cancelEditIg,
   showUsersModal: () => showModal('usersModal'),
   showChangePasswordModal: () => showModal('changePasswordModal'),
   applyFilters
