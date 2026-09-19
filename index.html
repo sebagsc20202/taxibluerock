@@ -215,13 +215,10 @@
             border: 1px solid var(--gris-medio);
             transition: var(--transicion); position: relative; overflow: hidden;
         }
-
-        /* Con flyer: miniatura a altura completa */
         .event-card.has-flyer {
             grid-template-columns: 90px 90px 1fr auto;
             min-height: 120px;
         }
-
         .event-card::before {
             content: ''; position: absolute; left: 0; top: 0;
             height: 100%; width: 4px; background: var(--azul-electrico);
@@ -305,7 +302,6 @@
             background: var(--gris-claro); flex-shrink: 0;
         }
 
-        /* Badge de categoría */
         .categoria-badge{
             display: inline-block;
             font-size: .62rem;
@@ -376,7 +372,6 @@
             50% { opacity: 0.6; }
         }
 
-        /* MINIATURA: ocupa todo el alto de la tarjeta */
         .event-flyer {
             width: 100%;
             height: 100%;
@@ -415,7 +410,6 @@
         }
         .event-info p { color: var(--gris-claro); font-size: 0.85rem; }
 
-        /* VENUE LINK */
         .venue-link {
             display: inline-flex; align-items: center; gap: 0.35rem;
             color: var(--azul-neon); font-size: 0.8rem; font-weight: 600;
@@ -439,7 +433,6 @@
         .event-card.past .venue-link,
         .event-card.past .venue-text { color: var(--gris-claro); }
 
-        /* Botón "Cómo llegar" */
         .directions-link {
             display: inline-flex; align-items: center; gap: 0.4rem;
             margin-top: 0.5rem;
@@ -545,28 +538,44 @@
             width: 100%; height: 1px;
             background: linear-gradient(90deg, transparent, var(--rojo-rock), transparent);
         }
-        .gallery-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+
+        /* INSTAGRAM GALERÍA */
+        .instagram-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            justify-items: center;
         }
-        .gallery-item {
-            aspect-ratio: 1; border-radius: 10px; overflow: hidden;
-            position: relative; cursor: pointer;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 1px solid var(--gris-medio); transition: var(--transicion);
+        .instagram-grid .instagram-media {
+            margin: 0 !important;
+            min-width: 0 !important;
+            max-width: 540px !important;
+            width: 100% !important;
+            background: #1a1a1a !important;
+            border: 1px solid #2a2a2a !important;
+            border-radius: 10px !important;
         }
-        .gallery-item:hover { transform: scale(1.03); border-color: var(--azul-electrico); }
-        .gallery-item::after {
-            content: '📷'; position: absolute; inset: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; opacity: 0.15; transition: var(--transicion);
+        .ig-loading {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #888;
+            font-size: 0.9rem;
         }
-        .gallery-item:hover::after { opacity: 0.4; }
-        .gallery-item:nth-child(1) { background: linear-gradient(135deg, #1a1a2e, #0f3460); }
-        .gallery-item:nth-child(2) { background: linear-gradient(135deg, #2d1b2e, #1a1a2e); }
-        .gallery-item:nth-child(3) { background: linear-gradient(135deg, #1a1a2e, #1e3a5f); }
-        .gallery-item:nth-child(4) { background: linear-gradient(135deg, #2d1b2e, #0f3460); }
-        .gallery-item:nth-child(5) { background: linear-gradient(135deg, #1e3a5f, #1a1a2e); }
-        .gallery-item:nth-child(6) { background: linear-gradient(135deg, #1a1a2e, #2d1b2e); }
+        .ig-item-wrapper {
+            width: 100%;
+            max-width: 540px;
+        }
+        .ig-titulo {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 0.6rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
         .gallery-cta { text-align: center; margin-top: 2.5rem; }
         .gallery-cta a {
             display: inline-flex; align-items: center; gap: 0.5rem;
@@ -760,7 +769,12 @@
             }
             .live-badge { font-size: 0.75rem; padding: 0.6rem 1.2rem; }
             .directions-link { margin-top: 0.4rem; }
-            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+
+            .instagram-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
             .band-stats { grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
             .stat-number { font-size: 1.8rem; }
             .contact-form { padding: 1.5rem; }
@@ -771,7 +785,6 @@
             .hero h1 { letter-spacing: 2px; }
             .btn { padding: 0.8rem 1.5rem; font-size: 0.75rem; }
             .hero-buttons { flex-direction: column; align-items: center; }
-            .gallery-grid { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
             .band-stats { grid-template-columns: 1fr; }
             .stat { padding: 1rem; }
 
@@ -783,7 +796,6 @@
             .live-badge { font-size: 0.7rem; padding: 0.55rem 1rem; letter-spacing: 1.3px; }
             .live-text { font-size: 0.68rem; }
 
-            /* Botones flotantes más chicos en mobile */
             .whatsapp-float {
                 width: 50px; height: 50px; bottom: 1.5rem; right: 1.5rem;
             }
@@ -890,13 +902,8 @@
             <div class="section-line"></div>
             <h2 class="section-title">GALERÍA <span class="accent">EN VIVO</span></h2>
             <p class="section-subtitle">Momentos, escenarios y la energía del rock.</p>
-            <div class="gallery-grid">
-                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
-                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
-                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
-                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
-                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
-                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener" class="gallery-item"></a>
+            <div class="instagram-grid" id="instagramGrid">
+                <div class="ig-loading">Cargando publicaciones...</div>
             </div>
             <div class="gallery-cta">
                 <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener">
@@ -1406,7 +1413,80 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadEventos);
+        /* ========== GALERÍA DE INSTAGRAM ========== */
+        async function loadInstagramGallery(){
+            const grid = document.getElementById('instagramGrid');
+            if (!grid) return;
+
+            try {
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+                const { getFirestore, collection, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+                const firebaseConfig = {
+                    apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
+                    authDomain: "taxiblue-87289.firebaseapp.com",
+                    projectId: "taxiblue-87289",
+                    storageBucket: "taxiblue-87289.firebasestorage.app",
+                    messagingSenderId: "886873440517",
+                    appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
+                    measurementId: "G-M04PSGFYDM"
+                };
+
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+
+                const snap = await new Promise(resolve => {
+                    const unsub = onSnapshot(collection(db, "instagram"), (s) => {
+                        resolve(s);
+                        unsub();
+                    });
+                });
+
+                const posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                posts.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+
+                if (!posts.length) {
+                    grid.innerHTML = `<div class="ig-loading">Próximamente nueva galería. ¡Seguinos en Instagram para no perderte nada!</div>`;
+                    return;
+                }
+
+                grid.innerHTML = posts.map(p => `
+                    <div class="ig-item-wrapper">
+                        ${p.titulo ? `<div class="ig-titulo">${escapeHtml(p.titulo)}</div>` : ''}
+                        <blockquote class="instagram-media"
+                            data-instgrm-permalink="${p.url}"
+                            data-instgrm-version="14"
+                            style="background:#FFF;border:0;border-radius:10px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:0;max-width:540px;min-width:326px;padding:0;width:99.375%;">
+                        </blockquote>
+                    </div>
+                `).join('');
+
+                if (!window.instgrm) {
+                    const s = document.createElement('script');
+                    s.async = true;
+                    s.src = "//www.instagram.com/embed.js";
+                    s.onload = () => {
+                        if (window.instgrm && window.instgrm.Embeds) {
+                            window.instgrm.Embeds.process();
+                        }
+                    };
+                    document.body.appendChild(s);
+                } else {
+                    window.instgrm.Embeds.process();
+                }
+
+            } catch (err) {
+                console.error('Error cargando galería Instagram:', err);
+                grid.innerHTML = `<div class="ig-loading" style="border:1px dashed #e63946;color:#e63946;padding:2rem;border-radius:10px;">
+                    No se pudieron cargar los videos. Revisá la consola.
+                </div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEventos();
+            loadInstagramGallery();
+        });
     </script>
 </body>
 </html>
