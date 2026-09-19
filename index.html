@@ -215,7 +215,13 @@
             border: 1px solid var(--gris-medio);
             transition: var(--transicion); position: relative; overflow: hidden;
         }
-        .event-card.has-flyer { grid-template-columns: 80px 90px 1fr auto; }
+
+        /* ⚡ CON FLYER: min-height para que la miniatura tenga espacio */
+        .event-card.has-flyer {
+            grid-template-columns: 90px 90px 1fr auto;
+            min-height: 120px;
+        }
+
         .event-card::before {
             content: ''; position: absolute; left: 0; top: 0;
             height: 100%; width: 4px; background: var(--azul-electrico);
@@ -370,14 +376,20 @@
             50% { opacity: 0.6; }
         }
 
+        /* ⚡ MINIATURA: ocupa todo el alto de la tarjeta */
         .event-flyer {
-            width: 80px; height: 80px; border-radius: 8px;
-            object-fit: cover; border: 1px solid var(--gris-medio);
+            width: 100%;
+            height: 100%;
+            min-height: 90px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--gris-medio);
             cursor: zoom-in;
+            align-self: stretch;
             transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         }
         .event-flyer:hover {
-            transform: scale(1.05);
+            transform: scale(1.04);
             border-color: var(--azul-electrico);
             box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
         }
@@ -387,7 +399,7 @@
         }
         .event-flyer:active { transform: scale(0.98); }
 
-        .event-date { text-align: center; }
+        .event-date { text-align: center; align-self: center; }
         .event-date .day {
             font-family: var(--fuente-titulo); font-size: 2.5rem;
             color: var(--azul-electrico); line-height: 1;
@@ -396,6 +408,7 @@
             font-size: 0.7rem; text-transform: uppercase;
             letter-spacing: 2px; color: var(--gris-claro);
         }
+        .event-info { align-self: center; }
         .event-info h4 {
             font-family: var(--fuente-titulo); font-size: 1.5rem;
             letter-spacing: 1px; margin-bottom: 0.3rem;
@@ -470,6 +483,7 @@
             border: 1px solid var(--gris-claro); border-radius: 4px;
             cursor: pointer; transition: var(--transicion);
             white-space: nowrap;
+            align-self: center;
         }
         .event-cta:hover { background: var(--azul-electrico); border-color: var(--azul-electrico); }
 
@@ -695,9 +709,19 @@
             }
             .nav-links.active { display: flex; }
             .menu-toggle { display: block; }
+
+            /* En mobile: 3 columnas y CTA debajo */
             .event-card { grid-template-columns: 70px 1fr; gap: 1rem; padding: 1.2rem; }
-            .event-card.has-flyer { grid-template-columns: 70px 70px 1fr; }
-            .event-flyer { width: 70px; height: 70px; }
+            .event-card.has-flyer {
+                grid-template-columns: 80px 70px 1fr;
+                min-height: 110px;
+            }
+            .event-flyer {
+                width: 100%;
+                height: 100%;
+                min-height: 80px;
+                align-self: stretch;
+            }
             .event-cta { grid-column: 1 / -1; width: 100%; text-align: center; }
             .past-badge { grid-column: 1 / -1; justify-self: center; margin-top: 0.3rem; }
             .live-block {
@@ -724,8 +748,13 @@
             .whatsapp-float svg { width: 25px; height: 25px; }
             .band-stats { grid-template-columns: 1fr; }
             .stat { padding: 1rem; }
-            .event-card.has-flyer { grid-template-columns: 60px 60px 1fr; }
-            .event-flyer { width: 60px; height: 60px; }
+
+            /* Card con flyer más compacta */
+            .event-card.has-flyer {
+                grid-template-columns: 70px 60px 1fr;
+                min-height: 100px;
+            }
+            .event-flyer { min-height: 70px; }
             .live-badge { font-size: 0.7rem; padding: 0.55rem 1rem; letter-spacing: 1.3px; }
             .live-text { font-size: 0.68rem; }
         }
@@ -1288,18 +1317,14 @@
                 const app = initializeApp(firebaseConfig);
                 const db = getFirestore(app);
 
-                // 🔴 onSnapshot: escucha en tiempo real
                 onSnapshot(collection(db, "eventos"), (snap) => {
                     const todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                    // Filtro: solo eventos CONFIRMADOS
-                    // Borradores y cancelados NO se muestran al público
                     const eventos = todos.filter(e => {
                         const est = e.estado || 'confirmado';
                         return est === 'confirmado';
                     });
 
-                    // Ordenar por campo `orden` (drag&drop del admin), fallback a fecha
                     eventos.sort((a, b) => {
                         const oa = typeof a.orden === 'number' ? a.orden : Infinity;
                         const ob = typeof b.orden === 'number' ? b.orden : Infinity;
@@ -1307,7 +1332,6 @@
                         return (a.fecha || '').localeCompare(b.fecha || '');
                     });
 
-                    // Remarcados primero
                     eventos.sort((a, b) => {
                         const ra = (a.categoria || '') === 'remarcado' ? 0 : 1;
                         const rb = (b.categoria || '') === 'remarcado' ? 0 : 1;
@@ -1323,7 +1347,6 @@
                     </div>`;
                 });
 
-                // Refresco cada 60s para actualizar el estado "EN VIVO" (basado en hora actual)
                 scheduleRefresh();
 
             } catch (err) {
