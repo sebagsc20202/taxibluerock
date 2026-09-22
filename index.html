@@ -2477,4 +2477,883 @@ window.guardarEdicion = async function() {
     const cuitWrapper = document.getElementById('editCuitWrapper');
     const cuitInput = document.getElementById('editCuit');
     if (!cuitWrapper.classList.contains('hidden') && cuitInput.value.trim() !== '') {
-        if (!
+        if (!/^\d{11}$/.test(cuitInput.value.trim())) {
+            await mostrarError('El CUIT debe tener exactamente 11 dígitos numéricos.');
+            return;
+        }
+    }
+    try {
+        await updateDoc(doc(db, 'contactos', docId), {
+            nombre,
+            telefono,
+            email: document.getElementById('editEmail').value.trim(),
+            servicio: document.getElementById('editServicio').value,
+            ubicacion: document.getElementById('editUbicacion').value.trim(),
+            mensaje: document.getElementById('editMensaje').value.trim(),
+            tipoFactura: document.getElementById('editTipoFactura').value || '',
+            situacionFiscal: document.getElementById('editSituacionFiscal').value || '',
+            cuit: document.getElementById('editCuit').value.trim() || ''
+        });
+        cerrarModal('editModal');
+    } catch (error) {
+        await mostrarError('Error al actualizar: ' + error.message);
+    }
+};
+
+// ============================================================
+//  PRESUPUESTOS
+// ============================================================
+window.abrirPresupuesto = function(docId) {
+    const registro = datosCache.contactos.find(c => c.id === docId);
+    if (!registro) {
+        mostrarError('Registro no encontrado.');
+        return;
+    }
+    window.contactoIdActual = docId;
+    const ahora = new Date();
+    const year = ahora.getFullYear();
+    const day = String(ahora.getDate()).padStart(2, '0');
+    const month = String(ahora.getMonth() + 1).padStart(2, '0');
+    const hour = String(ahora.getHours()).padStart(2, '0');
+    const minute = String(ahora.getMinutes()).padStart(2, '0');
+    const numero = `${year}-${day}${month}.${hour}${minute}`;
+    document.getElementById('previewNumero').textContent = `N° ${numero}`;
+    document.getElementById('presupuestoIndex').value = docId;
+    document.getElementById('presupuestoNombre').value = registro.nombre || '';
+    document.getElementById('presupuestoTelefono').value = registro.telefono || '';
+    document.getElementById('presupuestoEmail').value = registro.email || '';
+    let servicioMostrar = registro.servicio || 'No especificado';
+    if (servicioMostrar === 'emergencia') servicioMostrar = 'Emergencia 24/7';
+    document.getElementById('previewServicio').textContent = servicioMostrar;
+    document.getElementById('previewServicioTitulo').textContent = `Servicio de ${servicioMostrar}`;
+    document.getElementById('presupuestoDescripcion').value = '';
+    document.getElementById('presupuestoPrecio').value = '';
+    document.getElementById('presupuestoValidez').value = 30;
+    document.getElementById('presupuestoMateriales').value = 'No';
+
+    document.getElementById('presupuestoTipoFactura').value = registro.tipoFactura || '';
+    document.getElementById('presupuestoSituacionFiscal').value = registro.situacionFiscal || '';
+    document.getElementById('presupuestoCuit').value = registro.cuit || '';
+
+    toggleFiscalesPresupuesto();
+
+    actualizarVistaPrevia();
+    document.getElementById('presupuestoModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+};
+
+window.actualizarVistaPrevia = function() {
+    const nombre = document.getElementById('presupuestoNombre').value || '-';
+    const telefono = document.getElementById('presupuestoTelefono').value || '-';
+    const email = document.getElementById('presupuestoEmail').value || '-';
+    const descripcionRaw = document.getElementById('presupuestoDescripcion').value || 'Sin descripción';
+    const total = parseFloat(document.getElementById('presupuestoPrecio').value) || 0;
+    const validezDias = parseInt(document.getElementById('presupuestoValidez').value) || 30;
+    const materiales = document.getElementById('presupuestoMateriales').value;
+
+    document.getElementById('previewNombre').textContent = nombre;
+    document.getElementById('previewTelefono').textContent = telefono;
+    document.getElementById('previewEmail').textContent = email;
+
+    const servicio = document.getElementById('previewServicio').textContent || 'No especificado';
+    document.getElementById('previewServicioTitulo').textContent = `Servicio de ${servicio}`;
+    document.getElementById('previewMateriales').textContent = materiales === 'Sí' ? 'Incluidos' : 'No incluidos';
+    document.getElementById('previewCondMateriales').textContent = materiales;
+
+    const docId = document.getElementById('presupuestoIndex').value;
+    const registro = datosCache.contactos.find(c => c.id === docId);
+    const fechaCreacion = registro && registro.fecha ? (registro.fecha.toDate ? registro.fecha.toDate() : new Date(registro.fecha)) : new Date();
+    const fechaValidez = new Date(fechaCreacion);
+    fechaValidez.setDate(fechaValidez.getDate() + validezDias);
+    const validezStr = fechaValidez.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+    document.getElementById('previewValidez').textContent = `${validezStr} (${validezDias} días)`;
+    document.getElementById('previewFechaValidez').textContent = `Válido hasta el ${validezStr}`;
+    document.getElementById('previewValidezDias').textContent = validezDias;
+    document.getElementById('previewValidezFecha').textContent = validezStr;
+
+    document.getElementById('previewDescripcion').innerHTML = descripcionRaw.replace(/\n/g, '<br>');
+
+    document.getElementById('previewTotal').textContent = formatearPrecio(total);
+    document.getElementById('previewSubtotal').textContent = formatearPrecio(total);
+
+    const fiscalContainer = document.getElementById('previewFiscalContainer');
+    const tipoFactura = document.getElementById('presupuestoTipoFactura').value;
+    const situacionFiscal = document.getElementById('presupuestoSituacionFiscal').value;
+    const cuit = document.getElementById('presupuestoCuit').value.trim();
+    let fiscalHtml = '';
+    if (tipoFactura) {
+        fiscalHtml += `<div class="item fiscal-item"><span class="etiqueta">Tipo Factura:</span> <span class="valor">${tipoFactura}</span></div>`;
+    }
+    if (situacionFiscal) {
+        fiscalHtml += `<div class="item fiscal-item"><span class="etiqueta">Situación Fiscal:</span> <span class="valor">${situacionFiscal}</span></div>`;
+    }
+    if (cuit) {
+        fiscalHtml += `<div class="item fiscal-item"><span class="etiqueta">CUIT:</span> <span class="valor">${cuit}</span></div>`;
+    }
+    fiscalContainer.innerHTML = fiscalHtml;
+};
+
+document.getElementById('presupuestoTipoFactura')?.addEventListener('change', actualizarVistaPrevia);
+document.getElementById('presupuestoSituacionFiscal')?.addEventListener('change', actualizarVistaPrevia);
+document.getElementById('presupuestoCuit')?.addEventListener('input', actualizarVistaPrevia);
+document.getElementById('presupuestoDescripcion').addEventListener('input', actualizarVistaPrevia);
+document.getElementById('presupuestoPrecio').addEventListener('input', actualizarVistaPrevia);
+document.getElementById('presupuestoValidez').addEventListener('input', actualizarVistaPrevia);
+document.getElementById('presupuestoMateriales').addEventListener('change', actualizarVistaPrevia);
+
+window.guardarPresupuesto = async function() {
+    const nombre = document.getElementById('presupuestoNombre').value || 'Sin nombre';
+    const servicio = document.getElementById('previewServicio').textContent || 'No especificado';
+    const descripcion = document.getElementById('presupuestoDescripcion').value.trim() || 'Sin descripción';
+    const total = parseFloat(document.getElementById('presupuestoPrecio').value) || 0;
+    const precioNumero = parseFloat(total.toFixed(2));
+    const numero = document.getElementById('previewNumero').textContent.replace('N° ', '');
+    const validez = document.getElementById('presupuestoValidez').value || 30;
+    const materiales = document.getElementById('presupuestoMateriales').value;
+    const tipoFactura = document.getElementById('presupuestoTipoFactura').value || '';
+    const situacionFiscal = document.getElementById('presupuestoSituacionFiscal').value || '';
+    const cuit = document.getElementById('presupuestoCuit').value.trim() || '';
+
+    let contactoId = window.contactoIdActual;
+    if (!contactoId || contactoId.trim() === '') {
+        contactoId = 'sin_contacto';
+    }
+
+    const btn = document.getElementById('guardarPresupuestoBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+
+    try {
+        const element = document.getElementById('presupuestoPreview');
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: element.scrollWidth,
+            height: element.scrollHeight
+        });
+        if (canvas.width === 0 || canvas.height === 0) throw new Error('El canvas generado está vacío.');
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const scale = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+        const imgWidth = canvas.width * scale;
+        const imgHeight = canvas.height * scale;
+        const xOffset = (pdfWidth - imgWidth) / 2;
+        pdf.addImage(imgData, 'JPEG', xOffset, 0, imgWidth, imgHeight);
+        const filename = `Presupuesto N° ${numero} - ${nombre} - ${new Date().toISOString().slice(0,10)}.pdf`;
+        pdf.save(filename);
+
+        const datosPresupuesto = {
+            nombre,
+            servicio,
+            descripcion,
+            precio: precioNumero,
+            numero,
+            validez,
+            materiales,
+            estado: 'encurso',
+            fecha: serverTimestamp(),
+            contactoId: contactoId,
+            tipoFactura: tipoFactura,
+            situacionFiscal: situacionFiscal,
+            cuit: cuit,
+            oculto: false,
+            adelantos: []
+        };
+
+        await addDoc(collection(db, 'presupuestos'), datosPresupuesto);
+
+        cerrarModal('presupuestoModal');
+
+    } catch (error) {
+        console.error('❌ Error al guardar presupuesto:', error);
+        await mostrarError('Hubo un error al guardar el presupuesto. Revisa la consola para más detalles.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Guardar y Descargar PDF';
+    }
+};
+
+document.getElementById('guardarPresupuestoBtn').addEventListener('click', window.guardarPresupuesto);
+
+window.cambiarEstadoPresupuesto = async function(docId, nuevoEstado) {
+    try {
+        await updateDoc(doc(db, 'presupuestos', docId), { estado: nuevoEstado });
+    } catch (error) {
+        await mostrarError('Error al cambiar estado: ' + error.message);
+    }
+};
+
+// ============================================================
+//  FUNCIÓN AUXILIAR PARA ESCAPAR CARACTERES
+// ============================================================
+function escape(str) {
+    if (!str) return '';
+    return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+// ============================================================
+//  RESUMEN POR CONTACTO
+// ============================================================
+function actualizarResumenContactos(data) {
+    const container = document.getElementById('resumenContainer');
+    const busquedaInput = document.getElementById('busquedaResumen');
+    const busqueda = busquedaInput ? busquedaInput.value.toLowerCase().trim() : '';
+
+    let dataFiltrada = data;
+    if (busqueda !== '') {
+        dataFiltrada = data.filter(item => {
+            const nombre = (item.nombre || '').toLowerCase();
+            const telefono = (item.telefono || '').toLowerCase();
+            return nombre.includes(busqueda) || telefono.includes(busqueda);
+        });
+    }
+
+    if (dataFiltrada.length === 0) {
+        container.innerHTML = `<div class="no-data"><i class="fas fa-search" style="font-size:2rem;color:var(--gray-text);"></i><p style="margin-top:10px;">No se encontraron clientes que coincidan con la búsqueda.</p></div>`;
+        return;
+    }
+
+    const contactosMap = new Map();
+    dataFiltrada.forEach(item => {
+        const nombre = item.nombre || 'Anónimo';
+        const telefono = item.telefono ? String(item.telefono).trim() : '';
+        if (!telefono) return;
+        const key = `${nombre}|${telefono}`;
+        if (contactosMap.has(key)) {
+            const contacto = contactosMap.get(key);
+            contacto.cantidad += 1;
+            if (item.servicio && !contacto.servicios.includes(item.servicio)) {
+                contacto.servicios.push(item.servicio);
+            }
+            contacto.email = item.email || contacto.email;
+            contacto.ubicacion = item.ubicacion || contacto.ubicacion;
+            contacto.id = item.id;
+        } else {
+            contactosMap.set(key, {
+                nombre,
+                telefono,
+                email: item.email || '',
+                ubicacion: item.ubicacion || '',
+                cantidad: 1,
+                servicios: item.servicio ? [item.servicio] : [],
+                id: item.id
+            });
+        }
+    });
+
+    const contactos = Array.from(contactosMap.values()).sort((a,b) => b.cantidad - a.cantidad);
+    if (contactos.length === 0) {
+        container.innerHTML = `<div class="no-data"><i class="fas fa-inbox" style="font-size:2rem;color:var(--gray-text);"></i><p style="margin-top:10px;">No hay contactos con teléfono registrado.</p></div>`;
+        return;
+    }
+
+    let html = `<table><thead><tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Email</th>
+        <th>Ubicación</th>
+        <th style="text-align:center;">Servicios</th>
+        <th style="text-align:center;">Contactar</th>
+        <th style="text-align:center;">Eliminar</th>
+    </tr></thead><tbody>`;
+    contactos.forEach((contacto, index) => {
+        const telefonoLimpio = contacto.telefono.replace(/\D/g, '');
+        const mensaje = encodeURIComponent('Hola, me comunico de REF Electrotecnia en respuesta a tu solicitud de presupuesto. ¿Podemos conversar?');
+        const whatsappUrl = `https://wa.me/${telefonoLimpio}?text=${mensaje}`;
+        const serviciosLista = contacto.servicios.join(', ');
+
+        const nombreNormalizado = contacto.nombre.trim().toLowerCase();
+        const contactoEncontrado = datosCache.contactos.find(c => c.nombre && c.nombre.trim().toLowerCase() === nombreNormalizado);
+        const contactoId = contactoEncontrado ? contactoEncontrado.id : null;
+        let tieneVencido = false;
+        if (contactoId) {
+            tieneVencido = datosCache.presupuestos.some(p => {
+                if (p.contactoId && p.contactoId === contactoId) {
+                    return calcularEstadoPresupuesto(p) === 'vencido';
+                }
+                return false;
+            });
+        }
+
+        const alertaHtml = tieneVencido
+            ? '<i class="fas fa-exclamation-triangle alerta-vencido" title="Presupuesto vencido"></i>'
+            : '';
+        const btnClase = tieneVencido ? 'btn-whatsapp-alerta' : 'btn-whatsapp';
+        const btnTexto = tieneVencido ? 'Contactar URGENTE' : 'Contactar';
+
+        const docId = contacto.id;
+        html += `<tr>
+            <td>${index + 1}</td>
+            <td><strong>${contacto.nombre}</strong> ${alertaHtml}</td>
+            <td>${contacto.telefono}</td>
+            <td>${contacto.email || '—'}</td>
+            <td>${contacto.ubicacion || '—'}</td>
+            <td style="text-align:center;">
+                <span class="badge servicios-clickable" style="background:var(--primary-cyan); color:white; padding:2px 12px; border-radius:4px; font-weight:600; display:inline-block;"
+                      onclick="mostrarServicios('${escape(contacto.nombre)}', '${escape(contacto.telefono)}')"
+                      title="Haz clic para ver los servicios">
+                    ${contacto.cantidad}
+                </span>
+                <span style="font-size:0.75rem; color:var(--gray-text); margin-left:6px; cursor:default;" title="Servicios: ${serviciosLista || 'Ninguno'}"><i class="fas fa-info-circle"></i></span>
+            </td>
+            <td style="text-align:center;">
+                <a href="${whatsappUrl}" target="_blank" class="${btnClase}"><i class="fab fa-whatsapp"></i> ${btnTexto}</a>
+            </td>
+            <td style="text-align:center;">
+                <button class="btn-eliminar-contacto" onclick="eliminarContactoDefinitivo('${docId}')" title="Eliminar contacto definitivamente">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>`;
+    });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+// ============================================================
+//  MODAL DE SERVICIOS
+// ============================================================
+window.mostrarServicios = function(nombre, telefono) {
+    const modal = document.getElementById('serviciosModal');
+    const nombreSpan = document.getElementById('serviciosClienteNombre');
+    const container = document.getElementById('serviciosListContainer');
+
+    nombreSpan.textContent = nombre || 'Sin nombre';
+
+    const registros = datosCache.contactos.filter(c => 
+        (c.nombre || '').trim().toLowerCase() === (nombre || '').trim().toLowerCase() &&
+        (c.telefono || '') === (telefono || '')
+    );
+
+    if (registros.length === 0) {
+        container.innerHTML = '<p style="color: var(--gray-text);">No se encontraron registros para este contacto.</p>';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        return;
+    }
+
+    let html = `<table class="servicios-table" style="width:100%; border-collapse:collapse; margin-top:10px;">
+        <thead>
+            <tr style="background:var(--light-bg);">
+                <th style="text-align:left; padding:8px; border-bottom:2px solid #E9ECEF;">Servicio</th>
+                <th style="text-align:left; padding:8px; border-bottom:2px solid #E9ECEF;">Estado</th>
+                <th style="text-align:left; padding:8px; border-bottom:2px solid #E9ECEF;">Fecha de cambio</th>
+            </tr>
+        </thead><tbody>`;
+
+    registros.forEach(reg => {
+        const servicio = reg.servicio || 'No especificado';
+        let presupuesto = null;
+        if (reg.id) {
+            presupuesto = datosCache.presupuestos.find(p => p.contactoId === reg.id);
+        }
+        if (!presupuesto) {
+            presupuesto = datosCache.presupuestos.find(p => 
+                (p.nombre || '').trim().toLowerCase() === (nombre || '').trim().toLowerCase() &&
+                (p.telefono || '') === (telefono || '')
+            );
+        }
+
+        let estado = 'Sin presupuesto';
+        let fecha = formatearFechaHora(reg.fecha);
+        let colorEstado = '#ccc';
+        if (presupuesto) {
+            const estadoRaw = presupuesto.estado || 'encurso';
+            const estadoMap = {
+                'aprobado': { label: 'Aprobado', color: '#2ecc71' },
+                'encurso': { label: 'En Curso', color: '#f39c12' },
+                'realizado': { label: 'Realizado', color: '#2ecc71' },
+                'vencido': { label: 'Vencido', color: '#e74c3c' },
+                'cancelado': { label: 'Cancelado', color: '#7f8c8d' }
+            };
+            const info = estadoMap[estadoRaw] || { label: estadoRaw.charAt(0).toUpperCase() + estadoRaw.slice(1), color: '#00A8FF' };
+            estado = info.label;
+            colorEstado = info.color;
+            if (presupuesto.fecha) {
+                fecha = formatearFechaHora(presupuesto.fecha);
+            }
+        }
+
+        html += `<tr>
+            <td style="padding:8px; border-bottom:1px solid #E9ECEF;">${servicio}</td>
+            <td style="padding:8px; border-bottom:1px solid #E9ECEF;">
+                <span class="estado-badge" style="background:${colorEstado}; border-radius:4px;">
+                    ${estado}
+                </span>
+            </td>
+            <td style="padding:8px; border-bottom:1px solid #E9ECEF; font-size:0.85rem;">${fecha}</td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+};
+
+document.getElementById('closeServiciosModal').addEventListener('click', () => cerrarModal('serviciosModal'));
+document.getElementById('closeServiciosBtn').addEventListener('click', () => cerrarModal('serviciosModal'));
+document.getElementById('serviciosModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModal('serviciosModal');
+    }
+});
+
+// ============================================================
+//  MODALES EXISTENTES
+// ============================================================
+function cerrarModal(id) {
+    document.getElementById(id).classList.remove('active');
+    document.body.style.overflow = '';
+}
+window.cerrarModal = cerrarModal;
+
+document.getElementById('closeEditModal').addEventListener('click', () => cerrarModal('editModal'));
+document.getElementById('cancelEditBtn').addEventListener('click', () => cerrarModal('editModal'));
+document.getElementById('closePresupuestoModal').addEventListener('click', () => cerrarModal('presupuestoModal'));
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+document.getElementById('saveEditBtn').addEventListener('click', window.guardarEdicion);
+
+document.getElementById('filtroEstado').addEventListener('change', () => renderizarPresupuestos(datosCache.presupuestos));
+document.getElementById('busquedaPresupuesto').addEventListener('input', () => renderizarPresupuestos(datosCache.presupuestos));
+
+document.getElementById('mostrarOcultosBtn').addEventListener('click', function() {
+    mostrarOcultos = !mostrarOcultos;
+    this.textContent = mostrarOcultos ? 'Ocultar ocultos' : 'Mostrar ocultos';
+    this.classList.toggle('activo', mostrarOcultos);
+    renderizarTabla(datosCache.contactos);
+});
+
+document.getElementById('mostrarOcultosPresupuestosBtn').addEventListener('click', function() {
+    mostrarOcultosPresupuestos = !mostrarOcultosPresupuestos;
+    this.textContent = mostrarOcultosPresupuestos ? 'Ocultar ocultos' : 'Mostrar ocultos';
+    this.classList.toggle('activo', mostrarOcultosPresupuestos);
+    renderizarPresupuestos(datosCache.presupuestos);
+});
+
+const busquedaResumen = document.getElementById('busquedaResumen');
+if (busquedaResumen) {
+    busquedaResumen.addEventListener('input', function() {
+        actualizarResumenContactos(datosCache.contactos);
+    });
+}
+
+// ============================================================
+//  CAMBIAR CONTRASEÑA
+// ============================================================
+document.getElementById('cambiarPassBtn').addEventListener('click', function() {
+    document.getElementById('cambiarPassModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmNewPassword').value = '';
+});
+
+document.getElementById('closeCambiarPassModal').addEventListener('click', () => cerrarModal('cambiarPassModal'));
+document.getElementById('cancelCambiarPassBtn').addEventListener('click', () => cerrarModal('cambiarPassModal'));
+
+document.getElementById('saveCambiarPassBtn').addEventListener('click', async function() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmNewPassword').value;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        await mostrarError('Todos los campos son obligatorios.');
+        return;
+    }
+    if (newPassword.length < 6) {
+        await mostrarError('La nueva contraseña debe tener al menos 6 caracteres.');
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        await mostrarError('Las contraseñas no coinciden.');
+        return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) {
+        await mostrarError('No hay usuario autenticado.');
+        return;
+    }
+
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cambiando...';
+
+    try {
+        const credential = EmailAuthProvider.credential(user.email, currentPassword);
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, newPassword);
+        await mostrarModal({
+            tipo: 'success',
+            icon: '✅',
+            titulo: 'Contraseña cambiada',
+            mensaje: 'La contraseña se ha actualizado correctamente.',
+            botones: [{ texto: 'Aceptar', clase: 'primary' }]
+        });
+        cerrarModal('cambiarPassModal');
+    } catch (error) {
+        let mensaje = 'Error al cambiar la contraseña.';
+        if (error.code === 'auth/wrong-password') {
+            mensaje = 'La contraseña actual es incorrecta.';
+        } else if (error.code === 'auth/requires-recent-login') {
+            mensaje = 'Esta operación es sensible. Por favor, cierra sesión y vuelve a iniciar sesión antes de cambiar la contraseña.';
+        } else {
+            mensaje = error.message;
+        }
+        await mostrarError(mensaje);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Cambiar contraseña';
+    }
+});
+
+// ============================================================
+//  ANTICIPOS
+// ============================================================
+window.abrirAnticipo = async function(docId) {
+    const presupuesto = datosCache.presupuestos.find(p => p.id === docId);
+    if (!presupuesto) {
+        await mostrarError('Presupuesto no encontrado.');
+        return;
+    }
+
+    document.getElementById('anticipoDocId').value = docId;
+    document.getElementById('anticipoNombre').textContent = presupuesto.nombre || '-';
+    document.getElementById('anticipoTelefono').textContent = presupuesto.telefono || '-';
+    document.getElementById('anticipoEmail').textContent = presupuesto.email || '-';
+    const precio = presupuesto.precio || 0;
+    document.getElementById('anticipoTotalPresupuesto').textContent = formatearPrecio(precio);
+
+    const hoy = new Date().toISOString().slice(0,10);
+    document.getElementById('anticipoFecha').value = hoy;
+    document.getElementById('anticipoMonto').value = '';
+
+    renderizarAdelantos(docId);
+
+    document.getElementById('anticipoModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+};
+
+function renderizarAdelantos(docId) {
+    const presupuesto = datosCache.presupuestos.find(p => p.id === docId);
+    if (!presupuesto) {
+        document.getElementById('anticipoItems').innerHTML = '<p>Sin adelantos</p>';
+        return;
+    }
+
+    const adelantos = presupuesto.adelantos || [];
+    const precio = presupuesto.precio || 0;
+    const totalAdelantado = adelantos.reduce((sum, a) => sum + (parseFloat(a.monto) || 0), 0);
+    const diferencia = precio - totalAdelantado;
+    const porcentaje = precio > 0 ? Math.round((totalAdelantado / precio) * 100) : 0;
+
+    document.getElementById('anticipoTotalAdelantado').textContent = formatearPrecio(totalAdelantado);
+    document.getElementById('anticipoDiferencia').textContent = formatearPrecio(diferencia);
+    document.getElementById('anticipoPorcentaje').textContent = porcentaje + '%';
+
+    if (adelantos.length === 0) {
+        document.getElementById('anticipoItems').innerHTML = '<p style="color:var(--gray-text);">No hay adelantos registrados.</p>';
+        return;
+    }
+
+    let html = '<ul style="list-style:none; padding:0; margin:0;">';
+    adelantos.forEach((a, index) => {
+        const fecha = a.fecha || '';
+        const monto = parseFloat(a.monto) || 0;
+        html += `<li style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #E9ECEF;">
+            <span><strong>${fecha}</strong> - ${formatearPrecio(monto)}</span>
+            <button class="btn-delete" onclick="eliminarAdelanto('${docId}', ${index})" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button>
+        </li>`;
+    });
+    html += '</ul>';
+    document.getElementById('anticipoItems').innerHTML = html;
+}
+
+window.agregarAdelanto = async function() {
+    const docId = document.getElementById('anticipoDocId').value;
+    const fecha = document.getElementById('anticipoFecha').value;
+    const monto = parseFloat(document.getElementById('anticipoMonto').value);
+
+    if (!fecha) {
+        await mostrarError('Debes seleccionar una fecha.');
+        return;
+    }
+    if (isNaN(monto) || monto <= 0) {
+        await mostrarError('Ingresa un monto válido mayor a 0.');
+        return;
+    }
+
+    const presupuesto = datosCache.presupuestos.find(p => p.id === docId);
+    if (!presupuesto) {
+        await mostrarError('Presupuesto no encontrado.');
+        return;
+    }
+
+    const adelantos = presupuesto.adelantos || [];
+    const totalAdelantado = adelantos.reduce((sum, a) => sum + (parseFloat(a.monto) || 0), 0);
+    const precio = presupuesto.precio || 0;
+    if (totalAdelantado + monto > precio) {
+        await mostrarError('El total adelantado no puede superar el monto del presupuesto.');
+        return;
+    }
+
+    const nuevoAdelanto = { fecha, monto };
+    const nuevosAdelantos = [...adelantos, nuevoAdelanto];
+
+    try {
+        await updateDoc(doc(db, 'presupuestos', docId), { adelantos: nuevosAdelantos });
+        renderizarAdelantos(docId);
+        document.getElementById('anticipoMonto').value = '';
+    } catch (error) {
+        await mostrarError('Error al agregar adelanto: ' + error.message);
+    }
+};
+
+window.eliminarAdelanto = async function(docId, index) {
+    const presupuesto = datosCache.presupuestos.find(p => p.id === docId);
+    if (!presupuesto) return;
+
+    const adelantos = presupuesto.adelantos || [];
+    if (index < 0 || index >= adelantos.length) return;
+
+    const confirmado = await mostrarConfirmacion('¿Eliminar este adelanto?');
+    if (!confirmado) return;
+
+    const nuevosAdelantos = adelantos.filter((_, i) => i !== index);
+    try {
+        await updateDoc(doc(db, 'presupuestos', docId), { adelantos: nuevosAdelantos });
+        renderizarAdelantos(docId);
+    } catch (error) {
+        await mostrarError('Error al eliminar adelanto: ' + error.message);
+    }
+};
+
+window.exportarAnticipoPDF = async function() {
+    const docId = document.getElementById('anticipoDocId').value;
+    const presupuesto = datosCache.presupuestos.find(p => p.id === docId);
+    if (!presupuesto) {
+        await mostrarError('Presupuesto no encontrado.');
+        return;
+    }
+
+    const nombre = presupuesto.nombre || '-';
+    const telefono = presupuesto.telefono || '-';
+    const email = presupuesto.email || '-';
+    const precio = presupuesto.precio || 0;
+    const adelantos = presupuesto.adelantos || [];
+    const totalAdelantado = adelantos.reduce((sum, a) => sum + (parseFloat(a.monto) || 0), 0);
+    const diferencia = precio - totalAdelantado;
+    const porcentaje = precio > 0 ? Math.round((totalAdelantado / precio) * 100) : 0;
+
+    const numeroPresupuesto = presupuesto.numero || 'N/A';
+    const fechaEmision = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '0';
+    tempDiv.style.width = '920px';
+    tempDiv.style.background = 'white';
+    tempDiv.style.padding = '0';
+    tempDiv.style.fontFamily = 'Inter, sans-serif';
+    tempDiv.className = 'presupuesto-preview';
+
+    tempDiv.innerHTML = `
+        <div class="presupuesto">
+            <div class="marca-agua">
+                <img src="/images/icon-512.png" alt="Marca de agua" />
+            </div>
+            <header class="header">
+                <div class="header-left">
+                    <div class="logo">
+                        <img src="/images/icon-192.png" alt="REF Electrotecnia" />
+                    </div>
+                    <div class="empresa">
+                        <h1>REF <span>Electrotecnia</span></h1>
+                        <div class="subtitulo">Soluciones pensadas.</div>
+                    </div>
+                </div>
+                <div class="badge-presupuesto">
+                    <span class="numero">HISTORIAL DE ANTICIPOS</span>
+                    <span class="numero-presupuesto">Presupuesto N° ${numeroPresupuesto}</span>
+                    <span class="fecha">Emisión: ${fechaEmision}</span>
+                </div>
+            </header>
+            <div class="cuerpo">
+                <section class="seccion">
+                    <div class="seccion-titulo" style="margin-bottom:12px;">
+                        <span class="icono"></span> DATOS DEL CLIENTE Y PRESUPUESTO
+                        <span class="linea-aux"></span>
+                    </div>
+                    <div class="datos-wrapper">
+                        <div class="datos-col izquierda">
+                            <div class="col-titulo">Detalles del Presupuesto</div>
+                            <div class="item"><span class="etiqueta">Servicio:</span> <span class="valor">${presupuesto.servicio || '-'}</span></div>
+                            <div class="item"><span class="etiqueta">Total:</span> <span class="valor">${formatearPrecio(precio)}</span></div>
+                            <div class="item"><span class="etiqueta">Estado:</span> <span class="valor">${presupuesto.estado || 'En curso'}</span></div>
+                            ${presupuesto.tipoFactura ? `<div class="item fiscal-item"><span class="etiqueta">Tipo Factura:</span> <span class="valor">${presupuesto.tipoFactura}</span></div>` : ''}
+                            ${presupuesto.situacionFiscal ? `<div class="item fiscal-item"><span class="etiqueta">Situación Fiscal:</span> <span class="valor">${presupuesto.situacionFiscal}</span></div>` : ''}
+                            ${presupuesto.cuit ? `<div class="item fiscal-item"><span class="etiqueta">CUIT:</span> <span class="valor">${presupuesto.cuit}</span></div>` : ''}
+                        </div>
+                        <div class="datos-col derecha">
+                            <div class="col-titulo">Información del Cliente</div>
+                            <div class="item"><span class="etiqueta">Cliente:</span> <span class="valor">${nombre}</span></div>
+                            <div class="item"><span class="etiqueta">Teléfono:</span> <span class="valor">${telefono}</span></div>
+                            <div class="item"><span class="etiqueta">Email:</span> <span class="valor email">${email}</span></div>
+                        </div>
+                    </div>
+                </section>
+                <section class="seccion seccion-prestacion">
+                    <div class="seccion-titulo">
+                        <span class="icono"></span> ADELANTOS REGISTRADOS
+                        <span class="linea-aux"></span>
+                    </div>
+                    <div class="prestacion-card" style="padding: 0; overflow: hidden;">
+                        <div class="prestacion-header">
+                            <span>FECHA</span>
+                            <span class="importe-label">MONTO</span>
+                        </div>
+                        ${adelantos.length === 0 ? `
+                            <div style="padding: 20px 24px; text-align: center; color: var(--gray-text);">
+                                No hay adelantos registrados.
+                            </div>
+                        ` : `
+                            ${adelantos.map(a => `
+                                <div class="prestacion-fila" style="grid-template-columns: 2fr 1fr; padding: 12px 24px; border-bottom: 1px dashed #e2e8f0;">
+                                    <span style="font-size: 15px; font-weight: 500; color: var(--gray-800);">${a.fecha || ''}</span>
+                                    <span style="text-align: right; font-size: 18px; font-weight: 700; color: var(--primary-blue);">${formatearPrecio(a.monto)}</span>
+                                </div>
+                            `).join('')}
+                        `}
+                    </div>
+                </section>
+                <div class="totales-container">
+                    <div class="totales-firma">
+                        <img class="firma-imagen" src="/images/firma.png" alt="Firma R. Figueras" />
+                        <span class="firma-texto">R. Figueras - REF Electrotecnia</span>
+                        <span class="firma-digital">✓ Firmado digitalmente</span>
+                    </div>
+                    <div class="totales-list" style="width: 100%; max-width: 380px;">
+                        <div class="linea" style="display: flex; justify-content: space-between; width: 100%; font-size: 16px; font-weight: 600; color: var(--gray-800);">
+                            <span>Total adelantado</span>
+                            <span>${formatearPrecio(totalAdelantado)}</span>
+                        </div>
+                        <div class="linea" style="display: flex; justify-content: space-between; width: 100%; font-size: 16px; font-weight: 600; color: var(--gray-800);">
+                            <span>Diferencia a pagar</span>
+                            <span>${formatearPrecio(diferencia)}</span>
+                        </div>
+                        <div class="linea" style="display: flex; justify-content: space-between; width: 100%; font-size: 16px; font-weight: 600; color: var(--gray-800);">
+                            <span>Porcentaje pagado</span>
+                            <span>${porcentaje}%</span>
+                        </div>
+                        <div class="linea total-final" style="width: 100%; border-top: 2px solid var(--primary-dark); padding-top: 10px; margin-top: 4px; font-size: 20px; font-weight: 800; color: var(--primary-dark); display: flex; justify-content: space-between;">
+                            <span class="label-total">Total presupuesto</span>
+                            <span class="valor-total">${formatearPrecio(precio)}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-documento">
+                    Documento generado electrónicamente a través de https://www.refelectrotecnia.com
+                </div>
+                <section class="condiciones">
+                    <div class="seccion-titulo">
+                        <span class="icono"></span> NOTAS SOBRE ANTICIPOS
+                        <span class="linea-aux"></span>
+                    </div>
+                    <ul>
+                        <li>Este documento refleja el historial de pagos anticipados para el presupuesto N° ${numeroPresupuesto}.</li>
+                        <li>Los adelantos se descuentan del total final del presupuesto.</li>
+                        <li>El saldo restante deberá abonarse según lo acordado.</li>
+                        <li>Para cualquier consulta, comunicarse con REF Electrotecnia.</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(tempDiv);
+
+    try {
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const canvas = await html2canvas(tempDiv, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: tempDiv.scrollWidth,
+            height: tempDiv.scrollHeight
+        });
+
+        if (canvas.width === 0 || canvas.height === 0) throw new Error('El canvas generado está vacío.');
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const scale = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+        const imgWidth = canvas.width * scale;
+        const imgHeight = canvas.height * scale;
+        const xOffset = (pdfWidth - imgWidth) / 2;
+        pdf.addImage(imgData, 'JPEG', xOffset, 0, imgWidth, imgHeight);
+        const filename = `Anticipos_${nombre}_${new Date().toISOString().slice(0,10)}.pdf`;
+        pdf.save(filename);
+
+    } catch (error) {
+        console.error('Error al generar PDF de anticipos:', error);
+        await mostrarError('Error al generar el PDF: ' + error.message);
+    } finally {
+        document.body.removeChild(tempDiv);
+    }
+};
+
+document.getElementById('closeAnticipoModal').addEventListener('click', () => cerrarModal('anticipoModal'));
+document.getElementById('closeAnticipoBtn').addEventListener('click', () => cerrarModal('anticipoModal'));
+document.getElementById('anticipoModal').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModal('anticipoModal');
+});
+document.getElementById('btnAgregarAdelanto').addEventListener('click', window.agregarAdelanto);
+document.getElementById('btnExportarAnticipo').addEventListener('click', window.exportarAnticipoPDF);
+
+</script>
+
+<!-- ========================================================== -->
+<!-- REGISTRO DEL SERVICE WORKER (PWA)                          -->
+<!-- ========================================================== -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(reg) {
+                    console.log('✅ Service Worker registrado correctamente:', reg);
+                })
+                .catch(function(err) {
+                    console.error('❌ Error al registrar el Service Worker:', err);
+                });
+        });
+    }
+</script>
+
+</body>
+</html>
