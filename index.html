@@ -1,1504 +1,2480 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLBWNLC0E2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PLBWNLC0E2');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taxi Blue Rock | Covers de Rock & Roll</title>
-    <meta name="description" content="Taxi Blue Rock, banda de covers de rock & roll. Revive los clásicos de los 80 y 90. Contrataciones y próximos eventos.">
+
+    <!-- ===== PWA: MANIFEST Y THEME COLOR ===== -->
+    <link rel="manifest" href="/manifest-admin.json">
+    <meta name="theme-color" content="#00A8FF">
+
+    <title>Admin | REF Electrotecnia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===== ESTILOS GENERALES (con bordes menos curvos) ===== */
+        * { margin:0; padding:0; box-sizing:border-box; }
         :root {
-            --negro: #0a0a0a;
-            --negro-suave: #111111;
-            --gris-oscuro: #1a1a1a;
-            --gris-medio: #2a2a2a;
-            --gris-claro: #888888;
-            --blanco: #f0f0f0;
-            --azul-electrico: #0066ff;
-            --azul-neon: #00a8ff;
-            --rojo-rock: #e63946;
-            --rojo-live: #ff1744;
-            --verde-maps: #34a853;
-            --dorado: #ffd700;
-            --fuente-titulo: 'Bebas Neue', sans-serif;
-            --fuente-cuerpo: 'Inter', sans-serif;
-            --transicion: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --primary-dark: #0A2E5C;
+            --primary-cyan: #00A8FF;
+            --light-bg: #F4F6F9;
+            --gray-text: #4A4A4A;
+            --shadow: 0 4px 15px rgba(0,0,0,0.08);
+            --radius: 6px;
+            --font: 'Inter', sans-serif;
         }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: var(--fuente-cuerpo);
-            background-color: var(--negro);
-            color: var(--blanco);
-            line-height: 1.7;
-            overflow-x: hidden;
+        body { font-family: var(--font); background: var(--light-bg); color: #1E1E1E; min-height: 100vh; }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0A2E5C 0%, #00A8FF 100%); display: flex; justify-content: center; align-items: center; z-index: 99999; padding: 20px; }
+        .login-box { background: white; padding: 40px 35px; border-radius: 6px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); max-width: 420px; width: 100%; text-align: center; }
+        .login-box .logo { height: 60px; margin-bottom: 20px; }
+        .login-box h2 { color: var(--primary-dark); font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+        .login-box .subtitle { color: var(--gray-text); font-size: 0.9rem; margin-bottom: 25px; }
+        .login-box input { width: 100%; padding: 14px 16px; border: 2px solid #E9ECEF; border-radius: 4px; font-size: 1rem; font-family: var(--font); margin-bottom: 15px; background: var(--light-bg); }
+        .login-box input:focus { outline: none; border-color: var(--primary-cyan); background: white; box-shadow: 0 0 0 4px rgba(0,168,255,0.1); }
+        .login-box .btn-login { width: 100%; background: var(--primary-cyan); color: white; border: none; padding: 14px; border-radius: 6px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .login-box .btn-login:hover { background: var(--primary-dark); }
+        .login-box .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
+        .login-box .error-msg { color: #e74c3c; font-size: 0.9rem; margin-top: 10px; display: none; font-weight: 600; }
+        .dashboard-locked { display: none !important; }
+        .dashboard { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; background: white; padding: 16px 28px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 15px; }
+        .dashboard-header h2 { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); }
+        .dashboard-header h2 span { color: var(--primary-cyan); }
+        .dashboard-header .header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .dashboard-header .btn-logout { background: transparent; color: var(--gray-text); border: 2px solid #E9ECEF; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
+        .dashboard-header .btn-logout:hover { background: #f1f1f1; border-color: #ccc; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 15px; }
+        .stat-card { background: white; padding: 20px 22px; border-radius: var(--radius); box-shadow: var(--shadow); border-left: 5px solid var(--primary-cyan); }
+        .stat-card .stat-number { font-size: 2.2rem; font-weight: 800; color: var(--primary-dark); }
+        .stat-card .stat-label { font-size: 0.9rem; color: var(--gray-text); margin-top: 4px; }
+        .stat-card .stat-icon { float: right; font-size: 2rem; color: var(--primary-cyan); opacity: 0.4; }
+        .stat-card.emergencia { border-left-color: #e74c3c; }
+        .stat-card.emergencia .stat-icon { color: #e74c3c; }
+        .stat-card.pendiente { 
+            border-left-color: #e74c3c; 
+            background-color: #e74c3c; 
+            color: #ffffff;
         }
-        body.no-scroll { overflow: hidden; }
-        a { text-decoration: none; color: inherit; }
-        img { max-width: 100%; display: block; }
-        .container { width: 90%; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        .stat-card.pendiente .stat-number,
+        .stat-card.pendiente .stat-label,
+        .stat-card.pendiente .stat-icon {
+            color: #ffffff;
+        }
+        .stat-card.pendiente .stat-icon {
+            opacity: 0.7;
+        }
+        .chart-section { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 15px; }
+        .chart-box { background: white; padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); }
+        .chart-box h4 { font-size: 1rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 16px; }
+        .chart-box canvas { max-height: 220px; max-width: 100%; }
+        .table-container { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; padding: 0 0 12px 0; margin-bottom: 15px; }
+        .table-container h4 { padding: 18px 24px 10px 24px; font-size: 1rem; font-weight: 700; color: var(--primary-dark); }
+        .table-scroll { overflow-x: auto; padding: 0 16px 16px 16px; }
+        .filtro-container { display: flex; gap: 10px; padding: 10px 24px; align-items: center; flex-wrap: wrap; }
+        .filtro-container label { font-weight: 600; font-size: 0.85rem; color: var(--primary-dark); }
+        .filtro-container select { padding: 8px 12px; border: 2px solid #E9ECEF; border-radius: 4px; font-family: var(--font); font-size: 0.85rem; background: white; cursor: pointer; }
+        .filtro-container select:focus { outline: none; border-color: var(--primary-cyan); }
+        .filtro-container input[type="text"] {
+            padding: 8px 12px;
+            border: 2px solid #E9ECEF;
+            border-radius: 4px;
+            font-family: var(--font);
+            font-size: 0.85rem;
+            background: white;
+            flex: 1;
+            min-width: 160px;
+        }
+        .filtro-container input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-cyan);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        table thead { background: var(--light-bg); }
+        table th { text-align: left; padding: 12px 14px; font-weight: 600; color: var(--primary-dark); border-bottom: 2px solid #E9ECEF; white-space: nowrap; }
+        table td { padding: 12px 14px; border-bottom: 1px solid #E9ECEF; color: var(--gray-text); vertical-align: middle; }
+        table tbody tr:hover { background: #F8FAFC; }
+        table tfoot td { font-weight: 700; color: var(--primary-dark); background: var(--light-bg); border-top: 2px solid #E9ECEF; padding: 12px 14px; white-space: nowrap; }
+        .badge-emergencia { background: #fee2e2; color: #b91c1c; padding: 2px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+        .btn-edit { background: var(--primary-cyan); color: white; border: none; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 5px; margin-right: 6px; }
+        .btn-edit:hover { background: var(--primary-dark); transform: scale(1.05); }
+        .btn-delete { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px; }
+        .btn-delete:hover { background: #c0392b; transform: scale(1.05); }
+        .btn-presupuesto { background: #2ecc71; color: white; border: none; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; margin-right: 6px; }
+        .btn-presupuesto:hover { background: #27ae60; transform: scale(1.05); }
+        .btn-whatsapp { background: #25D366; color: white; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.3s; border: none; cursor: pointer; }
+        .btn-whatsapp:hover { background: #1DA851; transform: scale(1.05); }
+        .btn-whatsapp-alerta { background: #e74c3c; color: white; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.3s; border: none; cursor: pointer; }
+        .btn-whatsapp-alerta:hover { background: #c0392b; transform: scale(1.05); }
+        .alerta-vencido { color: #e74c3c; font-size: 1rem; margin-left: 6px; animation: pulso 1.5s infinite; }
+        @keyframes pulso { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .badge { display: inline-block; padding: 2px 12px; border-radius: 4px; font-weight: 600; }
+        .maps-link { color: var(--primary-cyan); font-size: 1.1rem; text-decoration: none; transition: 0.2s; }
+        .maps-link:hover { color: var(--primary-dark); transform: scale(1.1); }
+        .loading { text-align: center; padding: 40px; color: var(--gray-text); }
+        .loading i { font-size: 2rem; color: var(--primary-cyan); animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .no-data { text-align: center; padding: 40px; color: var(--gray-text); }
 
-        /* NAVEGACIÓN */
-        .navbar {
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-            padding: 1.2rem 0; transition: var(--transicion); background: transparent;
-        }
-        .navbar.scrolled {
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--gris-medio);
-            padding: 0.8rem 0;
-        }
-        .nav-container { display: flex; justify-content: space-between; align-items: center; }
-        .logo {
-            font-family: var(--fuente-titulo); font-size: 2rem; letter-spacing: 2px;
-            color: var(--blanco); text-transform: uppercase;
-        }
-        .logo span { color: var(--azul-electrico); }
-        .nav-links { display: flex; gap: 2rem; list-style: none; }
-        .nav-links a {
-            font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 1.5px; color: var(--gris-claro);
-            transition: var(--transicion); position: relative;
-        }
-        .nav-links a::after {
-            content: ''; position: absolute; bottom: -6px; left: 0; width: 0;
-            height: 2px; background: var(--azul-electrico); transition: var(--transicion);
-        }
-        .nav-links a:hover { color: var(--blanco); }
-        .nav-links a:hover::after { width: 100%; }
-        .menu-toggle {
-            display: none; background: none; border: 2px solid var(--gris-claro);
-            color: var(--blanco); font-size: 1.5rem; padding: 0.4rem 0.8rem;
-            cursor: pointer; border-radius: 4px;
-        }
+        /* ===== MODALES ===== */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: var(--radius); max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 35px 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); animation: modalFade 0.3s ease; }
+        @keyframes modalFade { from { opacity:0; transform:scale(0.95) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal-box h3 { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 20px; padding-right: 30px; }
+        .modal-box h3 span { color: var(--primary-cyan); }
+        .modal-box .close-modal { float: right; background: none; border: none; font-size: 2rem; color: var(--gray-text); cursor: pointer; transition: 0.3s; line-height: 1; }
+        .modal-box .close-modal:hover { color: var(--primary-dark); transform: rotate(90deg); }
+        .modal-box .form-group { margin-bottom: 16px; }
+        .modal-box label { display: block; font-weight: 600; font-size: 0.9rem; color: var(--primary-dark); margin-bottom: 4px; }
+        .modal-box input, .modal-box select, .modal-box textarea { width: 100%; padding: 12px 14px; border: 2px solid #E9ECEF; border-radius: 4px; font-size: 1rem; font-family: var(--font); transition: 0.2s; background: var(--light-bg); }
+        .modal-box input:focus, .modal-box select:focus, .modal-box textarea:focus { outline: none; border-color: var(--primary-cyan); background: white; box-shadow: 0 0 0 4px rgba(0,168,255,0.1); }
+        .modal-box textarea { resize: vertical; min-height: 80px; }
+        .modal-box .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+        .modal-box .btn-save { background: var(--primary-cyan); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .modal-box .btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .modal-box .btn-cancel { background: transparent; color: var(--gray-text); border: 2px solid #E9ECEF; padding: 12px 30px; border-radius: 6px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .modal-box .btn-cancel:hover { background: #f1f1f1; border-color: #ccc; }
+        .estado-select { padding: 5px 10px; border: 2px solid #E9ECEF; border-radius: 4px; font-size: 0.8rem; font-family: var(--font); font-weight: 600; cursor: pointer; min-width: 110px; }
+        .estado-select.estado-aprobado { border-color: #2ecc71; color: #27ae60; background: #f0fff4; }
+        .estado-select.estado-encurso { border-color: #f39c12; color: #e67e22; background: #fff8f0; }
+        .estado-select.estado-vencido { border-color: #e74c3c; color: #c0392b; background: #fff5f5; }
+        .estado-select.estado-cancelado { border-color: #7f8c8d; color: #555; background: #f5f5f5; }
+        .estado-select.estado-realizado { border-color: #2ecc71; color: #27ae60; background: #f0fff4; }
+        .presupuesto-box { max-width: 900px; }
+        .presupuesto-box .presupuesto-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .presupuesto-box .presupuesto-datos .full-width { grid-column: 1 / -1; }
+        .presupuesto-box .presupuesto-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; margin-top: 10px; }
+        .presupuesto-box .presupuesto-actions .btn-guardar { background: var(--primary-dark); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .presupuesto-box .presupuesto-actions .btn-guardar:hover { background: var(--primary-cyan); transform: translateY(-2px); }
+        .presupuesto-box .presupuesto-actions .btn-guardar:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .check-presupuesto { color: #27ae60; font-size: 1.2rem; font-weight: bold; }
+        .no-presupuesto { color: #ccc; font-size: 1.2rem; }
 
-        /* HERO */
-        .hero {
-            position: relative; height: 100vh; min-height: 600px;
-            display: flex; align-items: center; justify-content: center;
-            text-align: center; overflow: hidden;
-            background: linear-gradient(135deg, #0a0a0a 0%, #111827 50%, #0a0a0a 100%);
-        }
-        .hero-bg {
-            position: absolute; inset: 0;
-            background:
-                radial-gradient(circle at 20% 50%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 80% 50%, rgba(230, 57, 70, 0.08) 0%, transparent 50%);
-        }
-        .hero-noise {
-            position: absolute; inset: 0; opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-        }
-        .hero-content { position: relative; z-index: 2; padding: 0 1rem; }
-        .hero-badge {
-            display: inline-block; font-size: 0.75rem; font-weight: 600;
-            letter-spacing: 3px; text-transform: uppercase; color: var(--azul-neon);
-            border: 1px solid var(--azul-electrico); padding: 0.5rem 1.5rem;
-            border-radius: 50px; margin-bottom: 2rem;
-            background: rgba(0, 102, 255, 0.08);
-        }
-        .hero h1 {
-            font-family: var(--fuente-titulo);
-            font-size: clamp(4rem, 12vw, 9rem);
-            line-height: 0.95; letter-spacing: 4px;
-            text-transform: uppercase; margin-bottom: 0.5rem;
-        }
-        .hero h1 .blue {
-            color: var(--azul-electrico);
-            text-shadow: 0 0 40px rgba(0, 102, 255, 0.5), 0 0 80px rgba(0, 102, 255, 0.2);
-        }
-        .hero-sub {
-            font-size: clamp(1rem, 2.5vw, 1.3rem); color: var(--gris-claro);
-            margin-bottom: 3rem; font-weight: 300; letter-spacing: 1px;
-        }
-        .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-        .btn {
-            display: inline-block; padding: 0.9rem 2.2rem; font-size: 0.85rem;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
-            border: none; cursor: pointer; transition: var(--transicion);
-            border-radius: 4px; font-family: var(--fuente-cuerpo);
-        }
-        .btn-primary { background: var(--azul-electrico); color: var(--blanco); }
-        .btn-primary:hover {
-            background: var(--azul-neon);
-            box-shadow: 0 0 30px rgba(0, 102, 255, 0.5);
-            transform: translateY(-2px);
-        }
-        .btn-outline {
-            background: transparent; color: var(--blanco);
-            border: 2px solid var(--gris-medio);
-        }
-        .btn-outline:hover {
-            border-color: var(--azul-electrico); color: var(--azul-neon);
-            transform: translateY(-2px);
-        }
-
-        /* SECCIONES GENERALES */
-        section { padding: 6rem 0; }
-        .section-title {
-            font-family: var(--fuente-titulo);
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            letter-spacing: 3px; text-transform: uppercase;
-            margin-bottom: 0.5rem; line-height: 1;
-        }
-        .section-title .accent { color: var(--azul-electrico); }
-        .section-subtitle {
-            color: var(--gris-claro); font-size: 1rem;
-            margin-bottom: 3rem; font-weight: 300; letter-spacing: 0.5px;
-        }
-        .section-line {
-            width: 60px; height: 3px;
-            background: var(--azul-electrico); margin-bottom: 3rem;
-        }
-
-        /* LA BANDA */
-        .band-section { background: var(--negro-suave); position: relative; }
-        .band-section::before {
-            content: ''; position: absolute; top: 0; left: 0;
-            width: 100%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--azul-electrico), transparent);
-        }
-        .band-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 4rem; align-items: center;
-        }
-        .band-text p {
-            color: var(--gris-claro); margin-bottom: 1.5rem;
-            font-size: 1rem; line-height: 1.9;
-        }
-        .band-text .highlight { color: var(--blanco); font-weight: 600; }
-        .band-stats {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem; margin-top: 2.5rem;
-        }
-        .stat {
-            text-align: center; padding: 1.5rem 0.5rem;
-            background: var(--gris-oscuro); border-radius: 8px;
-            border: 1px solid var(--gris-medio); transition: var(--transicion);
-        }
-        .stat:hover { border-color: var(--azul-electrico); transform: translateY(-4px); }
-        .stat-number {
-            font-family: var(--fuente-titulo); font-size: 2.5rem;
-            color: var(--azul-electrico); display: block; line-height: 1;
-        }
-        .stat-label {
-            font-size: 0.7rem; text-transform: uppercase;
-            letter-spacing: 2px; color: var(--gris-claro); margin-top: 0.5rem;
-        }
-        .band-visual { position: relative; }
-        .band-visual .image-placeholder {
-            width: 100%; aspect-ratio: 4/5;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            border-radius: 12px; display: flex; align-items: center;
-            justify-content: center; border: 1px solid var(--gris-medio);
-            overflow: hidden; position: relative;
-        }
-        .band-visual .image-placeholder::after {
-            content: 'TAXI BLUE'; font-family: var(--fuente-titulo);
-            font-size: 3rem; color: rgba(255,255,255,0.05);
-            letter-spacing: 8px; position: absolute; transform: rotate(-15deg);
-        }
-        .band-visual .image-placeholder svg {
-            width: 80px; height: 80px; fill: var(--azul-electrico); opacity: 0.3;
-        }
-
-        /* EVENTOS */
-        .events-section { background: var(--negro); }
-        .events-list { display: flex; flex-direction: column; gap: 1rem; }
-        .event-card {
-            display: grid; grid-template-columns: 100px 1fr auto;
-            align-items: center; gap: 2rem; padding: 1.5rem 2rem;
-            background: var(--gris-oscuro); border-radius: 10px;
-            border: 1px solid var(--gris-medio);
-            transition: var(--transicion); position: relative; overflow: hidden;
-        }
-        .event-card.has-flyer {
-            grid-template-columns: 90px 90px 1fr auto;
-            min-height: 120px;
-        }
-        .event-card::before {
-            content: ''; position: absolute; left: 0; top: 0;
-            height: 100%; width: 4px; background: var(--azul-electrico);
-            opacity: 0; transition: var(--transicion);
-        }
-        .event-card:hover {
-            border-color: var(--azul-electrico);
-            background: var(--gris-medio); transform: translateX(4px);
-        }
-        .event-card:hover::before { opacity: 1; }
-
-        /* EN VIVO */
-        .event-card.live {
-            border-color: rgba(230, 57, 70, 0.55);
-            box-shadow: 0 0 30px rgba(230, 57, 70, 0.18);
-            background: linear-gradient(135deg, var(--gris-oscuro), #221012);
-        }
-        .event-card.live::before {
-            background: var(--rojo-rock); opacity: 1;
-            animation: liveBarPulse 1.6s ease-in-out infinite;
-        }
-        .event-card.live:hover {
-            border-color: var(--rojo-rock);
-            box-shadow: 0 0 45px rgba(230, 57, 70, 0.35);
-        }
-        .event-card.live .event-date .day { color: var(--rojo-live); }
-        @keyframes liveBarPulse {
-            0%, 100% { box-shadow: 0 0 0 rgba(230, 57, 70, 0); }
-            50% { box-shadow: 0 0 15px rgba(230, 57, 70, 0.9); }
-        }
-
-        /* PASADO */
-        .event-card.past { opacity: 0.72; }
-        .event-card.past::before { background: var(--gris-claro); }
-        .event-card.past:hover::before { opacity: 0.6; }
-        .event-card.past .event-date .day { color: var(--gris-claro); }
-
-        /* REMARCADO */
-        .event-card.remarcado{
-            border-color: rgba(255,215,0,.5);
-            background: linear-gradient(135deg, var(--gris-oscuro), rgba(255,215,0,.06));
-            box-shadow: 0 0 25px rgba(255,215,0,.15);
-        }
-        .event-card.remarcado:hover{
-            border-color: #ffd700;
-            box-shadow: 0 0 40px rgba(255,215,0,.3);
-            background: linear-gradient(135deg, var(--gris-medio), rgba(255,215,0,.1));
-        }
-        .event-card.remarcado::before{ background: #ffd700; opacity: 1; }
-        .event-card.remarcado .event-date .day{ color: #ffd700; }
-        .event-card.remarcado .venue-link{ color: #ffd700; }
-        .event-card.remarcado .venue-text{ color: #ffd700; }
-        .event-card.remarcado .directions-link{
-            background: rgba(255,215,0,.12);
-            border-color: rgba(255,215,0,.5);
-            color: #ffd700;
-        }
-        .event-card.remarcado .directions-link:hover{
-            background: #ffd700; border-color: #ffd700; color: #0a0a0a;
-            box-shadow: 0 4px 14px rgba(255,215,0,.5);
-        }
-        .event-card.remarcado .event-flyer:hover{
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255,215,0,.5);
-        }
-
-        /* BADGES */
-        .past-badge {
-            display: inline-flex; align-items: center; gap: 0.4rem;
-            font-size: 0.68rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 2px;
-            color: var(--gris-claro);
-            border: 1px solid var(--gris-medio);
-            background: rgba(255, 255, 255, 0.03);
-            padding: 0.4rem 0.85rem;
-            border-radius: 50px;
-            white-space: nowrap;
-        }
-        .past-badge::before {
-            content: ''; width: 6px; height: 6px; border-radius: 50%;
-            background: var(--gris-claro); flex-shrink: 0;
-        }
-
-        .categoria-badge{
-            display: inline-block;
-            font-size: .62rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.4px;
-            padding: .25rem .7rem;
-            border-radius: 20px;
-            margin-bottom: .5rem;
-        }
-        .categoria-badge.cat-covers{ background: rgba(0,102,255,.15); color: #00a8ff; }
-        .categoria-badge.cat-homenaje{ background: rgba(168,85,247,.15); color: #a855f7; }
-        .categoria-badge.cat-festival{ background: rgba(251,146,60,.15); color: #fb923c; }
-        .categoria-badge.cat-privado{ background: rgba(136,136,136,.15); color: #888; }
-        .categoria-badge.cat-remarcado{
-            background: linear-gradient(135deg, rgba(255,215,0,.25), rgba(255,140,0,.2));
-            color: #ffd700;
-            font-weight: 800;
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(255,215,0,.35);
-            animation: remarcadoPulse 2s ease-in-out infinite;
-        }
-        @keyframes remarcadoPulse{
-            0%, 100%{ box-shadow: 0 0 15px rgba(255,215,0,.35); }
-            50%{ box-shadow: 0 0 25px rgba(255,215,0,.7); }
-        }
-
-        .live-block {
-            display: flex; flex-direction: column;
-            align-items: flex-end; gap: 0.4rem;
-            text-align: right;
-        }
-        .live-badge {
-            display: inline-flex; align-items: center; gap: 0.55rem;
-            font-size: 0.72rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1.8px;
-            color: #fff;
-            background: linear-gradient(135deg, var(--rojo-rock), var(--rojo-live));
-            padding: 0.55rem 1.05rem;
-            border-radius: 50px;
-            box-shadow: 0 0 22px rgba(230, 57, 70, 0.6);
-            animation: liveBadgePulse 1.6s ease-in-out infinite;
-            white-space: nowrap;
-        }
-        .live-badge::before {
-            content: ''; width: 8px; height: 8px; border-radius: 50%;
-            background: #fff;
-            animation: liveDotBlink 1.1s ease-in-out infinite;
-            flex-shrink: 0;
-        }
-        .live-text {
-            font-size: 0.72rem; font-weight: 800;
-            color: var(--rojo-live);
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            animation: liveTextBlink 2s ease-in-out infinite;
-        }
-        @keyframes liveBadgePulse {
-            0%, 100% { box-shadow: 0 0 22px rgba(230, 57, 70, 0.6); transform: scale(1); }
-            50% { box-shadow: 0 0 34px rgba(230, 57, 70, 0.95); transform: scale(1.03); }
-        }
-        @keyframes liveDotBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.25; }
-        }
-        @keyframes liveTextBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
-        .event-flyer {
-            width: 100%;
-            height: 100%;
-            min-height: 90px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid var(--gris-medio);
-            cursor: zoom-in;
-            align-self: stretch;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-        }
-        .event-flyer:hover {
-            transform: scale(1.04);
-            border-color: var(--azul-electrico);
-            box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
-        }
-        .event-card.live .event-flyer:hover {
-            border-color: var(--rojo-rock);
-            box-shadow: 0 0 20px rgba(230, 57, 70, 0.5);
-        }
-        .event-flyer:active { transform: scale(0.98); }
-
-        .event-date { text-align: center; align-self: center; }
-        .event-date .day {
-            font-family: var(--fuente-titulo); font-size: 2.5rem;
-            color: var(--azul-electrico); line-height: 1;
-        }
-        .event-date .month {
-            font-size: 0.7rem; text-transform: uppercase;
-            letter-spacing: 2px; color: var(--gris-claro);
-        }
-        .event-info { align-self: center; }
-        .event-info h4 {
-            font-family: var(--fuente-titulo); font-size: 1.5rem;
-            letter-spacing: 1px; margin-bottom: 0.3rem;
-        }
-        .event-info p { color: var(--gris-claro); font-size: 0.85rem; }
-
-        .venue-link {
-            display: inline-flex; align-items: center; gap: 0.35rem;
-            color: var(--azul-neon); font-size: 0.8rem; font-weight: 600;
-            letter-spacing: 1px; text-transform: uppercase;
-            transition: var(--transicion);
-            margin-bottom: 0.15rem;
-        }
-        .venue-link:hover { color: var(--blanco); }
-        .venue-link:hover .venue-pin { transform: translateY(-1px) scale(1.1); }
-        .venue-pin {
-            width: 13px; height: 13px;
-            flex-shrink: 0;
-            transition: var(--transicion);
-        }
-        .venue-text {
-            color: var(--azul-neon); font-size: 0.8rem; font-weight: 600;
-            letter-spacing: 1px; text-transform: uppercase;
-        }
-        .event-card.live .venue-link,
-        .event-card.live .venue-text { color: var(--rojo-live); }
-        .event-card.past .venue-link,
-        .event-card.past .venue-text { color: var(--gris-claro); }
-
-        .directions-link {
-            display: inline-flex; align-items: center; gap: 0.4rem;
-            margin-top: 0.5rem;
-            font-size: 0.7rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1.2px;
-            color: var(--blanco);
-            background: rgba(52, 168, 83, 0.12);
-            border: 1px solid rgba(52, 168, 83, 0.4);
-            padding: 0.35rem 0.8rem;
-            border-radius: 50px;
-            transition: var(--transicion);
-            white-space: nowrap;
-        }
-        .directions-link:hover {
-            background: var(--verde-maps);
-            border-color: var(--verde-maps);
-            color: #fff;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(52, 168, 83, 0.4);
-        }
-        .directions-link:active { transform: translateY(0); }
-        .directions-link svg {
-            width: 12px; height: 12px; fill: currentColor; flex-shrink: 0;
-        }
-        .event-card.live .directions-link {
-            background: rgba(255, 23, 68, 0.14);
-            border-color: rgba(255, 23, 68, 0.45);
-            color: #ff5577;
-        }
-        .event-card.live .directions-link:hover {
-            background: var(--rojo-live);
-            border-color: var(--rojo-live);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(255, 23, 68, 0.5);
-        }
-
-        .event-cta {
-            padding: 0.7rem 1.5rem; font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1.5px;
-            background: transparent; color: var(--blanco);
-            border: 1px solid var(--gris-claro); border-radius: 4px;
-            cursor: pointer; transition: var(--transicion);
-            white-space: nowrap;
-            align-self: center;
-        }
-        .event-cta:hover { background: var(--azul-electrico); border-color: var(--azul-electrico); }
-
-        .events-empty {
-            color: #888; text-align: center; padding: 2.5rem 1rem;
-            border: 1px dashed #2a2a2a; border-radius: 10px; font-size: 0.9rem;
-        }
-
-        /* LIGHTBOX */
-        .lightbox {
-            position: fixed; inset: 0; z-index: 5000;
-            background: rgba(0, 0, 0, 0.95);
+        /* ===== MODAL PERSONALIZADO ===== */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
             backdrop-filter: blur(6px);
-            display: flex; align-items: center; justify-content: center;
-            padding: 1rem;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            touch-action: none;
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .lightbox.open { opacity: 1; visibility: visible; }
-        .lightbox img {
-            max-width: 95vw; max-height: 90vh;
-            width: auto; height: auto;
-            border-radius: 10px;
-            box-shadow: 0 20px 60px rgba(0, 102, 255, 0.35);
-            transform: scale(0.85);
-            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            user-select: none; -webkit-user-drag: none; pointer-events: none;
+        .custom-modal-overlay.active {
+            display: flex;
         }
-        .lightbox.open img { transform: scale(1); }
-        .lightbox-close {
-            position: absolute; top: 1rem; right: 1rem;
-            width: 44px; height: 44px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--blanco); font-size: 1.4rem; font-weight: 300;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: var(--transicion); z-index: 2;
-        }
-        .lightbox-close:hover {
-            background: var(--azul-electrico); border-color: var(--azul-electrico);
-            transform: rotate(90deg);
-        }
-        .lightbox-hint {
-            position: absolute; bottom: 1.5rem; left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.55);
-            font-size: 0.75rem; letter-spacing: 1.5px;
-            text-transform: uppercase; pointer-events: none;
-            animation: hintPulse 2.5s ease-in-out infinite;
-        }
-        @keyframes hintPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        @media (min-width: 769px) { .lightbox-hint { display: none; } }
-
-        /* GALERÍA */
-        .gallery-section { background: var(--negro-suave); position: relative; }
-        .gallery-section::before {
-            content: ''; position: absolute; top: 0; left: 0;
-            width: 100%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--rojo-rock), transparent);
-        }
-
-        .instagram-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-            justify-items: center;
-        }
-        .instagram-grid .instagram-media {
-            margin: 0 !important;
-            min-width: 0 !important;
-            max-width: 540px !important;
-            width: 100% !important;
-            background: #1a1a1a !important;
-            border: 1px solid #2a2a2a !important;
-            border-radius: 10px !important;
-        }
-        .ig-loading {
-            grid-column: 1 / -1;
+        .custom-modal-box {
+            background: white;
+            border-radius: 6px;
+            max-width: 480px;
+            width: 100%;
+            padding: 30px 28px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            animation: modalFade 0.25s ease;
             text-align: center;
-            padding: 3rem 1rem;
-            color: #888;
+        }
+        .custom-modal-box .icon {
+            font-size: 3.2rem;
+            margin-bottom: 12px;
+        }
+        .custom-modal-box .icon.success { color: #27ae60; }
+        .custom-modal-box .icon.error { color: #e74c3c; }
+        .custom-modal-box .icon.warning { color: #f39c12; }
+        .custom-modal-box .icon.info { color: var(--primary-cyan); }
+        .custom-modal-box h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+        .custom-modal-box p {
+            color: var(--gray-text);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .custom-modal-box .buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .custom-modal-box .buttons .btn-custom {
+            padding: 10px 28px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            min-width: 100px;
+            font-family: var(--font);
+        }
+        .custom-modal-box .buttons .btn-custom.primary {
+            background: var(--primary-cyan);
+            color: white;
+        }
+        .custom-modal-box .buttons .btn-custom.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .custom-modal-box .buttons .btn-custom.danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .custom-modal-box .buttons .btn-custom.danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        .custom-modal-box .buttons .btn-custom.secondary {
+            background: transparent;
+            color: var(--gray-text);
+            border: 2px solid #E9ECEF;
+        }
+        .custom-modal-box .buttons .btn-custom.secondary:hover {
+            background: #f1f1f1;
+            border-color: #ccc;
+        }
+
+        /* ===== EXPANDIR FILAS ===== */
+        .mensaje-cell,
+        .descripcion-cell {
+            position: relative;
+            overflow: hidden;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            cursor: pointer;
+            transition: max-height 0.3s ease;
+        }
+        .mensaje-cell { max-height: 3em; }
+        .descripcion-cell { max-height: 1.5em; }
+        .mensaje-cell.expandido,
+        .descripcion-cell.expandido { max-height: none; }
+        .mensaje-cell:not(.expandido).has-more::after,
+        .descripcion-cell:not(.expandido).has-more::after {
+            content: "\f078";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: white;
+            padding: 0 4px 0 8px;
+            box-shadow: -10px 0 10px -5px white;
+            pointer-events: none;
+            color: var(--primary-cyan);
             font-size: 0.9rem;
         }
-        .ig-item-wrapper {
+        table tbody tr:hover .mensaje-cell:not(.expandido).has-more::after,
+        table tbody tr:hover .descripcion-cell:not(.expandido).has-more::after {
+            background: #F8FAFC;
+            box-shadow: -10px 0 10px -5px #F8FAFC;
+        }
+        .table-scroll tbody tr td:last-child { cursor: default; }
+
+        /* ===== REAJUSTE DE ANCHOS EN "TODOS LOS REGISTROS" ===== */
+        #tablaContainer table {
             width: 100%;
-            max-width: 540px;
+            table-layout: fixed;
+            font-size: 0.9rem;
+            min-width: 800px;
         }
-        .ig-titulo {
-            text-align: center;
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 0.6rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: 600;
+        #tablaContainer table th,
+        #tablaContainer table td {
+            padding: 8px 10px;
+            vertical-align: middle;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #tablaContainer table th:nth-child(1),
+        #tablaContainer table td:nth-child(1) { width: 9%; }
+        #tablaContainer table th:nth-child(2),
+        #tablaContainer table td:nth-child(2) { width: 14%; }
+        #tablaContainer table th:nth-child(3),
+        #tablaContainer table td:nth-child(3) { width: 11%; }
+        #tablaContainer table th:nth-child(4),
+        #tablaContainer table td:nth-child(4) { width: 12%; }
+        #tablaContainer table th:nth-child(5),
+        #tablaContainer table td:nth-child(5) { width: 5%; min-width: 35px; max-width: 50px; white-space: nowrap; text-align: center; overflow: hidden; text-overflow: ellipsis; }
+        #tablaContainer table th:nth-child(6),
+        #tablaContainer table td:nth-child(6) { width: 20%; word-break: break-word; white-space: normal; text-overflow: clip; }
+        #tablaContainer table th:nth-child(7),
+        #tablaContainer table td:nth-child(7) { width: 6%; min-width: 35px; max-width: 50px; text-align: center; white-space: nowrap; }
+        #tablaContainer table th:nth-child(8),
+        #tablaContainer table td:nth-child(8) { width: 8%; }
+        #tablaContainer table th:nth-child(9),
+        #tablaContainer table td:nth-child(9) { width: 15%; min-width: 170px; white-space: nowrap; text-align: center; }
+
+        /* ===== TABLA PRESUPUESTOS ===== */
+        #presupuestosContainer table {
+            table-layout: fixed;
+            width: 100%;
+            font-size: 0.85rem;
+        }
+        #presupuestosContainer table th,
+        #presupuestosContainer table td { padding: 8px 10px; }
+        #presupuestosContainer table th:nth-child(1),
+        #presupuestosContainer table td:nth-child(1) { width: 11%; }
+        #presupuestosContainer table th:nth-child(2),
+        #presupuestosContainer table td:nth-child(2) { width: 12%; }
+        #presupuestosContainer table th:nth-child(3),
+        #presupuestosContainer table td:nth-child(3) { width: 18%; max-width: 150px; word-wrap: break-word; white-space: pre-wrap; }
+        #presupuestosContainer table th:nth-child(4),
+        #presupuestosContainer table td:nth-child(4) { width: 10%; }
+        #presupuestosContainer table th:nth-child(5),
+        #presupuestosContainer table td:nth-child(5) { width: 12%; }
+        #presupuestosContainer table th:nth-child(6),
+        #presupuestosContainer table td:nth-child(6) { width: 10%; }
+        #presupuestosContainer table th:nth-child(7),
+        #presupuestosContainer table td:nth-child(7) { width: 10%; }
+        #presupuestosContainer table th:nth-child(8),
+        #presupuestosContainer table td:nth-child(8) { width: 8%; min-width: 65px; text-align: center; white-space: normal; word-break: keep-all; }
+        #presupuestosContainer table th:nth-child(9),
+        #presupuestosContainer table td:nth-child(9) { width: 9%; min-width: 65px; text-align: center; }
+        #presupuestosContainer table th:nth-child(10),
+        #presupuestosContainer table td:nth-child(10) { width: 10%; min-width: 120px; text-align: center; }
+
+        .estado-select { max-width: 100%; min-width: 80px; font-size: 0.75rem; padding: 3px 6px; }
+        .porcentaje-anticipo {
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--primary-cyan);
+            transition: 0.2s;
+        }
+        .porcentaje-anticipo:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
         }
 
-        .gallery-cta { text-align: center; margin-top: 2.5rem; }
-        .gallery-cta a {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            color: var(--azul-neon); font-weight: 600; font-size: 0.9rem;
-            letter-spacing: 1px; text-transform: uppercase; transition: var(--transicion);
-        }
-        .gallery-cta a:hover { color: var(--blanco); gap: 1rem; }
-
-        /* CONTACTO */
-        .contact-section { background: var(--negro); position: relative; }
-        .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 4rem; }
-        .contact-info h3 {
-            font-family: var(--fuente-titulo); font-size: 2rem;
-            letter-spacing: 2px; margin-bottom: 1rem;
-        }
-        .contact-info p { color: var(--gris-claro); margin-bottom: 2rem; line-height: 1.8; }
-        .contact-detail { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
-        .contact-detail .icon {
-            width: 40px; height: 40px; background: var(--gris-oscuro);
-            border-radius: 8px; display: flex; align-items: center;
-            justify-content: center; font-size: 1.2rem;
-            border: 1px solid var(--gris-medio);
-        }
-        .contact-detail .text { font-size: 0.9rem; color: var(--gris-claro); }
-        .contact-detail .text strong {
-            color: var(--blanco); display: block; font-size: 0.95rem;
-        }
-        .contact-form {
-            background: var(--gris-oscuro); padding: 2.5rem;
-            border-radius: 12px; border: 1px solid var(--gris-medio);
-        }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label {
-            display: block; font-size: 0.75rem; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 1.5px;
-            color: var(--gris-claro); margin-bottom: 0.5rem;
-        }
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%; padding: 0.9rem 1rem; background: var(--negro);
-            border: 1px solid var(--gris-medio); border-radius: 6px;
-            color: var(--blanco); font-family: var(--fuente-cuerpo);
-            font-size: 0.95rem; transition: var(--transicion); outline: none;
-        }
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--azul-electrico);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
-        }
-        .form-group textarea { resize: vertical; min-height: 100px; }
-        .form-group select {
-            cursor: pointer; appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-        }
-        .form-group.hidden { display: none; }
-        .btn-whatsapp {
-            width: 100%; padding: 1rem; background: #25D366; color: #fff;
-            font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 2px; border: none; border-radius: 6px;
-            cursor: pointer; transition: var(--transicion);
-            display: flex; align-items: center; justify-content: center;
-            gap: 0.7rem; font-family: var(--fuente-cuerpo);
-        }
-        .btn-whatsapp:hover {
-            background: #1ebe5d;
-            box-shadow: 0 0 30px rgba(37, 211, 102, 0.4);
-            transform: translateY(-2px);
-        }
-        .btn-whatsapp svg { width: 20px; height: 20px; fill: #fff; }
-
-        /* WHATSAPP FLOTANTE */
-        .whatsapp-float {
-            position: fixed; bottom: 2rem; right: 2rem;
-            width: 60px; height: 60px; background: #25D366;
-            border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; z-index: 999;
-            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-            transition: var(--transicion); animation: pulse 2s infinite;
-        }
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
-        }
-        .whatsapp-float svg { width: 30px; height: 30px; fill: #fff; }
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
-            50% { box-shadow: 0 4px 30px rgba(37, 211, 102, 0.7); }
+        @media (max-width: 600px) {
+            #presupuestosContainer table { display: table; table-layout: auto; font-size: 0.8rem; min-width: 700px; width: auto; }
+            #presupuestosContainer table thead { display: table-header-group; }
+            #presupuestosContainer table tbody { display: table-row-group; }
+            #presupuestosContainer table tbody tr { display: table-row; box-shadow: none; border: none; margin: 0; padding: 0; background: transparent; }
+            #presupuestosContainer table tbody tr:hover { background: #F8FAFC; }
+            #presupuestosContainer table tbody tr td { display: table-cell; padding: 6px 8px; border-bottom: 1px solid #E9ECEF; white-space: normal; word-break: break-word; }
+            #presupuestosContainer table tbody tr td::before { content: none; }
+            #presupuestosContainer table tfoot { display: table-footer-group; }
+            #presupuestosContainer table tfoot tr { display: table-row; background: var(--light-bg); }
+            #presupuestosContainer table tfoot td { display: table-cell; padding: 8px 10px; border-top: 2px solid #E9ECEF; white-space: nowrap; }
+            .estado-select { min-width: 70px; font-size: 0.7rem; padding: 2px 4px; }
+            .btn-delete { padding: 4px 8px; font-size: 0.75rem; }
+            .descripcion-cell { max-height: 2.5em; }
+            .filtro-container { flex-direction: column; align-items: stretch; }
+            .filtro-container select,
+            .filtro-container input[type="text"] { width: 100%; min-width: unset; }
+            #tablaContainer table td:last-child {
+                white-space: nowrap;
+                min-width: 150px;
+            }
+            #tablaContainer table .btn-edit,
+            #tablaContainer table .btn-delete,
+            #tablaContainer table .btn-presupuesto {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+                margin-right: 3px;
+            }
+            #presupuestosContainer table td:last-child {
+                white-space: nowrap;
+                min-width: 120px;
+            }
+            #presupuestosContainer table .btn-delete,
+            #presupuestosContainer table .btn-ocultar,
+            #presupuestosContainer table .btn-restaurar {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+                margin-right: 3px;
+            }
         }
 
-        /* INSTAGRAM FLOTANTE */
-        .instagram-float {
-            position: fixed;
-            bottom: 6.5rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-            border-radius: 50%;
+        /* ===== DISEÑO DEL PRESUPUESTO (PDF) ===== */
+        .presupuesto-preview {
+            --primary-dark: #0a1a2f;
+            --primary-mid: #1a365d;
+            --primary-blue: #2563eb;
+            --accent-gold: #d4af37;
+            --accent-gold-light: #fef3c7;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --white: #ffffff;
+            --shadow-card: 0 20px 60px -12px rgba(10, 26, 47, 0.25);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --radius: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+        .presupuesto-preview * { margin:0; padding:0; box-sizing:border-box; }
+        .presupuesto-preview .presupuesto {
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255,255,255,0.3);
+            overflow: hidden;
+            position: relative;
+            max-width: 920px;
+            margin: 0 auto;
+        }
+        .presupuesto-preview .marca-agua {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 999;
-            box-shadow: 0 4px 20px rgba(214, 36, 159, 0.45);
-            transition: var(--transicion);
-            animation: pulseIG 2s infinite;
+            overflow: hidden;
         }
-        .instagram-float:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(214, 36, 159, 0.7);
+        .presupuesto-preview .marca-agua img {
+            max-width: 50%;
+            max-height: 50%;
+            width: auto;
+            height: auto;
+            opacity: 0.10;
+            filter: grayscale(100%) brightness(1.5) contrast(0.6);
+            transform: rotate(-25deg);
+            user-select: none;
+            pointer-events: none;
         }
-        .instagram-float svg {
-            width: 30px;
-            height: 30px;
-            fill: #fff;
-        }
-        @keyframes pulseIG {
-            0%, 100% { box-shadow: 0 4px 20px rgba(214, 36, 159, 0.45); }
-            50% { box-shadow: 0 4px 30px rgba(214, 36, 159, 0.75); }
-        }
-
-        /* FOOTER */
-        footer {
-            background: var(--negro-suave); padding: 3rem 0;
-            border-top: 1px solid var(--gris-medio); text-align: center;
-        }
-        footer .footer-logo {
-            font-family: var(--fuente-titulo); font-size: 2rem;
-            letter-spacing: 3px; margin-bottom: 1rem;
-        }
-        footer .footer-logo span { color: var(--azul-electrico); }
-        footer .social-links {
-            display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem;
+        /* ===== HEADER con banda.jpg de fondo ===== */
+        .presupuesto-preview .header {
+            background: linear-gradient(135deg, rgba(10,26,47,0.88) 0%, rgba(26,54,93,0.88) 60%, rgba(37,99,235,0.88) 100%),
+                        url('/banda.jpg') center/cover no-repeat;
+            padding: 32px 40px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
+            gap: 16px;
+            border-bottom: 4px solid var(--accent-gold);
+            position: relative;
+            z-index: 5;
         }
-        footer .social-links a {
-            width: 45px; height: 45px; background: var(--gris-oscuro);
-            border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; border: 1px solid var(--gris-medio);
-            transition: var(--transicion);
+        .presupuesto-preview .header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
         }
-        footer .social-links a:hover {
-            border-color: var(--azul-electrico);
-            background: var(--gris-medio); transform: translateY(-3px);
+        .presupuesto-preview .header .logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.10);
+            padding: 4px;
+            border: 1px solid rgba(255,255,255,0.15);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        footer .social-links svg {
-            width: 20px; height: 20px; fill: var(--gris-claro);
-            transition: var(--transicion);
+        .presupuesto-preview .header .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 4px;
         }
-        footer .social-links a:hover svg { fill: var(--azul-neon); }
-        /* Colores específicos al hacer hover */
-        footer .social-links a.ig:hover { border-color: #d6249f; }
-        footer .social-links a.ig:hover svg { fill: #d6249f; }
-        footer .social-links a.wa:hover { border-color: #25D366; }
-        footer .social-links a.wa:hover svg { fill: #25D366; }
-        footer .social-links a.yt:hover { border-color: #ff0000; }
-        footer .social-links a.yt:hover svg { fill: #ff0000; }
-        footer .copyright {
-            color: var(--gris-claro); font-size: 0.8rem; letter-spacing: 1px;
+        .presupuesto-preview .header .empresa {
+            color: var(--white);
         }
-
-        /* RESPONSIVE */
-        @media (max-width: 968px) {
-            .band-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-            .band-visual { order: -1; }
-            .band-visual .image-placeholder { aspect-ratio: 16/10; }
-            .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+        .presupuesto-preview .header .empresa h1 {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        .presupuesto-preview .header .empresa h1 span {
+            color: var(--accent-gold);
+        }
+        .presupuesto-preview .header .empresa .subtitulo {
+            font-size: 15px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .presupuesto-preview .header .badge-presupuesto {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(4px);
+            padding: 10px 22px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.25);
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .presupuesto-preview .header .badge-presupuesto .numero {
+            color: var(--white);
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .presupuesto-preview .header .badge-presupuesto .numero-presupuesto {
+            color: var(--accent-gold-light);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .presupuesto-preview .header .badge-presupuesto .fecha {
+            color: var(--accent-gold-light);
+            font-size: 12px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+        .presupuesto-preview .cuerpo {
+            padding: 32px 40px 28px;
+            position: relative;
+            z-index: 5;
+        }
+        .presupuesto-preview .seccion {
+            margin-bottom: 34px;
+        }
+        .presupuesto-preview .seccion:last-of-type {
+            margin-bottom: 0;
+        }
+        .presupuesto-preview .seccion-prestacion {
+            margin-bottom: 0;
+        }
+        .presupuesto-preview .seccion-titulo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--primary-blue);
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 10px;
+        }
+        .presupuesto-preview .seccion-titulo .icono {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .presupuesto-preview .seccion-titulo .linea-aux {
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+        .presupuesto-preview .datos-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            background: var(--gray-50);
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-blue);
+            overflow: hidden;
+        }
+        .presupuesto-preview .datos-col {
+            padding: 14px 22px;
+        }
+        .presupuesto-preview .datos-col.izquierda {
+            border-right: 1px solid var(--gray-200);
+        }
+        .presupuesto-preview .datos-col .col-titulo {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--primary-blue);
+            margin-bottom: 6px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 4px;
+        }
+        .presupuesto-preview .datos-col .item {
+            display: flex;
+            align-items: baseline;
+            padding: 2px 0;
+            font-size: 14.5px;
+        }
+        .presupuesto-preview .datos-col .item .etiqueta {
+            font-weight: 600;
+            color: var(--gray-600);
+            min-width: 75px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .presupuesto-preview .datos-col .item .valor {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+        .presupuesto-preview .datos-col .item .valor.email {
+            word-break: break-all;
+        }
+        .presupuesto-preview .datos-col .item.fiscal-item {
+            display: flex;
+            align-items: baseline;
+            padding: 2px 0;
+            font-size: 14.5px;
+        }
+        .presupuesto-preview .datos-col .item.fiscal-item .etiqueta {
+            font-weight: 600;
+            color: var(--gray-600);
+            min-width: 75px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .presupuesto-preview .datos-col .item.fiscal-item .valor {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+        .presupuesto-preview .prestacion-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-top: 4px;
+        }
+        .presupuesto-preview .prestacion-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            background: var(--gray-50);
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-600);
+        }
+        .presupuesto-preview .prestacion-header .importe-label {
+            text-align: right;
+        }
+        .presupuesto-preview .prestacion-fila {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            padding: 18px 24px 12px;
+            border-bottom: 1px dashed var(--gray-200);
+            align-items: baseline;
+        }
+        .presupuesto-preview .prestacion-fila .servicio-nombre {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .presupuesto-preview .prestacion-fila .servicio-importe {
+            text-align: right;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.3px;
+        }
+        .presupuesto-preview .prestacion-detalle {
+            padding: 12px 24px 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--gray-600);
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .presupuesto-preview .totales-container {
+            margin-top: 20px;
+            padding: 20px 28px;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+        .presupuesto-preview .totales-firma {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 6px;
+        }
+        .presupuesto-preview .totales-firma .firma-imagen {
+            max-width: 80px;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 4px;
+        }
+        .presupuesto-preview .totales-firma .firma-texto {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--primary-dark);
+        }
+        .presupuesto-preview .totales-firma .firma-digital {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            width: fit-content;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+            margin: 0 auto;
+        }
+        .presupuesto-preview .totales-list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .presupuesto-preview .totales-list .linea.total-final {
+            width: 280px;
+            border-top: 2px solid var(--primary-dark);
+            padding-top: 10px;
+            margin-top: 0;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: flex;
+            justify-content: space-between;
+        }
+        .presupuesto-preview .totales-list .linea.total-final .label-total {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .presupuesto-preview .totales-list .linea.total-final .valor-total {
+            color: var(--primary-blue);
+            font-size: 22px;
+            letter-spacing: -0.5px;
+        }
+        .presupuesto-preview .footer-documento {
+            text-align: right;
+            font-size: 12px;
+            color: var(--gray-600);
+            margin: 4px 0 4px 0;
+            line-height: 1.5;
+        }
+        .presupuesto-preview .condiciones {
+            margin-top: 0;
+            padding: 8px 16px;
+            background: var(--gray-50);
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            border-left: 4px solid var(--accent-gold);
+        }
+        .presupuesto-preview .condiciones .seccion-titulo {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 3px;
+            color: var(--primary-dark);
+        }
+        .presupuesto-preview .condiciones ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .presupuesto-preview .condiciones ul li {
+            font-size: 13.5px;
+            padding: 0px 0 2px 24px;
+            position: relative;
+            line-height: 1.4;
+            color: var(--gray-600);
+        }
+        .presupuesto-preview .condiciones ul li::before {
+            content: "◆";
+            position: absolute;
+            left: 4px;
+            color: var(--accent-gold);
+            font-size: 11px;
+            top: 0px;
         }
         @media (max-width: 768px) {
-            .nav-links {
-                display: none; position: absolute; top: 100%; left: 0;
-                width: 100%; background: rgba(10, 10, 10, 0.98);
-                backdrop-filter: blur(12px); flex-direction: column;
-                padding: 2rem; gap: 1.5rem;
-                border-bottom: 1px solid var(--gris-medio);
-            }
-            .nav-links.active { display: flex; }
-            .menu-toggle { display: block; }
-
-            .event-card { grid-template-columns: 70px 1fr; gap: 1rem; padding: 1.2rem; }
-            .event-card.has-flyer {
-                grid-template-columns: 80px 70px 1fr;
-                min-height: 110px;
-            }
-            .event-flyer {
-                width: 100%;
-                height: 100%;
-                min-height: 80px;
-                align-self: stretch;
-            }
-            .event-cta { grid-column: 1 / -1; width: 100%; text-align: center; }
-            .past-badge { grid-column: 1 / -1; justify-self: center; margin-top: 0.3rem; }
-            .live-block {
-                grid-column: 1 / -1; width: 100%;
-                align-items: center; text-align: center; margin-top: 0.3rem;
-            }
-            .live-badge { font-size: 0.75rem; padding: 0.6rem 1.2rem; }
-            .directions-link { margin-top: 0.4rem; }
-
-            .instagram-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .band-stats { grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
-            .stat-number { font-size: 1.8rem; }
-            .contact-form { padding: 1.5rem; }
-            .lightbox img { max-width: 100vw; max-height: 85vh; border-radius: 6px; }
-            .lightbox-close { top: 0.7rem; right: 0.7rem; width: 40px; height: 40px; }
+            .presupuesto-preview .header { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+            .presupuesto-preview .header .empresa h1 { font-size: 24px; }
+            .presupuesto-preview .header .badge-presupuesto { align-self: flex-start; padding: 6px 16px; text-align: left; align-items: flex-start; }
+            .presupuesto-preview .header .badge-presupuesto .numero { font-size: 16px; }
+            .presupuesto-preview .header .badge-presupuesto .numero-presupuesto { font-size: 13px; }
+            .presupuesto-preview .header .badge-presupuesto .fecha { font-size: 11px; }
+            .presupuesto-preview .cuerpo { padding: 24px 18px; }
+            .presupuesto-preview .datos-wrapper { grid-template-columns: 1fr; border-left: none; border-top: 4px solid var(--primary-blue); }
+            .presupuesto-preview .datos-col.izquierda { border-right: none; border-bottom: 1px solid var(--gray-200); }
+            .presupuesto-preview .datos-col .item .etiqueta { min-width: 70px; font-size: 12px; }
+            .presupuesto-preview .datos-col .item.fiscal-item .etiqueta { min-width: 70px; font-size: 12px; }
+            .presupuesto-preview .prestacion-header, .presupuesto-preview .prestacion-fila { grid-template-columns: 1fr; gap: 6px; padding: 12px 16px; }
+            .presupuesto-preview .prestacion-header .importe-label { text-align: left; }
+            .presupuesto-preview .prestacion-fila .servicio-importe { text-align: left; font-size: 18px; }
+            .presupuesto-preview .prestacion-detalle { padding: 12px 16px; }
+            .presupuesto-preview .totales-container { flex-direction: column; align-items: stretch; padding: 16px; margin-top: 16px; }
+            .presupuesto-preview .totales-firma { align-items: center; flex: none; }
+            .presupuesto-preview .totales-firma .firma-imagen { max-width: 70px; }
+            .presupuesto-preview .totales-list { align-items: stretch; }
+            .presupuesto-preview .totales-list .linea.total-final { width: 100%; }
+            .presupuesto-preview .footer-documento { margin: 3px 0 3px 0; font-size: 11px; }
+            .presupuesto-preview .condiciones { padding: 6px 14px; margin-top: 0; }
+            .presupuesto-preview .condiciones ul li { font-size: 13px; padding: 0px 0 2px 22px; line-height: 1.3; }
+            .presupuesto-preview .marca-agua img { max-width: 70%; max-height: 70%; }
         }
-        @media (max-width: 480px) {
-            .hero h1 { letter-spacing: 2px; }
-            .btn { padding: 0.8rem 1.5rem; font-size: 0.75rem; }
-            .hero-buttons { flex-direction: column; align-items: center; }
-            .band-stats { grid-template-columns: 1fr; }
-            .stat { padding: 1rem; }
+        @media print {
+            .presupuesto-preview .presupuesto { box-shadow: none !important; border: 1px solid #ccc !important; border-radius: 0 !important; }
+            .presupuesto-preview .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .presupuesto-preview .totales-firma .firma-digital { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .presupuesto-preview .marca-agua img { opacity: 0.05 !important; }
+        }
+        .presupuesto-box .presupuesto-preview { max-width: 100%; overflow: auto; margin: 15px 0; background: white; border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .presupuesto-box .presupuesto-preview .presupuesto { border-radius: 0; box-shadow: none; border: 1px solid #E9ECEF; }
+        @media (max-width: 768px) { .presupuesto-box .presupuesto-datos { grid-template-columns: 1fr; } }
 
-            .event-card.has-flyer {
-                grid-template-columns: 70px 60px 1fr;
-                min-height: 100px;
-            }
-            .event-flyer { min-height: 70px; }
-            .live-badge { font-size: 0.7rem; padding: 0.55rem 1rem; letter-spacing: 1.3px; }
-            .live-text { font-size: 0.68rem; }
+        /* ===== ESTILOS ADICIONALES ===== */
+        .btn-add-summary {
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .btn-add-summary:hover {
+            background: var(--primary-cyan);
+            transform: translateY(-2px);
+        }
+        .servicios-clickable {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .servicios-clickable:hover {
+            transform: scale(1.05);
+            background: var(--primary-cyan) !important;
+            color: white !important;
+        }
+        .servicios-modal-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        .servicios-modal-list li {
+            padding: 8px 12px;
+            border-bottom: 1px solid #E9ECEF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .servicios-modal-list li:last-child {
+            border-bottom: none;
+        }
+        .servicios-modal-list .badge-service {
+            background: var(--primary-cyan);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .servicios-table th {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary-dark);
+        }
+        .servicios-table td {
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+        .servicios-table .estado-badge {
+            padding: 2px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            display: inline-block;
+        }
 
-            .whatsapp-float {
-                width: 50px; height: 50px; bottom: 1.5rem; right: 1.5rem;
-            }
-            .whatsapp-float svg { width: 25px; height: 25px; }
+        /* ===== ESTILOS PARA CAMPOS FISCALES EN MODALES ===== */
+        .fiscal-group {
+            transition: opacity 0.3s, max-height 0.3s;
+            overflow: hidden;
+        }
+        .fiscal-group.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .fiscal-group.hidden {
+            display: none;
+        }
+        .fiscal-group select:disabled,
+        .fiscal-group input:disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
+        }
 
-            .instagram-float {
-                width: 50px; height: 50px;
-                bottom: 5.2rem;
-                right: 1.5rem;
-            }
-            .instagram-float svg { width: 25px; height: 25px; }
+        /* ===== BOTÓN ELIMINAR DEFINITIVO EN RESUMEN ===== */
+        .btn-eliminar-contacto {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-eliminar-contacto:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        /* ===== BOTÓN MOSTRAR OCULTOS (contactos) ===== */
+        .btn-mostrar-ocultos {
+            background: transparent;
+            color: var(--primary-dark);
+            border: 2px solid var(--primary-cyan);
+            padding: 4px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-left: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-mostrar-ocultos:hover {
+            background: var(--primary-cyan);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn-mostrar-ocultos.activo {
+            background: var(--primary-cyan);
+            color: white;
+        }
+        .btn-restaurar {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-restaurar:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        .fila-oculta {
+            opacity: 0.6;
+            background-color: #fef9e7;
+        }
+        .fila-oculta td {
+            color: #888;
+        }
+        .fila-oculta .btn-delete {
+            background: #27ae60;
+        }
+        .fila-oculta .btn-delete:hover {
+            background: #219150;
+        }
+        .badge-oculto {
+            background: #f39c12;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 4px;
+        }
+
+        /* ===== INPUT DE BÚSQUEDA EN RESUMEN ===== */
+        #busquedaResumen {
+            padding: 6px 12px;
+            border: 2px solid #E9ECEF;
+            border-radius: 4px;
+            font-family: var(--font);
+            font-size: 0.85rem;
+            min-width: 180px;
+            background: white;
+            transition: border-color 0.2s;
+        }
+        #busquedaResumen:focus {
+            outline: none;
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 0 3px rgba(0,168,255,0.1);
+        }
+        @media (max-width: 768px) {
+            #busquedaResumen { min-width: 120px; width: 100%; }
+            .btn-add-summary { margin-top: 5px; }
+        }
+        .btn-ocultar-presupuesto {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 4px;
+        }
+        .btn-ocultar-presupuesto:hover {
+            background: #d35400;
+            transform: scale(1.05);
+        }
+        .btn-restaurar-presupuesto {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 4px;
+        }
+        .btn-restaurar-presupuesto:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        .fila-oculta-presupuesto {
+            opacity: 0.6;
+            background-color: #fef9e7;
+        }
+        .fila-oculta-presupuesto td {
+            color: #888;
+        }
+        .badge-oculto-presupuesto {
+            background: #f39c12;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 4px;
+        }
+        .btn-mostrar-ocultos-presupuestos {
+            background: transparent;
+            color: var(--primary-dark);
+            border: 2px solid var(--primary-cyan);
+            padding: 4px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-mostrar-ocultos-presupuestos:hover {
+            background: var(--primary-cyan);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn-mostrar-ocultos-presupuestos.activo {
+            background: var(--primary-cyan);
+            color: white;
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVEGACIÓN -->
-    <nav class="navbar" id="navbar">
-        <div class="container nav-container">
-            <a href="#inicio" class="logo">TAXI <span>BLUE</span></a>
-            <button class="menu-toggle" id="menuToggle" aria-label="Menú">☰</button>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#banda">La Banda</a></li>
-                <li><a href="#eventos">Eventos</a></li>
-                <li><a href="#galeria">Galería</a></li>
-                <li><a href="#contacto">Contacto</a></li>
-            </ul>
+<!-- ===== LOGIN ===== -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+        <img src="https://sebagsc2020.github.io/refelectrotecnia/images/logoref.png" alt="REF" class="logo">
+        <h2>Panel Administrativo</h2>
+        <p class="subtitle">REF Electrotecnia · Acceso restringido</p>
+        <input type="email" id="loginEmail" placeholder="Correo electrónico" autocomplete="email">
+        <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+        <button class="btn-login" id="btnLogin"><i class="fas fa-lock"></i> Ingresar</button>
+        <p class="error-msg" id="loginError"></p>
+    </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="dashboard dashboard-locked" id="dashboard">
+    <div class="dashboard-header">
+        <h2><span>📊</span> Panel de Administración</h2>
+        <div class="header-actions">
+            <button class="btn-logout" id="cambiarPassBtn" style="background:transparent; color:var(--gray-text); border:2px solid #E9ECEF; padding:10px 20px; border-radius:6px; font-weight:600; font-size:0.9rem; cursor:pointer; transition:0.3s;"><i class="fas fa-key"></i> Cambiar contraseña</button>
+            <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Salir</button>
         </div>
-    </nav>
-
-    <!-- HERO -->
-    <header class="hero" id="inicio">
-        <div class="hero-bg"></div>
-        <div class="hero-noise"></div>
-        <div class="hero-content">
-            <div class="hero-badge">Covers de Rock & Roll · En Vivo</div>
-            <h1>TAXI <span class="blue">BLUE</span></h1>
-            <p class="hero-sub">Revive la energía de los clásicos. Rock de los 80 y 90 en estado puro.</p>
-            <div class="hero-buttons">
-                <a href="#contacto" class="btn btn-primary">Contratar Show</a>
-                <a href="#galeria" class="btn btn-outline">Ver Galería</a>
-            </div>
-        </div>
-    </header>
-
-    <!-- LA BANDA -->
-    <section class="band-section" id="banda">
-        <div class="container">
-            <div class="section-line"></div>
-            <h2 class="section-title">LA <span class="accent">BANDA</span></h2>
-            <p class="section-subtitle">Pasión, energía y los mejores clásicos del rock.</p>
-            <div class="band-grid">
-                <div class="band-text">
-                    <p>
-                        <span class="highlight">Taxi Blue</span> es una banda cordobesa de covers de rock internacional, reconocida como una de las mejores en su categoría. Surgida de la fusión de importantes grupos de Rosario y Villa Carlos Paz, la banda ha recorrido escenarios de todo el país y países limítrofes.
-                    </p>
-                    <p>
-                        Liderada por <span class="highlight">Ariel Pagliarecci</span> en guitarra y voz, junto a <span class="highlight">Claudio Castillo</span> en batería y <span class="highlight">Alejandro Rodríguez</span> en bajo, Taxi Blue interpreta los hits más emblemáticos de Bon Jovi, Aerosmith, U2, Guns 'n Roses, Queen, Europe, Scorpions y muchos más.
-                    </p>
-                    <p>
-                        Además de su repertorio de covers, la banda ha rendido destacados homenajes a Gustavo Cerati, consolidándose como un referente del rock en la región.
-                    </p>
-                    <div class="band-stats">
-                        <div class="stat">
-                            <span class="stat-number">+15</span>
-                            <span class="stat-label">Años en vivo</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-number">+200</span>
-                            <span class="stat-label">Shows</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-number">∞</span>
-                            <span class="stat-label">Energía</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="band-visual">
-                    <div class="image-placeholder">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- EVENTOS -->
-    <section class="events-section" id="eventos">
-        <div class="container">
-            <div class="section-line"></div>
-            <h2 class="section-title">PRÓXIMOS <span class="accent">EVENTOS</span></h2>
-            <p class="section-subtitle">No te pierdas la próxima descarga de rock en vivo.</p>
-            <div class="events-list" id="eventsList">
-                <div class="events-empty">Cargando próximos eventos...</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- GALERÍA -->
-    <section class="gallery-section" id="galeria">
-        <div class="container">
-            <div class="section-line"></div>
-            <h2 class="section-title">GALERÍA <span class="accent">EN VIVO</span></h2>
-            <p class="section-subtitle">Momentos, escenarios y la energía del rock.</p>
-            <div class="instagram-grid" id="instagramGrid">
-                <div class="ig-loading">Cargando publicaciones...</div>
-            </div>
-            <div class="gallery-cta">
-                <a href="https://www.instagram.com/taxi_blue_rock" target="_blank" rel="noopener">
-                    Ver más en Instagram
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- CONTACTO -->
-    <section class="contact-section" id="contacto">
-        <div class="container">
-            <div class="section-line"></div>
-            <h2 class="section-title">HABLEMOS DE <span class="accent">ROCK</span></h2>
-            <p class="section-subtitle">¿Querés contratar el show o pedir más información?</p>
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <h3>Contrataciones</h3>
-                    <p>
-                        Escribinos directamente por WhatsApp y te respondemos a la brevedad. Podés consultar por disponibilidad, fechas, presupuesto o cualquier duda sobre el show.
-                    </p>
-                    <div class="contact-detail">
-                        <div class="icon">📱</div>
-                        <div class="text">
-                            <strong>WhatsApp</strong>
-                            +54 9 3541 381626
-                        </div>
-                    </div>
-                    <div class="contact-detail">
-                        <div class="icon">📍</div>
-                        <div class="text">
-                            <strong>Base</strong>
-                            Villa Carlos Paz, Córdoba, Argentina
-                        </div>
-                    </div>
-                    <div class="contact-detail">
-                        <div class="icon">🎸</div>
-                        <div class="text">
-                            <strong>Disponibilidad</strong>
-                            Shows en todo el país y países limítrofes
-                        </div>
-                    </div>
-                </div>
-                <div class="contact-form">
-                    <form id="whatsappForm" onsubmit="sendToWhatsApp(event)">
-                        <div class="form-group">
-                            <label for="nombre">Tu nombre *</label>
-                            <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipo">Tipo de consulta *</label>
-                            <select id="tipo" name="tipo" required onchange="toggleFechaField()">
-                                <option value="">Seleccioná una opción</option>
-                                <option value="Contratación de show">Contratación de show</option>
-                                <option value="Pedido de información">Pedido de información</option>
-                            </select>
-                        </div>
-                        <div class="form-group hidden" id="fechaGroup">
-                            <label for="fecha">Fecha tentativa del evento</label>
-                            <input type="date" id="fecha" name="fecha">
-                        </div>
-                        <div class="form-group">
-                            <label for="mensaje">Mensaje</label>
-                            <textarea id="mensaje" name="mensaje" placeholder="Contanos brevemente qué necesitás..."></textarea>
-                        </div>
-                        <button type="submit" class="btn-whatsapp">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                            </svg>
-                            Enviar por WhatsApp
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- WHATSAPP FLOTANTE -->
-    <a href="https://wa.me/5493541381626?text=Hola%20Taxi%20Blue%2C%20quiero%20consultar%20por%20una%20contrataci%C3%B3n."
-       class="whatsapp-float" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-    </a>
-
-    <!-- INSTAGRAM FLOTANTE -->
-    <a href="https://www.instagram.com/taxi_blue_rock"
-       class="instagram-float"
-       target="_blank"
-       rel="noopener"
-       aria-label="Seguinos en Instagram">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-        </svg>
-    </a>
-
-    <!-- FOOTER -->
-    <footer>
-        <div class="container">
-            <div class="footer-logo">TAXI <span>BLUE</span></div>
-            <div class="social-links">
-                <a href="https://www.instagram.com/taxi_blue_rock" class="ig" target="_blank" rel="noopener" aria-label="Instagram">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                    </svg>
-                </a>
-                <a href="https://wa.me/5493541381626" class="wa" target="_blank" rel="noopener" aria-label="WhatsApp">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                    </svg>
-                </a>
-                <a href="https://youtube.com/@taxibluechanel781" class="yt" target="_blank" rel="noopener" aria-label="YouTube">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                </a>
-            </div>
-            <p class="copyright">© 2026 Taxi Blue Rock. Todos los derechos reservados.</p>
-        </div>
-    </footer>
-
-    <!-- LIGHTBOX -->
-    <div class="lightbox" id="lightbox" aria-hidden="true">
-        <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar">✕</button>
-        <img id="lightboxImg" alt="Flyer ampliado">
-        <div class="lightbox-hint">Tocá o deslizá para cerrar</div>
     </div>
 
-    <script>
-        /* ========== NAVBAR SCROLL ========== */
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) navbar.classList.add('scrolled');
-            else navbar.classList.remove('scrolled');
-        });
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><span class="stat-icon"><i class="fas fa-users"></i></span><div class="stat-number" id="totalContactos">0</div><div class="stat-label">Total de contactos</div></div>
+        <div class="stat-card"><span class="stat-icon"><i class="fas fa-calendar-week"></i></span><div class="stat-number" id="contactosMes">0</div><div class="stat-label">Registros del mes</div></div>
+        <div class="stat-card emergencia"><span class="stat-icon"><i class="fas fa-exclamation-triangle"></i></span><div class="stat-number" id="emergencias">0</div><div class="stat-label">Emergencias 24/7</div></div>
+        <div class="stat-card pendiente"><span class="stat-icon"><i class="fas fa-clock"></i></span><div class="stat-number" id="pendientesPresupuesto">0</div><div class="stat-label">Pendientes de presupuesto</div></div>
+    </div>
 
-        /* ========== MENÚ MÓVIL ========== */
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.getElementById('navLinks');
-        menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => navLinks.classList.remove('active'));
-        });
+    <div class="chart-section">
+        <div class="chart-box"><h4><i class="fas fa-chart-bar" style="color:var(--primary-cyan);"></i> Servicios más solicitados</h4><canvas id="serviciosChart"></canvas></div>
+        <div class="chart-box"><h4><i class="fas fa-chart-line" style="color:var(--primary-cyan);"></i> Últimos 5 registros</h4><div id="ultimosRegistros" style="font-size:0.9rem; color:var(--gray-text);"><p class="loading"><i class="fas fa-spinner"></i> Cargando...</p></div></div>
+    </div>
 
-        /* ========== FORMULARIO WHATSAPP ========== */
-        const WHATSAPP_NUMBER = '5493541381626';
+    <div class="table-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 12px 24px; border-bottom: 1px solid #E9ECEF;">
+            <h4 style="margin:0;"><i class="fas fa-table" style="color:var(--primary-cyan);"></i> Todos los registros</h4>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="btn-mostrar-ocultos" id="mostrarOcultosBtn"><i class="fas fa-eye"></i> Mostrar ocultos</button>
+                <button class="btn-add-summary" onclick="abrirNuevoRegistro()">
+                    <i class="fas fa-plus"></i> Agregar manual
+                </button>
+            </div>
+        </div>
+        <div class="table-scroll" id="tablaContainer"><div class="loading"><i class="fas fa-spinner"></i> Cargando datos...</div></div>
+    </div>
+    
+    <div class="table-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 12px 24px; border-bottom: 1px solid #E9ECEF;">
+            <h4 style="margin:0;"><i class="fas fa-file-invoice" style="color:var(--primary-cyan);"></i> Presupuestos enviados</h4>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="btn-mostrar-ocultos-presupuestos" id="mostrarOcultosPresupuestosBtn"><i class="fas fa-eye"></i> Mostrar ocultos</button>
+            </div>
+        </div>
+        <div class="filtro-container">
+            <label>Filtrar por estado:</label>
+            <select id="filtroEstado" onchange="renderizarPresupuestos(datosCache.presupuestos)">
+                <option value="todos">Todos</option>
+                <option value="aprobado">Aprobado</option>
+                <option value="encurso">En Curso</option>
+                <option value="realizado">Realizado</option>
+                <option value="vencido">Vencido</option>
+                <option value="cancelado">Cancelado</option>
+            </select>
+            <input type="text" id="busquedaPresupuesto" placeholder="Buscar por nombre, servicio o número de presupuesto" oninput="renderizarPresupuestos(datosCache.presupuestos)">
+        </div>
+        <div class="table-scroll" id="presupuestosContainer"><div class="loading"><i class="fas fa-spinner"></i> Cargando presupuestos...</div></div>
+    </div>
+    
+    <!-- ===== SECCIÓN RESUMEN POR CONTACTO (con búsqueda) ===== -->
+    <div class="table-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 12px 24px; border-bottom: 1px solid #E9ECEF;">
+            <h4 style="margin:0;"><i class="fas fa-address-book" style="color:var(--primary-cyan);"></i> Resumen por Contacto</h4>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="busquedaResumen" placeholder="Buscar cliente...">
+                <button class="btn-add-summary" onclick="abrirNuevoRegistro()">
+                    <i class="fas fa-user-plus"></i> Agregar contacto
+                </button>
+            </div>
+        </div>
+        <div class="table-scroll" id="resumenContainer"><div class="loading"><i class="fas fa-spinner"></i> Procesando contactos...</div></div>
+    </div>
+</div>
 
-        function toggleFechaField() {
-            const tipo = document.getElementById('tipo').value;
-            const fechaGroup = document.getElementById('fechaGroup');
-            if (tipo === 'Contratación de show') fechaGroup.classList.remove('hidden');
-            else fechaGroup.classList.add('hidden');
+<!-- ===== MODALES ===== -->
+<div class="custom-modal-overlay" id="customModal">
+    <div class="custom-modal-box">
+        <div class="icon" id="customModalIcon">⚠️</div>
+        <h3 id="customModalTitle">Título</h3>
+        <p id="customModalMessage">Mensaje</p>
+        <div class="buttons" id="customModalButtons"></div>
+    </div>
+</div>
+
+<!-- ===== MODAL EDITAR REGISTRO ===== -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <button class="close-modal" id="closeEditModal">&times;</button>
+        <h3><span>✏️</span> Editar registro</h3>
+        <input type="hidden" id="editIndex">
+        <div class="form-group"><label>Nombre completo</label><input type="text" id="editNombre" placeholder="Nombre completo"></div>
+        <div class="form-group"><label>Teléfono / WhatsApp</label><input type="text" id="editTelefono" placeholder="Teléfono"></div>
+        <div class="form-group"><label>Correo electrónico</label><input type="email" id="editEmail" placeholder="Correo electrónico"></div>
+        <div class="form-group"><label>Servicio</label>
+            <select id="editServicio">
+                <option value="">Selecciona el servicio</option>
+                <option>Instalación eléctrica</option>
+                <option>Reparación / Mantenimiento</option>
+                <option>Domótica / Automatización</option>
+                <option>Tableros / Puesta a tierra</option>
+                <option>Iluminación</option>
+                <option>Certificación / Habilitación</option>
+                <option value="emergencia">Emergencia 24/7</option>
+                <option>Otro</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Ubicación</label><input type="text" id="editUbicacion" placeholder="Ubicación o dirección"></div>
+        <div class="form-group"><label>Mensaje</label><textarea id="editMensaje" placeholder="Mensaje"></textarea></div>
+
+        <!-- CAMPOS FISCALES -->
+        <div class="form-group"><label>Tipo de Factura</label>
+            <select id="editTipoFactura" onchange="toggleFiscales('edit')">
+                <option value="">Seleccionar</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="Consumidor Final">Consumidor Final</option>
+            </select>
+        </div>
+        <div class="form-group fiscal-group" id="editSituacionFiscalWrapper"><label>Situación Fiscal</label>
+            <select id="editSituacionFiscal">
+                <option value="">Seleccionar</option>
+                <option value="Monotributista">Monotributista</option>
+                <option value="Consumidor Final">Consumidor Final</option>
+            </select>
+        </div>
+        <div class="form-group fiscal-group" id="editCuitWrapper"><label>CUIT/CUIL</label><input type="text" id="editCuit" placeholder="11 dígitos" maxlength="11" inputmode="numeric"></div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" id="cancelEditBtn">Cancelar</button>
+            <button class="btn-save" id="saveEditBtn"><i class="fas fa-save"></i> Guardar cambios</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL NUEVO REGISTRO ===== -->
+<div class="modal-overlay" id="nuevoRegistroModal">
+    <div class="modal-box">
+        <button class="close-modal" id="closeNuevoRegistroModal">&times;</button>
+        <h3><span>📝</span> Nuevo registro</h3>
+        <div class="form-group"><label>Nombre completo *</label><input type="text" id="nuevoNombre" placeholder="Nombre completo"></div>
+        <div class="form-group"><label>Teléfono / WhatsApp *</label><input type="text" id="nuevoTelefono" placeholder="Teléfono"></div>
+        <div class="form-group"><label>Correo electrónico</label><input type="email" id="nuevoEmail" placeholder="Correo electrónico"></div>
+        <div class="form-group"><label>Servicio</label>
+            <select id="nuevoServicio">
+                <option value="">Selecciona el servicio</option>
+                <option>Instalación eléctrica</option>
+                <option>Reparación / Mantenimiento</option>
+                <option>Domótica / Automatización</option>
+                <option>Tableros / Puesta a tierra</option>
+                <option>Iluminación</option>
+                <option>Certificación / Habilitación</option>
+                <option value="emergencia">Emergencia 24/7</option>
+                <option>Otro</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Ubicación</label><input type="text" id="nuevoUbicacion" placeholder="Ubicación o dirección"></div>
+        <div class="form-group"><label>Mensaje</label><textarea id="nuevoMensaje" placeholder="Mensaje"></textarea></div>
+
+        <!-- CAMPOS FISCALES -->
+        <div class="form-group"><label>Tipo de Factura</label>
+            <select id="nuevoTipoFactura" onchange="toggleFiscales('nuevo')">
+                <option value="">Seleccionar</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="Consumidor Final">Consumidor Final</option>
+            </select>
+        </div>
+        <div class="form-group fiscal-group" id="nuevoSituacionFiscalWrapper"><label>Situación Fiscal</label>
+            <select id="nuevoSituacionFiscal">
+                <option value="">Seleccionar</option>
+                <option value="Monotributista">Monotributista</option>
+                <option value="Consumidor Final">Consumidor Final</option>
+            </select>
+        </div>
+        <div class="form-group fiscal-group" id="nuevoCuitWrapper"><label>CUIT/CUIL</label><input type="text" id="nuevoCuit" placeholder="11 dígitos" maxlength="11" inputmode="numeric"></div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" id="cancelNuevoBtn">Cancelar</button>
+            <button class="btn-save" id="saveNuevoBtn"><i class="fas fa-save"></i> Guardar registro</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL SERVICIOS ===== -->
+<div class="modal-overlay" id="serviciosModal">
+    <div class="modal-box" style="max-width: 600px;">
+        <button class="close-modal" id="closeServiciosModal">&times;</button>
+        <h3><span>📋</span> Servicios de <span id="serviciosClienteNombre">-</span></h3>
+        <div id="serviciosListContainer" style="margin-top: 10px;">
+            <p style="color: var(--gray-text);">Cargando...</p>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" id="closeServiciosBtn">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL PRESUPUESTO ===== -->
+<div class="modal-overlay" id="presupuestoModal">
+    <div class="modal-box presupuesto-box">
+        <button class="close-modal" id="closePresupuestoModal">&times;</button>
+        <h3><span>📄</span> Generar Presupuesto</h3>
+        <input type="hidden" id="presupuestoIndex">
+        <div class="presupuesto-datos">
+            <div class="form-group"><label>Nombre</label><input type="text" id="presupuestoNombre" readonly></div>
+            <div class="form-group"><label>Teléfono</label><input type="text" id="presupuestoTelefono" readonly></div>
+            <div class="form-group full-width"><label>Email</label><input type="text" id="presupuestoEmail" readonly></div>
+            <div class="form-group full-width"><label>Descripción del servicio</label><textarea id="presupuestoDescripcion" rows="4" placeholder="Describe el trabajo a realizar (los saltos de línea se respetarán en el PDF)"></textarea></div>
+            <div class="form-group"><label>Precio ($)</label><input type="number" id="presupuestoPrecio" placeholder="0" step="0.01"></div>
+            <div class="form-group"><label>Validez (días)</label><input type="number" id="presupuestoValidez" value="30" step="1" min="1"></div>
+            <div class="form-group full-width"><label>Materiales incluidos</label>
+                <select id="presupuestoMateriales"><option value="Sí">Sí</option><option value="No" selected>No</option></select>
+            </div>
+            <!-- CAMPOS FISCALES EDITABLES EN EL PRESUPUESTO -->
+            <div class="form-group"><label>Tipo de Factura</label>
+                <select id="presupuestoTipoFactura" onchange="toggleFiscalesPresupuesto()">
+                    <option value="">Seleccionar</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="Consumidor Final">Consumidor Final</option>
+                </select>
+            </div>
+            <div class="form-group fiscal-group" id="presupuestoSituacionFiscalWrapper"><label>Situación Fiscal</label>
+                <select id="presupuestoSituacionFiscal" onchange="toggleFiscalesPresupuesto()">
+                    <option value="">Seleccionar</option>
+                    <option value="Monotributista">Monotributista</option>
+                    <option value="Consumidor Final">Consumidor Final</option>
+                </select>
+            </div>
+            <div class="form-group fiscal-group" id="presupuestoCuitWrapper"><label>CUIT/CUIL</label>
+                <input type="text" id="presupuestoCuit" placeholder="11 dígitos" maxlength="11" inputmode="numeric">
+            </div>
+        </div>
+
+        <!-- VISTA PREVIA DEL PRESUPUESTO (PDF) -->
+        <div class="presupuesto-preview" id="presupuestoPreview">
+            <div class="presupuesto">
+                <div class="marca-agua">
+                    <img src="/images/icon-512.png" alt="Marca de agua" />
+                </div>
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">
+                            <img src="/images/icon-192.png" alt="REF Electrotecnia" />
+                        </div>
+                        <div class="empresa">
+                            <h1>REF <span>Electrotecnia</span></h1>
+                            <div class="subtitulo">Soluciones pensadas.</div>
+                        </div>
+                    </div>
+                    <div class="badge-presupuesto">
+                        <span class="numero">PRESUPUESTO</span>
+                        <span class="numero-presupuesto" id="previewNumero">N° -</span>
+                        <span class="fecha" id="previewFechaValidez">Válido hasta el -</span>
+                    </div>
+                </header>
+                <div class="cuerpo">
+                    <section class="seccion">
+                        <div class="seccion-titulo" style="margin-bottom:12px;">
+                            <span class="icono"></span> DATOS DEL SERVICIO Y CLIENTE
+                            <span class="linea-aux"></span>
+                        </div>
+                        <div class="datos-wrapper">
+                            <div class="datos-col izquierda">
+                                <div class="col-titulo">Detalles del Servicio</div>
+                                <div class="item"><span class="etiqueta">Servicio:</span> <span class="valor" id="previewServicio">-</span></div>
+                                <div class="item"><span class="etiqueta">Materiales:</span> <span class="valor" id="previewMateriales">-</span></div>
+                                <div class="item"><span class="etiqueta">Validez:</span> <span class="valor" id="previewValidez">-</span></div>
+                                <div id="previewFiscalContainer"></div>
+                            </div>
+                            <div class="datos-col derecha">
+                                <div class="col-titulo">Información del Cliente</div>
+                                <div class="item"><span class="etiqueta">Cliente:</span> <span class="valor" id="previewNombre">-</span></div>
+                                <div class="item"><span class="etiqueta">Teléfono:</span> <span class="valor" id="previewTelefono">-</span></div>
+                                <div class="item"><span class="etiqueta">Email:</span> <span class="valor email" id="previewEmail">-</span></div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="seccion seccion-prestacion">
+                        <div class="seccion-titulo">
+                            <span class="icono"></span> DETALLE DE PRESTACIÓN / MANO DE OBRA
+                            <span class="linea-aux"></span>
+                        </div>
+                        <div class="prestacion-card">
+                            <div class="prestacion-header">
+                                <span>DESCRIPCIÓN DEL SERVICIO</span>
+                                <span class="importe-label">IMPORTE</span>
+                            </div>
+                            <div class="prestacion-fila">
+                                <span class="servicio-nombre" id="previewServicioTitulo">Servicio</span>
+                                <span class="servicio-importe" id="previewSubtotal">$ 0</span>
+                            </div>
+                            <div class="prestacion-detalle" id="previewDescripcion">-</div>
+                        </div>
+                    </section>
+                    <div class="totales-container">
+                        <div class="totales-firma">
+                            <img class="firma-imagen" src="/images/firma.png" alt="Firma R. Figueras" />
+                            <span class="firma-texto">R. Figueras - REF Electrotecnia</span>
+                            <span class="firma-digital">✓ Firmado digitalmente</span>
+                        </div>
+                        <div class="totales-list">
+                            <div class="linea total-final">
+                                <span class="label-total">Total</span>
+                                <span class="valor-total" id="previewTotal">$ 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-documento">
+                        Documento generado electrónicamente a través de https://www.refelectrotecnia.com
+                    </div>
+                    <section class="condiciones">
+                        <div class="seccion-titulo">
+                            <span class="icono"></span> CONDICIONES COMERCIALES, NOTAS &amp; GARANTÍA
+                            <span class="linea-aux"></span>
+                        </div>
+                        <ul>
+                            <li id="condicionValidez">Este presupuesto tiene una validez de <span id="previewValidezDias">30</span> días (hasta el <span id="previewValidezFecha">-</span>).</li>
+                            <li id="condicionMateriales">Materiales incluidos: <span id="previewCondMateriales">No</span></li>
+                            <li>Para la conformidad de este presupuesto se exige el 100% del pago de los materiales (si fueran por cuenta de la empresa) + 50% de la mano de obra.</li>
+                            <li><strong>GARANTIA:</strong> Mano de obra 100%</li>
+                            <li><strong>GARANTIA MATERIALES:</strong> en el caso de materiales incluidos 100%</li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <div class="presupuesto-actions">
+            <button class="btn-guardar" id="guardarPresupuestoBtn"><i class="fas fa-save"></i> Guardar y Descargar PDF</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL ANTICIPOS (NUEVO) ===== -->
+<div class="modal-overlay" id="anticipoModal">
+    <div class="modal-box" style="max-width: 600px;">
+        <button class="close-modal" id="closeAnticipoModal">&times;</button>
+        <h3><span>💰</span> Gestión de Anticipos</h3>
+        <input type="hidden" id="anticipoDocId">
+        <div id="anticipoClienteInfo" style="margin-bottom:15px; background:var(--light-bg); padding:12px; border-radius:var(--radius);">
+            <p><strong>Cliente:</strong> <span id="anticipoNombre">-</span></p>
+            <p><strong>Teléfono:</strong> <span id="anticipoTelefono">-</span></p>
+            <p><strong>Email:</strong> <span id="anticipoEmail">-</span></p>
+            <p><strong>Presupuesto total:</strong> <span id="anticipoTotalPresupuesto">$ 0</span></p>
+        </div>
+        <div id="anticipoLista" style="margin-bottom:15px;">
+            <p style="font-weight:600; color:var(--primary-dark);">Adelantos registrados:</p>
+            <div id="anticipoItems" style="max-height:200px; overflow-y:auto;"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="form-group"><label>Fecha del adelanto</label><input type="date" id="anticipoFecha"></div>
+            <div class="form-group"><label>Monto ($)</label><input type="number" id="anticipoMonto" placeholder="0" step="0.01"></div>
+        </div>
+        <button class="btn-save" id="btnAgregarAdelanto" style="width:100%; margin-bottom:15px;"><i class="fas fa-plus"></i> Agregar adelanto</button>
+        <div style="background:var(--light-bg); padding:12px; border-radius:var(--radius); margin-bottom:15px;">
+            <p><strong>Total adelantado:</strong> <span id="anticipoTotalAdelantado">$ 0</span></p>
+            <p><strong>Diferencia a pagar:</strong> <span id="anticipoDiferencia">$ 0</span></p>
+            <p><strong>Porcentaje pagado:</strong> <span id="anticipoPorcentaje">0%</span></p>
+        </div>
+        <div class="modal-actions" style="justify-content:space-between;">
+            <button class="btn-cancel" id="closeAnticipoBtn">Cerrar</button>
+            <button class="btn-save" id="btnExportarAnticipo"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL CAMBIAR CONTRASEÑA ===== -->
+<div class="modal-overlay" id="cambiarPassModal">
+    <div class="modal-box">
+        <button class="close-modal" id="closeCambiarPassModal">&times;</button>
+        <h3><span>🔑</span> Cambiar contraseña</h3>
+        <div class="form-group"><label>Contraseña actual</label><input type="password" id="currentPassword" placeholder="Contraseña actual"></div>
+        <div class="form-group"><label>Nueva contraseña</label><input type="password" id="newPassword" placeholder="Nueva contraseña (mínimo 6 caracteres)"></div>
+        <div class="form-group"><label>Confirmar nueva contraseña</label><input type="password" id="confirmNewPassword" placeholder="Confirmar nueva contraseña"></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" id="cancelCambiarPassBtn">Cancelar</button>
+            <button class="btn-save" id="saveCambiarPassBtn"><i class="fas fa-save"></i> Cambiar contraseña</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- IMPORTMAP + SCRIPT MÓDULO CON FIREBASE                    -->
+<!-- ========================================================== -->
+<script type="importmap">
+{
+    "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"
+    }
+}
+</script>
+
+<script type="module">
+import { initializeApp } from 'firebase/app';
+import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut,
+    reauthenticateWithCredential,
+    updatePassword,
+    EmailAuthProvider
+} from 'firebase/auth';
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+
+// Configuración de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyA5TiqIPtlIE-PFAFyGMH1qqSlGPbXbINw",
+    authDomain: "refelectrotecnia.firebaseapp.com",
+    projectId: "refelectrotecnia",
+    storageBucket: "refelectrotecnia.firebasestorage.app",
+    messagingSenderId: "204883844019",
+    appId: "1:204883844019:web:176d2973209b0cc98fc9c6",
+    measurementId: "G-8FDNZ6GJZD"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ============================================================
+//  VARIABLES GLOBALES
+// ============================================================
+let datosCache = { contactos: [], presupuestos: [] };
+let chartInstance = null;
+let unsubscribeContactos = null;
+let unsubscribePresupuestos = null;
+window.contactoIdActual = null;
+let mostrarOcultos = false;
+let mostrarOcultosPresupuestos = false;
+
+// ============================================================
+//  FUNCIONES AUXILIARES
+// ============================================================
+function formatearPrecio(valor) {
+    if (isNaN(valor)) return '$ 0';
+    return '$ ' + Math.round(valor).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ',00';
+}
+
+function formatearFechaHora(fecha) {
+    if (!fecha) return '';
+    const d = fecha.toDate ? fecha.toDate() : new Date(fecha);
+    return d.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+}
+
+function formatearFecha(fecha) {
+    if (!fecha) return '';
+    const d = fecha.toDate ? fecha.toDate() : new Date(fecha);
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function calcularEstadoPresupuesto(presupuesto) {
+    if (presupuesto.estado === 'realizado') return 'realizado';
+    if (presupuesto.estado === 'cancelado') return 'cancelado';
+    const fecha = presupuesto.fecha ? (presupuesto.fecha.toDate ? presupuesto.fecha.toDate() : new Date(presupuesto.fecha)) : new Date();
+    const validez = parseInt(presupuesto.validez) || 30;
+    const fechaVencimiento = new Date(fecha);
+    fechaVencimiento.setDate(fechaVencimiento.getDate() + validez);
+    const hoy = new Date();
+    if (hoy > fechaVencimiento) return 'vencido';
+    return presupuesto.estado || 'encurso';
+}
+
+function obtenerFechaVencimiento(presupuesto) {
+    const fecha = presupuesto.fecha ? (presupuesto.fecha.toDate ? presupuesto.fecha.toDate() : new Date(presupuesto.fecha)) : new Date();
+    const validez = parseInt(presupuesto.validez) || 30;
+    const fechaVencimiento = new Date(fecha);
+    fechaVencimiento.setDate(fechaVencimiento.getDate() + validez);
+    return fechaVencimiento;
+}
+
+function calcularDiasRestantes(presupuesto) {
+    if (presupuesto.estado === 'cancelado' || presupuesto.estado === 'realizado') return null;
+    const fechaVencimiento = obtenerFechaVencimiento(presupuesto);
+    const hoy = new Date();
+    const diff = Math.ceil((fechaVencimiento - hoy) / (1000 * 60 * 60 * 24));
+    return diff;
+}
+
+// ============================================================
+//  MODAL PERSONALIZADO
+// ============================================================
+function mostrarModal(opciones) {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('customModal');
+        const icon = document.getElementById('customModalIcon');
+        const title = document.getElementById('customModalTitle');
+        const message = document.getElementById('customModalMessage');
+        const buttons = document.getElementById('customModalButtons');
+
+        const tipo = opciones.tipo || 'info';
+        const iconos = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+        icon.textContent = opciones.icon || iconos[tipo] || 'ℹ️';
+        title.textContent = opciones.titulo || 'Aviso';
+        message.textContent = opciones.mensaje || '';
+
+        buttons.innerHTML = '';
+
+        if (opciones.botones) {
+            opciones.botones.forEach((btn) => {
+                const b = document.createElement('button');
+                b.className = `btn-custom ${btn.clase || 'primary'}`;
+                b.textContent = btn.texto;
+                b.addEventListener('click', () => {
+                    cerrarModalPersonalizado();
+                    resolve(btn.valor !== undefined ? btn.valor : true);
+                });
+                buttons.appendChild(b);
+            });
+        } else {
+            const b = document.createElement('button');
+            b.className = 'btn-custom primary';
+            b.textContent = 'Aceptar';
+            b.addEventListener('click', () => {
+                cerrarModalPersonalizado();
+                resolve(true);
+            });
+            buttons.appendChild(b);
         }
 
-        function sendToWhatsApp(event) {
-            event.preventDefault();
-            const nombre = document.getElementById('nombre').value.trim();
-            const tipo = document.getElementById('tipo').value;
-            const fecha = document.getElementById('fecha').value;
-            const mensaje = document.getElementById('mensaje').value.trim();
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
 
-            if (!nombre || !tipo) {
-                alert('Por favor, completá los campos obligatorios.');
-                return;
-            }
-
-            let texto = `*Consulta desde la web - Taxi Blue Rock*\n\n`;
-            texto += `👤 *Nombre:* ${nombre}\n`;
-            texto += `📋 *Tipo de consulta:* ${tipo}\n`;
-
-            if (tipo === 'Contratación de show' && fecha) {
-                const fechaObj = new Date(fecha + 'T00:00:00');
-                const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
-                const fechaLegible = fechaObj.toLocaleDateString('es-AR', opciones);
-                texto += `📅 *Fecha tentativa:* ${fechaLegible}\n`;
-            }
-
-            if (mensaje) texto += `\n💬 *Mensaje:*\n${mensaje}`;
-
-            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
-            window.open(url, '_blank');
+        function cerrarModalPersonalizado() {
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
         }
+    });
+}
 
-        /* ========== SCROLL SUAVE ========== */
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                const target = document.querySelector(targetId);
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+async function mostrarError(mensaje) {
+    await mostrarModal({
+        tipo: 'error',
+        icon: '❌',
+        titulo: 'Error',
+        mensaje: mensaje,
+        botones: [{ texto: 'Entendido', clase: 'primary' }]
+    });
+}
+
+async function mostrarConfirmacion(mensaje) {
+    const result = await mostrarModal({
+        tipo: 'warning',
+        icon: '⚠️',
+        titulo: 'Confirmar',
+        mensaje: mensaje,
+        botones: [
+            { texto: 'No', clase: 'secondary', valor: false },
+            { texto: 'Sí', clase: 'danger', valor: true }
+        ]
+    });
+    return result;
+}
+
+// ============================================================
+//  FUNCIONES DE INTERFAZ
+// ============================================================
+function showLogin() {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('dashboard').classList.add('dashboard-locked');
+}
+function showDashboard() {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('dashboard').classList.remove('dashboard-locked');
+}
+
+// ============================================================
+//  AUTENTICACIÓN
+// ============================================================
+document.getElementById('btnLogin').addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('btnLogin');
+    
+    if (!email || !password) {
+        errorEl.textContent = 'Por favor, completa ambos campos.';
+        errorEl.style.display = 'block';
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+    errorEl.style.display = 'none';
+    
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+        let mensaje = 'Credenciales incorrectas. Intenta de nuevo.';
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+            mensaje = 'Email o contraseña incorrectos.';
+        } else if (error.code === 'auth/invalid-email') {
+            mensaje = 'El formato del email no es válido.';
+        } else if (error.code === 'auth/too-many-requests') {
+            mensaje = 'Demasiados intentos fallidos. Espera un momento.';
+        }
+        errorEl.textContent = mensaje;
+        errorEl.style.display = 'block';
+        document.getElementById('loginPassword').value = '';
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-lock"></i> Ingresar';
+});
+
+document.getElementById('loginEmail').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+});
+document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+});
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        showDashboard();
+        if (unsubscribeContactos) unsubscribeContactos();
+        if (unsubscribePresupuestos) unsubscribePresupuestos();
+        unsubscribeContactos = escucharContactos();
+        unsubscribePresupuestos = escucharPresupuestos();
+    } else {
+        showLogin();
+        if (unsubscribeContactos) { unsubscribeContactos(); unsubscribeContactos = null; }
+        if (unsubscribePresupuestos) { unsubscribePresupuestos(); unsubscribePresupuestos = null; }
+    }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    const confirmado = await mostrarConfirmacion('¿Estás seguro de que quieres cerrar sesión?');
+    if (confirmado) {
+        signOut(auth);
+    }
+});
+
+// ============================================================
+//  ESCUCHAS EN TIEMPO REAL
+// ============================================================
+function escucharContactos() {
+    return onSnapshot(collection(db, 'contactos'), (snapshot) => {
+        const contactos = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            contactos.push({ id: doc.id, ...data });
+        });
+        contactos.sort((a, b) => {
+            const fechaA = a.fecha ? (a.fecha.toDate ? a.fecha.toDate() : new Date(a.fecha)) : new Date(0);
+            const fechaB = b.fecha ? (b.fecha.toDate ? b.fecha.toDate() : new Date(b.fecha)) : new Date(0);
+            return fechaB - fechaA;
+        });
+
+        datosCache.contactos = contactos;
+        actualizarStats(contactos);
+        actualizarGrafico(contactos);
+        actualizarUltimos(contactos);
+        renderizarTabla(contactos);
+        actualizarResumenContactos(contactos);
+    }, (error) => {
+        console.error('Error en onSnapshot contactos:', error);
+        document.getElementById('tablaContainer').innerHTML = `<div class="no-data"><i class="fas fa-exclamation-circle" style="font-size:2rem;color:#e74c3c;"></i><p style="margin-top:10px;">Error al cargar contactos: ${error.message}</p></div>`;
+    });
+}
+
+function escucharPresupuestos() {
+    return onSnapshot(collection(db, 'presupuestos'), (snapshot) => {
+        const presupuestos = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            presupuestos.push({ id: doc.id, ...data });
+        });
+
+        datosCache.presupuestos = presupuestos;
+        renderizarPresupuestos(presupuestos);
+        renderizarTabla(datosCache.contactos);
+        actualizarStats(datosCache.contactos);
+        actualizarResumenContactos(datosCache.contactos);
+    }, (error) => {
+        console.error('Error en onSnapshot presupuestos:', error);
+        document.getElementById('presupuestosContainer').innerHTML = `<div class="no-data"><i class="fas fa-exclamation-circle" style="font-size:2rem;color:#e74c3c;"></i><p style="margin-top:10px;">Error al cargar presupuestos: ${error.message}</p></div>`;
+    });
+}
+
+// ============================================================
+//  ESTADÍSTICAS, GRÁFICO, ÚLTIMOS REGISTROS
+// ============================================================
+function actualizarStats(data) {
+    document.getElementById('totalContactos').textContent = data.length;
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const anioActual = hoy.getFullYear();
+    const contactosMes = data.filter(item => {
+        if (!item.fecha) return false;
+        const fecha = item.fecha.toDate ? item.fecha.toDate() : new Date(item.fecha);
+        return fecha.getMonth() === mesActual && fecha.getFullYear() === anioActual;
+    });
+    document.getElementById('contactosMes').textContent = contactosMes.length;
+    document.getElementById('emergencias').textContent = data.filter(item => item.servicio && item.servicio.toLowerCase().includes('emergencia')).length;
+
+    const contactosConPresupuestoActivo = new Set();
+    datosCache.presupuestos.forEach(p => {
+        if (p.contactoId) {
+            const estado = calcularEstadoPresupuesto(p);
+            if (estado !== 'vencido' && estado !== 'cancelado') {
+                contactosConPresupuestoActivo.add(p.contactoId);
+            }
+        } else {
+            const key = (p.nombre || '') + '|' + (p.telefono || '');
+            if (key !== '|') {
+                const estado = calcularEstadoPresupuesto(p);
+                if (estado !== 'vencido' && estado !== 'cancelado') {
+                    contactosConPresupuestoActivo.add(key);
+                }
+            }
+        }
+    });
+
+    const pendientes = data.filter(item => {
+        const id = item.id;
+        if (id && contactosConPresupuestoActivo.has(id)) return false;
+        const key = (item.nombre || '') + '|' + (item.telefono || '');
+        return key !== '|' && !contactosConPresupuestoActivo.has(key);
+    });
+
+    document.getElementById('pendientesPresupuesto').textContent = pendientes.length;
+}
+
+function actualizarGrafico(data) {
+    const servicioCount = {};
+    data.forEach(item => {
+        let servicio = item.servicio || 'No especificado';
+        if (servicio === 'emergencia') servicio = 'Emergencia 24/7';
+        servicioCount[servicio] = (servicioCount[servicio] || 0) + 1;
+    });
+    const sorted = Object.entries(servicioCount).sort((a,b) => b[1] - a[1]);
+    const labels = sorted.map(item => item[0]);
+    const values = sorted.map(item => item[1]);
+    const ctx = document.getElementById('serviciosChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+    if (labels.length === 0) {
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: ['Sin datos'], datasets: [{ label: 'Solicitudes', data: [0], backgroundColor: ['#E9ECEF'], borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f1f1' } }, x: { grid: { display: false } } } }
+        });
+        return;
+    }
+    const colores = ['#00A8FF','#0A2E5C','#FFB800','#FF7A00','#34A853','#E4405F','#9B59B6','#1ABC9C','#F39C12','#E74C3C'];
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Solicitudes', data: values, backgroundColor: colores.slice(0, labels.length), borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f1f1' } }, x: { grid: { display: false } } } }
+    });
+}
+
+function actualizarUltimos(data) {
+    const container = document.getElementById('ultimosRegistros');
+    if (data.length === 0) {
+        container.innerHTML = '<p style="color:var(--gray-text);">No hay registros aún.</p>';
+        return;
+    }
+    const ultimos = data.slice(0, 5);
+    let html = '<ul style="list-style:none; padding:0; margin:0;">';
+    ultimos.forEach(item => {
+        const nombre = item.nombre || 'Anónimo';
+        const servicio = item.servicio || 'No especificado';
+        const fecha = formatearFecha(item.fecha);
+        const esEmergencia = servicio.toLowerCase().includes('emergencia');
+        html += `<li style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #E9ECEF; align-items:center;">
+            <span><strong>${nombre}</strong> <span style="color:var(--gray-text); font-size:0.85rem;">${servicio}</span></span>
+            <span style="font-size:0.8rem; color:var(--gray-text);">${esEmergencia ? '<span class="badge-emergencia">⚠️</span>' : ''} ${fecha}</span>
+        </li>`;
+    });
+    html += '</ul>';
+    container.innerHTML = html;
+}
+
+// ============================================================
+//  FUNCIÓN PARA MANEJAR CAMPOS FISCALES
+// ============================================================
+window.toggleFiscales = function(prefix) {
+    const tipoFactura = document.getElementById(prefix + 'TipoFactura');
+    const situacionWrapper = document.getElementById(prefix + 'SituacionFiscalWrapper');
+    const cuitWrapper = document.getElementById(prefix + 'CuitWrapper');
+    const situacionSelect = document.getElementById(prefix + 'SituacionFiscal');
+    const cuitInput = document.getElementById(prefix + 'Cuit');
+
+    if (!tipoFactura || !situacionWrapper || !cuitWrapper) return;
+
+    const isConsumidorFinal = tipoFactura.value === 'Consumidor Final';
+
+    if (isConsumidorFinal) {
+        situacionWrapper.classList.add('disabled');
+        situacionSelect.disabled = true;
+        situacionSelect.value = '';
+        cuitWrapper.classList.add('hidden');
+        cuitInput.value = '';
+        cuitInput.disabled = true;
+    } else {
+        situacionWrapper.classList.remove('disabled');
+        situacionSelect.disabled = false;
+        if (situacionSelect.value !== '') {
+            cuitWrapper.classList.remove('hidden');
+            cuitInput.disabled = false;
+        } else {
+            cuitWrapper.classList.add('hidden');
+            cuitInput.value = '';
+            cuitInput.disabled = true;
+        }
+    }
+};
+
+window.toggleFiscalesPresupuesto = function() {
+    const tipoFactura = document.getElementById('presupuestoTipoFactura');
+    const situacionWrapper = document.getElementById('presupuestoSituacionFiscalWrapper');
+    const cuitWrapper = document.getElementById('presupuestoCuitWrapper');
+    const situacionSelect = document.getElementById('presupuestoSituacionFiscal');
+    const cuitInput = document.getElementById('presupuestoCuit');
+
+    if (!tipoFactura || !situacionWrapper || !cuitWrapper) return;
+
+    const isConsumidorFinal = tipoFactura.value === 'Consumidor Final';
+
+    if (isConsumidorFinal) {
+        situacionWrapper.classList.add('disabled');
+        situacionSelect.disabled = true;
+        situacionSelect.value = '';
+        cuitWrapper.classList.add('hidden');
+        cuitInput.value = '';
+        cuitInput.disabled = true;
+    } else {
+        situacionWrapper.classList.remove('disabled');
+        situacionSelect.disabled = false;
+        if (situacionSelect.value !== '') {
+            cuitWrapper.classList.remove('hidden');
+            cuitInput.disabled = false;
+        } else {
+            cuitWrapper.classList.add('hidden');
+            cuitInput.value = '';
+            cuitInput.disabled = true;
+        }
+    }
+    actualizarVistaPrevia();
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    ['edit', 'nuevo'].forEach(prefix => {
+        const situacionSelect = document.getElementById(prefix + 'SituacionFiscal');
+        if (situacionSelect) {
+            situacionSelect.addEventListener('change', function() {
+                const cuitWrapper = document.getElementById(prefix + 'CuitWrapper');
+                const cuitInput = document.getElementById(prefix + 'Cuit');
+                if (this.value !== '') {
+                    cuitWrapper.classList.remove('hidden');
+                    cuitInput.disabled = false;
+                } else {
+                    cuitWrapper.classList.add('hidden');
+                    cuitInput.value = '';
+                    cuitInput.disabled = true;
                 }
             });
-        });
-
-        /* ========== HELPERS ========== */
-        function escapeHtml(s){
-            return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
-        function escapeJs(s){
-            return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');
-        }
-
-        function sendEventWhatsApp(eventInfo){
-            const texto = `*Consulta sobre evento - Taxi Blue Rock*\n\n🎸 *Evento:* ${eventInfo}\n\nHola, me gustaría recibir más información sobre este show.`;
-            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`, '_blank');
-        }
-
-        /* ========== GOOGLE MAPS HELPERS ========== */
-        function getDirectionsUrl(ev){
-            if(!ev.lugar) return null;
-            let destino = ev.lugar;
-            if(ev.mapsUrl){
-                const coords = extraerCoordsDeMapsUrl(ev.mapsUrl);
-                if(coords) destino = coords;
-            }
-            return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destino)}`;
-        }
-
-        function extraerCoordsDeMapsUrl(url){
-            let m = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-            if(m) return `${m[1]},${m[2]}`;
-            m = url.match(/[?&](?:q|query|destination)=(-?\d+\.\d+),(-?\d+\.\d+)/);
-            if(m) return `${m[1]},${m[2]}`;
-            return null;
-        }
-
-        /* ========== LIGHTBOX ========== */
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-        const lightboxClose = document.getElementById('lightboxClose');
-
-        let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
-        let imgStartX = 0, imgStartY = 0, isDragging = false;
-
-        function openLightbox(src, alt) {
-            lightboxImg.src = src;
-            lightboxImg.alt = alt || 'Flyer ampliado';
-            lightbox.classList.add('open');
-            lightbox.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('no-scroll');
-        }
-
-        function closeLightbox() {
-            if (isDragging) {
-                lightboxImg.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
-                lightboxImg.style.transform = `translate(${imgStartX}px, ${imgStartY}px) scale(0.7)`;
-                lightboxImg.style.opacity = '0';
-                setTimeout(() => {
-                    lightboxImg.style.transition = '';
-                    lightboxImg.style.transform = '';
-                    lightboxImg.style.opacity = '';
-                }, 260);
-            }
-            lightbox.classList.remove('open');
-            lightbox.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('no-scroll');
-            isDragging = false;
-        }
-
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox || e.target === lightboxClose) closeLightbox();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
-        });
-
-        lightbox.addEventListener('touchstart', (e) => {
-            if (!lightbox.classList.contains('open')) return;
-            const t = e.touches[0];
-            touchStartX = t.clientX; touchStartY = t.clientY;
-            touchStartTime = Date.now();
-            imgStartX = 0; imgStartY = 0;
-            isDragging = true;
-            lightboxImg.style.transition = 'none';
-        }, { passive: true });
-
-        lightbox.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            const t = e.touches[0];
-            const dx = t.clientX - touchStartX;
-            const dy = t.clientY - touchStartY;
-            imgStartX = dx; imgStartY = dy;
-            const opacity = Math.max(0.3, 1 - Math.abs(dx + dy) / 800);
-            lightboxImg.style.transform = `translate(${dx}px, ${dy}px) scale(${Math.max(0.85, 1 - Math.abs(dx + dy) / 1500)})`;
-            lightboxImg.style.opacity = opacity;
-            lightbox.style.background = `rgba(0, 0, 0, ${0.95 * opacity})`;
-        }, { passive: true });
-
-        lightbox.addEventListener('touchend', () => {
-            if (!isDragging) return;
-            const elapsed = Date.now() - touchStartTime;
-            const dist = Math.sqrt(imgStartX * imgStartX + imgStartY * imgStartY);
-            const velocity = dist / Math.max(elapsed, 1);
-            lightbox.style.background = '';
-            if (dist > 80 || velocity > 0.5) {
-                closeLightbox();
+    });
+    const situacionPresupuesto = document.getElementById('presupuestoSituacionFiscal');
+    if (situacionPresupuesto) {
+        situacionPresupuesto.addEventListener('change', function() {
+            const cuitWrapper = document.getElementById('presupuestoCuitWrapper');
+            const cuitInput = document.getElementById('presupuestoCuit');
+            if (this.value !== '') {
+                cuitWrapper.classList.remove('hidden');
+                cuitInput.disabled = false;
             } else {
-                lightboxImg.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
-                lightboxImg.style.transform = '';
-                lightboxImg.style.opacity = '';
-                setTimeout(() => { lightboxImg.style.transition = ''; }, 260);
-                isDragging = false;
+                cuitWrapper.classList.add('hidden');
+                cuitInput.value = '';
+                cuitInput.disabled = true;
             }
+            actualizarVistaPrevia();
+        });
+    }
+    document.getElementById('presupuestoTipoFactura')?.addEventListener('change', actualizarVistaPrevia);
+    document.getElementById('presupuestoCuit')?.addEventListener('input', actualizarVistaPrevia);
+});
+
+function initFiscales(prefix) {
+    toggleFiscales(prefix);
+}
+
+// ============================================================
+//  RENDERIZAR TABLA DE CONTACTOS
+// ============================================================
+function renderizarTabla(data) {
+    const container = document.getElementById('tablaContainer');
+    let dataFiltrada = data;
+    if (!mostrarOcultos) {
+        dataFiltrada = data.filter(item => item.oculto !== true);
+    }
+    if (dataFiltrada.length === 0) {
+        container.innerHTML = `<div class="no-data"><i class="fas fa-inbox" style="font-size:2rem;color:var(--gray-text);"></i><p style="margin-top:10px;">No hay registros activos.</p></div>`;
+        return;
+    }
+
+    const columnas = ['Fecha', 'Nombre', 'Teléfono', 'Servicio', 'Ubicación', 'Mensaje', 'Presupuesto', 'Tipo Factura'];
+    let html = `<table><thead><tr>${columnas.map(col => `<th>${col}</th>`).join('')}<th style="text-align:center;">Acciones</th></tr></thead><tbody>`;
+    const sorted = [...dataFiltrada].sort((a,b) => {
+        const fechaA = a.fecha ? (a.fecha.toDate ? a.fecha.toDate() : new Date(a.fecha)) : new Date(0);
+        const fechaB = b.fecha ? (b.fecha.toDate ? b.fecha.toDate() : new Date(b.fecha)) : new Date(0);
+        return fechaB - fechaA;
+    });
+    sorted.forEach((row) => {
+        const docId = row.id;
+        const fecha = formatearFechaHora(row.fecha);
+        const nombre = row.nombre || '';
+        const telefono = row.telefono || '';
+        let servicio = row.servicio || '';
+        if (servicio === 'emergencia') servicio = 'Emergencia 24/7';
+        const ubicacion = row.ubicacion || '';
+        const mensaje = row.mensaje || '';
+        const esEmergencia = servicio.toLowerCase().includes('emergencia');
+
+        const tipoFactura = row.tipoFactura || '';
+        const oculto = row.oculto === true;
+
+        const tienePresupuestoActivo = datosCache.presupuestos.some(p => {
+            if (p.contactoId && p.contactoId === docId) {
+                const estado = calcularEstadoPresupuesto(p);
+                return estado !== 'vencido' && estado !== 'cancelado';
+            }
+            return false;
         });
 
-        lightbox.addEventListener('touchmove', (e) => {
-            if (e.cancelable) e.preventDefault();
-        }, { passive: false });
+        const checkHtml = tienePresupuestoActivo ? '<span class="check-presupuesto">✅</span>' : '<span class="no-presupuesto">❌</span>';
 
-        window.openLightbox = openLightbox;
-
-        /* ========== VENTANA TEMPORAL DE EVENTO ========== */
-        const LIVE_DURATION_MS = 2.5 * 60 * 60 * 1000;
-
-        function getEventWindow(fecha, hora) {
-            const inicio = new Date(fecha + 'T00:00:00');
-            let duracionMs = 24 * 60 * 60 * 1000;
-            if (hora) {
-                const m = String(hora).match(/(\d{1,2})[:.](\d{1,2})/);
-                if (m) {
-                    const h = parseInt(m[1], 10);
-                    const min = parseInt(m[2], 10);
-                    if (!isNaN(h) && !isNaN(min)) {
-                        inicio.setHours(h, min, 0, 0);
-                        duracionMs = LIVE_DURATION_MS;
-                    }
-                }
+        let mapsHtml = '';
+        if (ubicacion && ubicacion.trim() !== '' && ubicacion.trim() !== '-') {
+            let url = '';
+            const esCoordenada = /^-?\d+\.\d+,\s*-?\d+\.\d+/.test(ubicacion);
+            if (esCoordenada) {
+                const coords = ubicacion.match(/-?\d+\.\d+/g);
+                if (coords && coords.length >= 2) url = `https://www.google.com/maps?q=${coords[0]},${coords[1]}`;
+            } else {
+                url = `https://www.google.com/maps?q=${encodeURIComponent(ubicacion)}`;
             }
-            const fin = new Date(inicio.getTime() + duracionMs);
-            return { inicio, fin };
+            if (url) mapsHtml = `<a href="${url}" target="_blank" class="maps-link" title="Abrir en Google Maps"><i class="fas fa-map-marked-alt"></i></a>`;
+        }
+        const mensajeEscapado = mensaje.replace(/"/g, '&quot;');
+        const trClass = oculto ? 'fila-oculta' : '';
+        const badgeOculto = oculto ? '<span class="badge-oculto">Oculto</span>' : '';
+        const acciones = oculto
+            ? `<button class="btn-restaurar" onclick="restaurarRegistro('${docId}')" title="Restaurar"><i class="fas fa-undo"></i></button>`
+            : `<button class="btn-edit" onclick="editarRegistro('${docId}')"><i class="fas fa-edit"></i></button>
+               <button class="btn-delete" onclick="ocultarRegistro('${docId}')" title="Ocultar"><i class="fas fa-eye-slash"></i></button>
+               <button class="btn-presupuesto" onclick="abrirPresupuesto('${docId}')" title="Presupuesto"><i class="fas fa-file-invoice"></i></button>`;
+        html += `<tr data-id="${docId}" class="${trClass}">
+            <td>${fecha}</td>
+            <td><strong>${nombre}</strong> ${badgeOculto}</td>
+            <td>${telefono}</td>
+            <td>${esEmergencia ? `<span class="badge-emergencia">⚠️ ${servicio}</span>` : servicio}</td>
+            <td>${mapsHtml || '—'}</td>
+            <td><div class="mensaje-cell" title="Haz clic para expandir/colapsar">${mensajeEscapado}</div></td>
+            <td style="text-align:center;">${checkHtml}</td>
+            <td>${tipoFactura || '—'}</td>
+            <td style="text-align:center; white-space:nowrap;">${acciones}</td>
+        </tr>`;
+    });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+
+    container.querySelector('table tbody').addEventListener('click', function(e) {
+        if (e.target.closest('button, a')) return;
+        const fila = e.target.closest('tr');
+        if (!fila) return;
+        const celdaMensaje = fila.querySelector('.mensaje-cell');
+        if (celdaMensaje) {
+            celdaMensaje.classList.toggle('expandido');
+            actualizarIndicadorDesbordamiento(celdaMensaje);
+        }
+    });
+    document.querySelectorAll('.mensaje-cell').forEach(celda => actualizarIndicadorDesbordamiento(celda));
+}
+
+function actualizarIndicadorDesbordamiento(elemento) {
+    if (!elemento) return;
+    if (!elemento.classList.contains('expandido')) {
+        const maxHeight = parseFloat(getComputedStyle(elemento).maxHeight);
+        if (maxHeight && elemento.scrollHeight > maxHeight) {
+            elemento.classList.add('has-more');
+        } else {
+            elemento.classList.remove('has-more');
+        }
+    } else {
+        elemento.classList.remove('has-more');
+    }
+}
+
+// ============================================================
+//  RENDERIZAR PRESUPUESTOS
+// ============================================================
+function renderizarPresupuestos(data) {
+    const container = document.getElementById('presupuestosContainer');
+
+    let dataFiltrada = data;
+    if (!mostrarOcultosPresupuestos) {
+        dataFiltrada = data.filter(item => item.oculto !== true);
+    }
+
+    const filtroEstado = document.getElementById('filtroEstado').value;
+    const busqueda = document.getElementById('busquedaPresupuesto').value.toLowerCase().trim();
+
+    let filtrados = dataFiltrada.filter((presupuesto) => {
+        const estado = calcularEstadoPresupuesto(presupuesto);
+        if (filtroEstado !== 'todos' && estado !== filtroEstado) return false;
+        if (busqueda !== '') {
+            const nombre = (presupuesto.nombre || '').toLowerCase();
+            const servicio = (presupuesto.servicio || '').toLowerCase();
+            const numero = (presupuesto.numero || '').toLowerCase();
+            if (!nombre.includes(busqueda) && !servicio.includes(busqueda) && !numero.includes(busqueda)) return false;
+        }
+        return true;
+    });
+
+    filtrados.sort((a, b) => {
+        const fechaA = obtenerFechaVencimiento(a);
+        const fechaB = obtenerFechaVencimiento(b);
+        return fechaA - fechaB;
+    });
+
+    if (filtrados.length === 0) {
+        container.innerHTML = `<div class="no-data"><i class="fas fa-filter" style="font-size:2rem;color:var(--gray-text);"></i><p style="margin-top:10px;">No hay presupuestos que coincidan con los filtros.</p></div>`;
+        return;
+    }
+
+    let totalFiltrado = 0;
+    let html = `<table><thead><tr>
+        <th>Nombre</th>
+        <th>Servicio</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+        <th>Vencimiento</th>
+        <th>Precio</th>
+        <th>Fecha envío</th>
+        <th style="text-align:center;">Anticipo</th>
+        <th style="text-align:center;">Acciones</th>
+    </tr></thead><tbody>`;
+
+    filtrados.forEach((row) => {
+        const docId = row.id;
+        const nombre = row.nombre || '-';
+        const servicio = row.servicio || '-';
+        const descripcion = row.descripcion || '-';
+        const precio = row.precio ? parseFloat(row.precio) : 0;
+        const fecha = formatearFecha(row.fecha);
+        const estado = calcularEstadoPresupuesto(row);
+        const oculto = row.oculto === true;
+
+        totalFiltrado += precio;
+
+        const adelantos = row.adelantos || [];
+        const totalAdelantado = adelantos.reduce((sum, a) => sum + (parseFloat(a.monto) || 0), 0);
+        const porcentaje = precio > 0 ? Math.round((totalAdelantado / precio) * 100) : 0;
+        const porcentajeHtml = `<span class="porcentaje-anticipo" onclick="abrirAnticipo('${docId}')" style="cursor:pointer; font-weight:700; color:var(--primary-cyan);">${porcentaje}%</span>`;
+
+        let diasHtml = '';
+        const dias = calcularDiasRestantes(row);
+        if (estado === 'realizado') {
+            diasHtml = '<span style="color:#27ae60; font-weight:600;">✅ Realizado</span>';
+        } else if (estado === 'cancelado') {
+            diasHtml = '<span style="color:#7f8c8d; font-weight:600;">Cancelado</span>';
+        } else if (dias !== null && dias > 0) {
+            diasHtml = `<span style="color:#27ae60; font-weight:600;">Vence en ${dias} día${dias !== 1 ? 's' : ''}</span>`;
+        } else if (dias !== null && dias === 0) {
+            diasHtml = '<span style="color:#f39c12; font-weight:600;">Vence hoy</span>';
+        } else if (dias !== null && dias < 0) {
+            diasHtml = `<span style="color:#e74c3c; font-weight:600;">Vencido hace ${Math.abs(dias)} día${Math.abs(dias) !== 1 ? 's' : ''}</span>`;
         }
 
-        function getEstado(ev, ahora) {
-            const { inicio, fin } = getEventWindow(ev.fecha, ev.hora);
-            if (ahora < inicio) return 'proximo';
-            if (ahora < fin) return 'live';
-            return 'pasado';
+        let estadoSelect = `<select class="estado-select estado-${estado}" onchange="cambiarEstadoPresupuesto('${docId}', this.value)">`;
+        estadoSelect += `<option value="aprobado" ${estado === 'aprobado' ? 'selected' : ''}>Aprobado</option>`;
+        estadoSelect += `<option value="encurso" ${estado === 'encurso' ? 'selected' : ''}>En Curso</option>`;
+        estadoSelect += `<option value="realizado" ${estado === 'realizado' ? 'selected' : ''}>Realizado</option>`;
+        estadoSelect += `<option value="vencido" ${estado === 'vencido' ? 'selected' : ''}>Vencido</option>`;
+        estadoSelect += `<option value="cancelado" ${estado === 'cancelado' ? 'selected' : ''}>Cancelado</option>`;
+        estadoSelect += `</select>`;
+
+        const descripcionEscapada = descripcion.replace(/"/g, '&quot;');
+        const trClass = oculto ? 'fila-oculta-presupuesto' : '';
+        const badgeOculto = oculto ? '<span class="badge-oculto-presupuesto">Oculto</span>' : '';
+
+        let accionesHtml = '';
+        if (oculto) {
+            accionesHtml = `<button class="btn-restaurar-presupuesto" onclick="restaurarPresupuesto('${docId}')" title="Restaurar"><i class="fas fa-undo"></i></button>`;
+        } else {
+            accionesHtml = `<button class="btn-ocultar-presupuesto" onclick="ocultarPresupuesto('${docId}')" title="Ocultar"><i class="fas fa-eye-slash"></i></button>`;
         }
+        accionesHtml += `<button class="btn-delete" onclick="eliminarPresupuesto('${docId}')" title="Eliminar"><i class="fas fa-trash"></i></button>`;
 
-        /* ========== RENDER EVENTOS ========== */
-        let cachedEventos = [];
+        html += `<tr data-id="${docId}" class="${trClass}">
+            <td><strong>${nombre}</strong> ${badgeOculto}</td>
+            <td>${servicio}</td>
+            <td class="descripcion-td"><div class="descripcion-cell" title="Haz clic para expandir/colapsar">${descripcionEscapada}</div></td>
+            <td>${estadoSelect}</td>
+            <td>${diasHtml}</td>
+            <td style="font-weight:600; color:var(--primary-dark);">${formatearPrecio(precio)}</td>
+            <td>${fecha}</td>
+            <td style="text-align:center;">${porcentajeHtml}</td>
+            <td style="text-align:center; white-space:nowrap;">${accionesHtml}</td>
+        </tr>`;
+    });
 
-        function renderEventos() {
-            const list = document.getElementById('eventsList');
-            if (!list) return;
+    html += `</tbody><tfoot><tr>
+        <td colspan="5" style="text-align:right; font-weight:700;">TOTAL ${filtroEstado !== 'todos' ? '(' + filtroEstado.toUpperCase() + ')' : ''}:</td>
+        <td style="font-weight:700; color:var(--primary-dark); font-size:1rem;">${formatearPrecio(totalFiltrado)}</td>
+        <td colspan="3"></td>
+    </tr></tfoot></table>`;
+    container.innerHTML = html;
 
-            if (!cachedEventos.length) {
-                list.innerHTML = `<div class="events-empty">
-                    Próximamente nuevas fechas. ¡Seguinos en Instagram para enterarte primero!
-                </div>`;
-                return;
-            }
-
-            const ahora = new Date();
-            const CAT_LABEL = {
-                covers: '🎸 Covers',
-                remarcado: '⭐ DESTACADO',
-                homenaje: '🎤 Homenaje Cerati',
-                festival: '🎪 Festival',
-                privado: '🎩 Evento Privado'
-            };
-
-            list.innerHTML = cachedEventos.map(ev => {
-                const d = new Date(ev.fecha + 'T00:00:00');
-                const dd = String(d.getDate()).padStart(2,'0');
-                const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
-                const yy = d.getFullYear();
-                const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
-
-                const estado = getEstado(ev, ahora);
-                const cat = ev.categoria || 'covers';
-                const isRemarcado = cat === 'remarcado';
-                const catLabel = CAT_LABEL[cat] || '';
-
-                const flyerHtml = ev.flyer
-                    ? `<img class="event-flyer"
-                          src="${ev.flyer}"
-                          alt="Flyer ${escapeHtml(ev.titulo)}"
-                          onclick="openLightbox(this.src, this.alt)">`
-                    : '';
-
-                const extraInfo = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
-
-                const directionsUrl = getDirectionsUrl(ev);
-                const lugarHtml = (estado !== 'pasado' && directionsUrl)
-                    ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="venue-link" title="Trazar ruta más corta en Google Maps">
-                           <svg class="venue-pin" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
-                           </svg>
-                           ${escapeHtml(ev.lugar)}
-                       </a>`
-                    : `<span class="venue-text">${escapeHtml(ev.lugar)}</span>`;
-
-                const directionsHtml = (estado !== 'pasado' && directionsUrl)
-                    ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="directions-link" title="Ruta más corta en Google Maps">
-                           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                               <path d="M21.71 11.29l-9-9a.996.996 0 00-1.41 0l-9 9a.996.996 0 000 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 000-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/>
-                           </svg>
-                           Cómo llegar
-                       </a>`
-                    : '';
-
-                let accionHtml = '';
-                if (estado === 'proximo') {
-                    accionHtml = `<button class="event-cta"
-                        onclick="sendEventWhatsApp('${escapeJs(fechaTxt)} - ${escapeJs(ev.lugar)}')">
-                        Consultar
-                    </button>`;
-                } else if (estado === 'live') {
-                    accionHtml = `
-                        <div class="live-block">
-                            <span class="live-badge">EN VIVO AHORA</span>
-                            <span class="live-text">¡Vení, te esperamos!</span>
-                        </div>`;
-                } else {
-                    accionHtml = `<span class="past-badge">Realizado</span>`;
-                }
-
-                const claseEstado = estado === 'live' ? ' live' : (estado === 'pasado' ? ' past' : '');
-                const claseRemarcado = isRemarcado ? ' remarcado' : '';
-
-                return `
-                    <div class="event-card${ev.flyer ? ' has-flyer' : ''}${claseEstado}${claseRemarcado}">
-                        ${flyerHtml}
-                        <div class="event-date">
-                            <div class="day">${dd}</div>
-                            <div class="month">${mm} ${yy}</div>
-                        </div>
-                        <div class="event-info">
-                            ${catLabel ? `<div class="categoria-badge cat-${cat}">${catLabel}</div>` : ''}
-                            <h4>${escapeHtml(ev.titulo)}</h4>
-                            ${lugarHtml}
-                            ${extraInfo ? `<p>${escapeHtml(extraInfo)}</p>` : ''}
-                            ${directionsHtml}
-                        </div>
-                        ${accionHtml}
-                    </div>`;
-            }).join('');
+    container.querySelector('table tbody').addEventListener('click', function(e) {
+        if (e.target.closest('button, a, select')) return;
+        const fila = e.target.closest('tr');
+        if (!fila) return;
+        const celdaDesc = fila.querySelector('.descripcion-cell');
+        if (celdaDesc) {
+            celdaDesc.classList.toggle('expandido');
+            actualizarIndicadorDesbordamiento(celdaDesc);
         }
+    });
+    document.querySelectorAll('.descripcion-cell').forEach(celda => actualizarIndicadorDesbordamiento(celda));
+}
 
-        function scheduleRefresh() {
-            setInterval(() => {
-                if (!lightbox.classList.contains('open')) {
-                    renderEventos();
-                }
-            }, 60000);
+// ============================================================
+//  ACCIONES CRUD
+// ============================================================
+window.ocultarRegistro = async function(docId) {
+    const registro = datosCache.contactos.find(c => c.id === docId);
+    if (!registro) return;
+    const confirmado = await mostrarConfirmacion(`¿Ocultar el registro de "${registro.nombre || 'Anónimo'}"? El contacto seguirá apareciendo en el resumen.`);
+    if (confirmado) {
+        try {
+            await updateDoc(doc(db, 'contactos', docId), { oculto: true });
+        } catch (error) {
+            await mostrarError('Error al ocultar: ' + error.message);
         }
+    }
+};
 
-        /* ========== CARGAR DESDE FIRESTORE (TIEMPO REAL) ========== */
-        async function loadEventos() {
-            const list = document.getElementById('eventsList');
-            if (!list) return;
+window.restaurarRegistro = async function(docId) {
+    try {
+        await updateDoc(doc(db, 'contactos', docId), { oculto: false });
+    } catch (error) {
+        await mostrarError('Error al restaurar: ' + error.message);
+    }
+};
 
-            try {
-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-                const { getFirestore, collection, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-
-                const firebaseConfig = {
-                    apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
-                    authDomain: "taxiblue-87289.firebaseapp.com",
-                    projectId: "taxiblue-87289",
-                    storageBucket: "taxiblue-87289.firebasestorage.app",
-                    messagingSenderId: "886873440517",
-                    appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
-                    measurementId: "G-M04PSGFYDM"
-                };
-
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-
-                onSnapshot(collection(db, "eventos"), (snap) => {
-                    const todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-                    const eventos = todos.filter(e => {
-                        const est = e.estado || 'confirmado';
-                        return est === 'confirmado';
-                    });
-
-                    eventos.sort((a, b) => {
-                        const oa = typeof a.orden === 'number' ? a.orden : Infinity;
-                        const ob = typeof b.orden === 'number' ? b.orden : Infinity;
-                        if (oa !== ob) return oa - ob;
-                        return (a.fecha || '').localeCompare(b.fecha || '');
-                    });
-
-                    eventos.sort((a, b) => {
-                        const ra = (a.categoria || '') === 'remarcado' ? 0 : 1;
-                        const rb = (b.categoria || '') === 'remarcado' ? 0 : 1;
-                        return ra - rb;
-                    });
-
-                    cachedEventos = eventos;
-                    renderEventos();
-                }, (err) => {
-                    console.error('Error en tiempo real Firestore:', err);
-                    list.innerHTML = `<div class="events-empty" style="border-color:#e63946;color:#e63946;">
-                        No se pudieron cargar los eventos. Revisá la consola.
-                    </div>`;
-                });
-
-                scheduleRefresh();
-
-            } catch (err) {
-                console.error('Error al inicializar Firestore:', err);
-                list.innerHTML = `<div class="events-empty" style="border-color:#e63946;color:#e63946;">
-                    No se pudieron cargar los eventos. Revisá la consola.
-                </div>`;
-            }
+window.ocultarPresupuesto = async function(docId) {
+    const presupuesto = datosCache.presupuestos.find(p => p.id === docId);
+    if (!presupuesto) return;
+    const confirmado = await mostrarConfirmacion(`¿Ocultar el presupuesto de "${presupuesto.nombre || 'Anónimo'}"?`);
+    if (confirmado) {
+        try {
+            await updateDoc(doc(db, 'presupuestos', docId), { oculto: true });
+        } catch (error) {
+            await mostrarError('Error al ocultar: ' + error.message);
         }
+    }
+};
 
-        /* ========== GALERÍA DE INSTAGRAM ========== */
-        async function loadInstagramGallery(){
-            const grid = document.getElementById('instagramGrid');
-            if (!grid) return;
+window.restaurarPresupuesto = async function(docId) {
+    try {
+        await updateDoc(doc(db, 'presupuestos', docId), { oculto: false });
+    } catch (error) {
+        await mostrarError('Error al restaurar: ' + error.message);
+    }
+};
 
-            try {
-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-                const { getFirestore, collection, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+window.eliminarPresupuesto = async function(docId) {
+    const presupuesto = datosCache.presupuestos.find(p => p.id === docId);
+    if (!presupuesto) return;
 
-                const firebaseConfig = {
-                    apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
-                    authDomain: "taxiblue-87289.firebaseapp.com",
-                    projectId: "taxiblue-87289",
-                    storageBucket: "taxiblue-87289.firebasestorage.app",
-                    messagingSenderId: "886873440517",
-                    appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
-                    measurementId: "G-M04PSGFYDM"
-                };
+    const confirmado = await mostrarModal({
+        tipo: 'warning',
+        icon: '⚠️',
+        titulo: 'Confirmar eliminación',
+        mensaje: `¿Estás seguro de que quieres eliminar este presupuesto de "${presupuesto.nombre || 'Anónimo'}"?`,
+        botones: [
+            { texto: 'No', clase: 'secondary', valor: false },
+            { texto: 'Sí', clase: 'danger', valor: true }
+        ]
+    });
 
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-
-                const snap = await new Promise(resolve => {
-                    const unsub = onSnapshot(collection(db, "instagram"), (s) => {
-                        resolve(s);
-                        unsub();
-                    });
-                });
-
-                const posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                posts.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
-
-                if (!posts.length) {
-                    grid.innerHTML = `<div class="ig-loading">Próximamente nueva galería. ¡Seguinos en Instagram para no perderte nada!</div>`;
-                    return;
-                }
-
-                grid.innerHTML = posts.map(p => `
-                    <div class="ig-item-wrapper">
-                        ${p.titulo ? `<div class="ig-titulo">${escapeHtml(p.titulo)}</div>` : ''}
-                        <blockquote class="instagram-media"
-                            data-instgrm-permalink="${p.url}"
-                            data-instgrm-version="14"
-                            style="background:#FFF;border:0;border-radius:10px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:0;max-width:540px;min-width:326px;padding:0;width:99.375%;">
-                        </blockquote>
-                    </div>
-                `).join('');
-
-                if (!window.instgrm) {
-                    const s = document.createElement('script');
-                    s.async = true;
-                    s.src = "//www.instagram.com/embed.js";
-                    s.onload = () => {
-                        if (window.instgrm && window.instgrm.Embeds) {
-                            window.instgrm.Embeds.process();
-                        }
-                    };
-                    document.body.appendChild(s);
-                } else {
-                    window.instgrm.Embeds.process();
-                }
-
-            } catch (err) {
-                console.error('Error cargando galería Instagram:', err);
-                grid.innerHTML = `<div class="ig-loading" style="border:1px dashed #e63946;color:#e63946;padding:2rem;border-radius:10px;">
-                    No se pudieron cargar los videos. Revisá la consola.
-                </div>`;
-            }
+    if (confirmado === true) {
+        try {
+            await deleteDoc(doc(db, 'presupuestos', docId));
+        } catch (error) {
+            await mostrarError('Error al eliminar: ' + error.message);
         }
+    }
+};
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadEventos();
-            loadInstagramGallery();
+window.eliminarContactoDefinitivo = async function(docId) {
+    const contacto = datosCache.contactos.find(c => c.id === docId);
+    if (!contacto) return;
+
+    const confirmado = await mostrarModal({
+        tipo: 'warning',
+        icon: '⚠️',
+        titulo: 'Eliminar contacto definitivamente',
+        mensaje: `¿Estás seguro de que quieres eliminar el contacto "${contacto.nombre || 'Anónimo'}" y todos sus datos? Esta acción no se puede deshacer.`,
+        botones: [
+            { texto: 'No', clase: 'secondary', valor: false },
+            { texto: 'Sí, eliminar', clase: 'danger', valor: true }
+        ]
+    });
+
+    if (confirmado === true) {
+        try {
+            await deleteDoc(doc(db, 'contactos', docId));
+        } catch (error) {
+            await mostrarError('Error al eliminar contacto: ' + error.message);
+        }
+    }
+};
+
+// ============================================================
+//  NUEVO REGISTRO MANUAL
+// ============================================================
+window.abrirNuevoRegistro = function() {
+    document.getElementById('nuevoNombre').value = '';
+    document.getElementById('nuevoTelefono').value = '';
+    document.getElementById('nuevoEmail').value = '';
+    document.getElementById('nuevoUbicacion').value = '';
+    document.getElementById('nuevoServicio').value = '';
+    document.getElementById('nuevoMensaje').value = '';
+    document.getElementById('nuevoTipoFactura').value = '';
+    document.getElementById('nuevoSituacionFiscal').value = '';
+    document.getElementById('nuevoCuit').value = '';
+    initFiscales('nuevo');
+    document.getElementById('nuevoRegistroModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+};
+
+document.getElementById('closeNuevoRegistroModal').addEventListener('click', () => cerrarModal('nuevoRegistroModal'));
+document.getElementById('cancelNuevoBtn').addEventListener('click', () => cerrarModal('nuevoRegistroModal'));
+
+document.getElementById('saveNuevoBtn').addEventListener('click', async function() {
+    const nombre = document.getElementById('nuevoNombre').value.trim();
+    const telefono = document.getElementById('nuevoTelefono').value.trim();
+    const email = document.getElementById('nuevoEmail').value.trim();
+    const servicio = document.getElementById('nuevoServicio').value;
+    const ubicacion = document.getElementById('nuevoUbicacion').value.trim();
+    const mensaje = document.getElementById('nuevoMensaje').value.trim();
+    const tipoFactura = document.getElementById('nuevoTipoFactura').value;
+    const situacionFiscal = document.getElementById('nuevoSituacionFiscal').value;
+    let cuit = document.getElementById('nuevoCuit').value.trim();
+
+    if (!nombre || !telefono) {
+        await mostrarError('El nombre y el teléfono son obligatorios.');
+        return;
+    }
+
+    const cuitWrapper = document.getElementById('nuevoCuitWrapper');
+    if (!cuitWrapper.classList.contains('hidden') && cuit !== '') {
+        if (!/^\d{11}$/.test(cuit)) {
+            await mostrarError('El CUIT debe tener exactamente 11 dígitos numéricos.');
+            return;
+        }
+    }
+
+    try {
+        await addDoc(collection(db, 'contactos'), {
+            nombre,
+            telefono,
+            email: email || '',
+            servicio: servicio || '',
+            ubicacion: ubicacion || '',
+            mensaje: mensaje || '',
+            tipoFactura: tipoFactura || '',
+            situacionFiscal: situacionFiscal || '',
+            cuit: cuit || '',
+            oculto: false,
+            fecha: serverTimestamp()
         });
-    </script>
-</body>
-</html>
+        cerrarModal('nuevoRegistroModal');
+        await mostrarModal({
+            tipo: 'success',
+            icon: '✅',
+            titulo: 'Registro creado',
+            mensaje: 'El registro se agregó correctamente a "Todos los registros".',
+            botones: [{ texto: 'Aceptar', clase: 'primary' }]
+        });
+    } catch (error) {
+        await mostrarError('Error al guardar: ' + error.message);
+    }
+});
+
+// ============================================================
+//  EDITAR REGISTRO
+// ============================================================
+window.editarRegistro = async function(docId) {
+    const registro = datosCache.contactos.find(c => c.id === docId);
+    if (!registro) {
+        await mostrarError('Registro no encontrado.');
+        return;
+    }
+    document.getElementById('editIndex').value = docId;
+    document.getElementById('editNombre').value = registro.nombre || '';
+    document.getElementById('editTelefono').value = registro.telefono || '';
+    document.getElementById('editEmail').value = registro.email || '';
+    document.getElementById('editServicio').value = registro.servicio || '';
+    document.getElementById('editUbicacion').value = registro.ubicacion || '';
+    document.getElementById('editMensaje').value = registro.mensaje || '';
+
+    document.getElementById('editTipoFactura').value = registro.tipoFactura || '';
+    document.getElementById('editSituacionFiscal').value = registro.situacionFiscal || '';
+    document.getElementById('editCuit').value = registro.cuit || '';
+
+    initFiscales('edit');
+
+    document.getElementById('editModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+};
+
+window.guardarEdicion = async function() {
+    const docId = document.getElementById('editIndex').value;
+    const nombre = document.getElementById('editNombre').value.trim();
+    const telefono = document.getElementById('editTelefono').value.trim();
+    if (!nombre || !telefono) {
+        await mostrarError('El nombre y el teléfono son obligatorios.');
+        return;
+    }
+    const cuitWrapper = document.getElementById('editCuitWrapper');
+    const cuitInput = document.getElementById('editCuit');
+    if (!cuitWrapper.classList.contains('hidden') && cuitInput.value.trim() !== '') {
+        if (!
