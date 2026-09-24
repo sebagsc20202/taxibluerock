@@ -387,10 +387,10 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
         <option value="pasados">Pasados</option>
       </select>
       <select id="filterOrder" onchange="applyFilters()">
-        <option value="manual">Orden manual</option>
+        <option value="manual">Orden manual (recientes primero)</option>
         <option value="fecha-asc">Fecha ↑</option>
         <option value="fecha-desc">Fecha ↓</option>
-        <option value="recientes">Recientes</option>
+        <option value="recientes">Última edición</option>
       </select>
     </div>
 
@@ -758,9 +758,9 @@ let currentUserEmail = '';
 let miniMapTimer = null;
 let igPreviewTimer = null;
 
-/* NUEVO: estado del archivo de flyers */
-let flyerArchiveList = [];       // [{ id, flyer, titulo, fecha, orden }]
-let flyerArchiveFiltered = [];   // después de aplicar búsqueda
+/* Estado del archivo de flyers */
+let flyerArchiveList = [];
+let flyerArchiveFiltered = [];
 
 /* ====== UTILS ====== */
 function safeDestroySortable(){ if(sortableInstance){ try{sortableInstance.destroy();}catch(e){} sortableInstance=null; } }
@@ -770,6 +770,13 @@ function formatBytes(b){ if(b<1024) return b+' B'; if(b<1048576) return (b/1024)
 function todayStart(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
 function showModal(id){ document.getElementById(id).classList.add('show'); }
 function hideModal(id){ document.getElementById(id).classList.remove('show'); }
+
+/* NUEVO: helper para el próximo orden (siempre al tope) */
+function nextTopOrder(){
+  if(!events.length) return 0;
+  const nums = events.map(x => typeof x.orden === 'number' ? x.orden : 0);
+  return Math.min(...nums) - 1;
+}
 
 /* ====== HORARIOS ====== */
 function formatHora(hora){
@@ -1190,10 +1197,9 @@ function showGalleryModal(){
     </div>`).join('');
 }
 
-/* ====== NUEVO: ARCHIVO DE FLYERS (para elegir) ====== */
+/* ====== ARCHIVO DE FLYERS (para elegir) ====== */
 function buildFlyerArchive(){
-  // Recolectamos flyers únicos entre todos los eventos
-  const map = new Map(); // key = flyer string, value = item
+  const map = new Map();
   events.forEach(e => {
     if(!e.flyer) return;
     if(!map.has(e.flyer)){
@@ -1263,7 +1269,6 @@ function selectFlyerFromArchive(idx){
   if(!item) return;
   flyerBase64 = item.flyer;
 
-  // Actualizamos la vista previa en el formulario
   document.getElementById('flyerImg').src = item.flyer;
   document.getElementById('flyerPreview').classList.add('show');
 
@@ -1272,11 +1277,9 @@ function selectFlyerFromArchive(idx){
   const aprox = Math.round(item.flyer.length * 0.75);
   info.innerHTML = `📎 Flyer del archivo: <strong>${formatBytes(aprox)}</strong> · "${escapeHtml(item.titulo)}"`;
 
-  // Limpiamos el input file por si había algo pendiente
   const fileInput = document.getElementById('flyerInput');
   if(fileInput) fileInput.value = '';
 
-  // Actualizamos el contador
   updateFlyerArchiveCount();
 
   hideModal('flyerArchiveModal');
@@ -1694,16 +1697,17 @@ function subscribeEvents(){
     unsubscribe = onSnapshot(collection(db, COL), (snap)=>{
       if(isReordering) return;
       events = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      // Orden: el `orden` más bajo (o más negativo) primero → los nuevos (negativos) van arriba.
       events.sort((a,b)=>{
         const oa = typeof a.orden === 'number' ? a.orden : Infinity;
         const ob = typeof b.orden === 'number' ? b.orden : Infinity;
         if(oa !== ob) return oa-ob;
-        return (a.fecha||'').localeCompare(b.fecha||'');
+        // Desempate: fecha más reciente primero
+        return (b.fecha||'').localeCompare(a.fecha||'');
       });
       applyFilters();
       renderDashboard();
       updateFlyerArchiveCount();
-      // Si el archivo de flyers está abierto, refrescamos
       if(document.getElementById('flyerArchiveModal').classList.contains('show')){
         const search = document.getElementById('flyerArchiveSearch');
         const q = search ? search.value : '';
@@ -1744,11 +1748,13 @@ function applyFilters(){
   else if(fOrder === 'fecha-desc') arr.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
   else if(fOrder === 'recientes') arr.sort((a,b)=>((b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0)));
   else {
+    // 🆕 Orden manual: respeta el campo `orden`.
+    // Los recién creados tienen orden negativo y quedan arriba.
     arr.sort((a,b) => {
-      const ra = (a.categoria||'') === 'remarcado' ? 0 : 1;
-      const rb = (b.categoria||'') === 'remarcado' ? 0 : 1;
-      if(ra !== rb) return ra - rb;
-      return 0;
+      const oa = typeof a.orden === 'number' ? a.orden : Infinity;
+      const ob = typeof b.orden === 'number' ? b.orden : Infinity;
+      if(oa !== ob) return oa - ob;
+      return (b.fecha||'').localeCompare(a.fecha||'');
     });
   }
 
@@ -1904,6 +1910,7 @@ function initSortable(){
         eventsFiltered.splice(evt.newIndex, 0, moved);
         isReordering = true;
         try{
+          // Renumeramos 0..n-1. Los próximos nuevos seguirán yendo a -1 → arriba.
           const batch = writeBatch(db);
           eventsFiltered.forEach((ev, i) => {
             ev.orden = i;
@@ -1927,12 +1934,14 @@ async function saveEvent(e){
   e.preventDefault();
   const id = document.getElementById('editId').value;
 
+  // 🆕 Si es nuevo → siempre al tope (orden más bajo - 1).
+  // Si es edición → mantenemos el orden que ya tenía (o lo mandamos al tope si no tenía).
   let orden;
   if(id){
     const ex = events.find(x => x.id === id);
-    orden = ex && typeof ex.orden === 'number' ? ex.orden : (events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0);
+    orden = (ex && typeof ex.orden === 'number') ? ex.orden : nextTopOrder();
   } else {
-    orden = events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0;
+    orden = nextTopOrder();
   }
 
   const horaRaw = document.getElementById('hora').value.trim();
@@ -2008,7 +2017,8 @@ async function duplicateEvent(id){
     fecha: '', hora: ev.hora || '', estado: 'borrador', categoria: ev.categoria || 'covers',
     titulo: ev.titulo + ' (copia)', lugar: ev.lugar, mapsUrl: ev.mapsUrl || null,
     descripcion: ev.descripcion || '', notasInternas: ev.notasInternas || '',
-    flyer: null, orden: events.length ? Math.max(...events.map(x => typeof x.orden === 'number' ? x.orden : -1)) + 1 : 0,
+    flyer: null,
+    orden: nextTopOrder(), // 🆕 la copia también arriba
     createdAt: serverTimestamp(), updatedAt: serverTimestamp()
   };
   try{
@@ -2119,7 +2129,6 @@ Object.assign(window, {
   showUsersModal: () => showModal('usersModal'),
   showChangePasswordModal: () => showModal('changePasswordModal'),
   applyFilters,
-  /* NUEVO: archivo de flyers */
   openFlyerArchive, selectFlyerFromArchive, filterFlyerArchive
 });
 </script>
