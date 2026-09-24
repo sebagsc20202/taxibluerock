@@ -207,13 +207,43 @@
 
         /* EVENTOS */
         .events-section { background: var(--negro); }
-        .events-list { display: flex; flex-direction: column; gap: 1rem; }
+        .events-list {
+            display: flex; flex-direction: column; gap: 1rem;
+            /* ⚡ SCROLL: máximo 5 eventos visibles */
+            max-height: 704px;
+            overflow-y: auto;
+            padding-right: 1rem;
+            /* Scroll suave */
+            scroll-behavior: smooth;
+            /* Scrollbar personalizado (Firefox) */
+            scrollbar-width: thin;
+            scrollbar-color: var(--azul-electrico) var(--gris-oscuro);
+        }
+        /* Scrollbar personalizado (Webkit: Chrome, Safari, Edge) */
+        .events-list::-webkit-scrollbar {
+            width: 10px;
+        }
+        .events-list::-webkit-scrollbar-track {
+            background: var(--gris-oscuro);
+            border-radius: 10px;
+            border: 1px solid var(--gris-medio);
+        }
+        .events-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--azul-electrico), var(--azul-neon));
+            border-radius: 10px;
+            border: 2px solid var(--gris-oscuro);
+        }
+        .events-list::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--azul-neon), var(--azul-electrico));
+        }
+
         .event-card {
             display: grid; grid-template-columns: 100px 1fr auto;
             align-items: center; gap: 2rem; padding: 1.5rem 2rem;
             background: var(--gris-oscuro); border-radius: 10px;
             border: 1px solid var(--gris-medio);
             transition: var(--transicion); position: relative; overflow: hidden;
+            flex-shrink: 0;
         }
         .event-card.has-flyer {
             grid-template-columns: 90px 90px 1fr auto;
@@ -539,7 +569,6 @@
             background: linear-gradient(90deg, transparent, var(--rojo-rock), transparent);
         }
 
-        /* INSTAGRAM GALERÍA */
         .instagram-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -780,6 +809,15 @@
             .contact-form { padding: 1.5rem; }
             .lightbox img { max-width: 100vw; max-height: 85vh; border-radius: 6px; }
             .lightbox-close { top: 0.7rem; right: 0.7rem; width: 40px; height: 40px; }
+
+            /* ⚡ SCROLL ajustado para mobile: 5 eventos */
+            .events-list {
+                max-height: 660px;
+                padding-right: 0.6rem;
+            }
+            .events-list::-webkit-scrollbar {
+                width: 6px;
+            }
         }
         @media (max-width: 480px) {
             .hero h1 { letter-spacing: 2px; }
@@ -807,6 +845,12 @@
                 right: 1.5rem;
             }
             .instagram-float svg { width: 25px; height: 25px; }
+
+            /* ⚡ SCROLL ajustado para mobile chico: 5 eventos */
+            .events-list {
+                max-height: 600px;
+                padding-right: 0.5rem;
+            }
         }
     </style>
 </head>
