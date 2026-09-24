@@ -505,7 +505,7 @@
         }
 
         /* ══════════════════════════════════════════════════════ */
-        /* POPUP AUTOMÁTICO DEL PRÓXIMO EVENTO (3 segundos)     */
+        /* POPUP AUTOMÁTICO — MÚSICA + DESTELLOS DE LUZ         */
         /* ══════════════════════════════════════════════════════ */
         .next-event-popup {
             position: fixed; inset: 0; z-index: 6000;
@@ -518,63 +518,158 @@
         }
         .next-event-backdrop {
             position: absolute; inset: 0;
-            background: rgba(0, 0, 0, 0.82);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
             animation: nextBackdropIn 0.35s ease both;
         }
         @keyframes nextBackdropIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        /* ⚡ DESTELLOS DE LUZ — rayos de fondo */
+        .next-event-lights {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .next-event-lights::before,
+        .next-event-lights::after {
+            content: '';
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: lightBeam 2.4s ease-in-out infinite;
+        }
+        .next-event-lights::before {
+            top: -10%; left: -10%;
+            background: radial-gradient(circle, rgba(0,102,255,0.75), rgba(0,102,255,0) 70%);
+        }
+        .next-event-lights::after {
+            bottom: -10%; right: -10%;
+            background: radial-gradient(circle, rgba(230,57,70,0.7), rgba(230,57,70,0) 70%);
+            animation-delay: 1.2s;
+        }
+        @keyframes lightBeam {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.35); opacity: 0.9; }
+        }
+
+        /* 💥 Flash overlay que destella sobre todo el popup */
+        .next-event-flash {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.25), transparent 60%);
+            z-index: 3;
+            pointer-events: none;
+            animation: bigFlash 6s ease-out both;
+        }
+        @keyframes bigFlash {
+            0% { opacity: 0; }
+            2% { opacity: 1; }
+            6% { opacity: 0.2; }
+            8% { opacity: 0.9; }
+            12% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* CARD */
         .next-event-card {
             position: relative;
             width: 100%;
             max-width: 420px;
             background: var(--gris-oscuro);
-            border: 1px solid var(--azul-electrico);
+            border: 2px solid var(--azul-electrico);
             border-radius: 16px;
             overflow: hidden;
             box-shadow:
                 0 25px 80px rgba(0, 0, 0, 0.8),
-                0 0 60px rgba(0, 102, 255, 0.3);
-            animation: nextCardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+                0 0 60px rgba(0, 102, 255, 0.4),
+                0 0 100px rgba(0, 102, 255, 0.2);
+            animation: nextCardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+                       neonPulse 2s ease-in-out infinite 0.5s;
             z-index: 2;
+        }
+        @keyframes nextCardIn {
+            from { opacity: 0; transform: scale(0.85) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes neonPulse {
+            0%, 100% {
+                box-shadow:
+                    0 25px 80px rgba(0,0,0,0.8),
+                    0 0 60px rgba(0,102,255,0.4),
+                    0 0 100px rgba(0,102,255,0.15);
+            }
+            50% {
+                box-shadow:
+                    0 25px 80px rgba(0,0,0,0.8),
+                    0 0 80px rgba(0,102,255,0.75),
+                    0 0 140px rgba(0,102,255,0.35);
+            }
         }
         .next-event-card.remarcado {
             border-color: #ffd700;
-            box-shadow:
-                0 25px 80px rgba(0, 0, 0, 0.8),
-                0 0 60px rgba(255, 215, 0, 0.35);
+            animation: nextCardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+                       neonPulseGold 2s ease-in-out infinite 0.5s;
+        }
+        @keyframes neonPulseGold {
+            0%, 100% { box-shadow: 0 25px 80px rgba(0,0,0,0.8), 0 0 60px rgba(255,215,0,0.4), 0 0 100px rgba(255,215,0,0.15); }
+            50% { box-shadow: 0 25px 80px rgba(0,0,0,0.8), 0 0 80px rgba(255,215,0,0.8), 0 0 140px rgba(255,215,0,0.4); }
         }
         .next-event-card.live {
             border-color: var(--rojo-rock);
-            box-shadow:
-                0 25px 80px rgba(0, 0, 0, 0.8),
-                0 0 60px rgba(230, 57, 70, 0.4);
+            animation: nextCardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+                       neonPulseRed 1.4s ease-in-out infinite 0.5s;
         }
-        @keyframes nextCardIn {
-            from {
-                opacity: 0;
-                transform: scale(0.85) translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        @keyframes neonPulseRed {
+            0%, 100% { box-shadow: 0 25px 80px rgba(0,0,0,0.8), 0 0 60px rgba(230,57,70,0.5), 0 0 100px rgba(230,57,70,0.2); }
+            50% { box-shadow: 0 25px 80px rgba(0,0,0,0.8), 0 0 90px rgba(230,57,70,0.9), 0 0 150px rgba(230,57,70,0.5); }
         }
-        .next-event-popup.closing .next-event-card {
-            animation: nextCardOut 0.35s ease both;
+
+        /* ✨ STROBE / destellos dentro de la card */
+        .next-event-strobe {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 4;
+            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%);
+            background-size: 250% 100%;
+            animation: strobeSweep 1.6s linear infinite;
         }
-        .next-event-popup.closing .next-event-backdrop {
-            animation: nextBackdropOut 0.35s ease both;
+        @keyframes strobeSweep {
+            0% { background-position: 200% 0; }
+            100% { background-position: -100% 0; }
         }
-        @keyframes nextCardOut {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0; transform: scale(0.9) translateY(20px); }
+
+        /* 🎵 Botón de sonido */
+        .next-event-sound {
+            position: absolute; top: 0.75rem; right: 3.5rem;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: var(--blanco); font-size: 1rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: var(--transicion); z-index: 5;
         }
-        @keyframes nextBackdropOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+        .next-event-sound:hover {
+            background: var(--azul-electrico);
+            border-color: var(--azul-electrico);
+            transform: scale(1.08);
+        }
+        .next-event-sound.muted {
+            background: rgba(230, 57, 70, 0.25);
+            border-color: var(--rojo-rock);
+            animation: soundAttention 1s ease-in-out infinite;
+        }
+        @keyframes soundAttention {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
         }
 
         .next-event-close {
@@ -596,7 +691,7 @@
             position: absolute;
             top: 1rem;
             left: 1rem;
-            z-index: 3;
+            z-index: 5;
             font-family: var(--fuente-titulo);
             font-size: 0.85rem;
             letter-spacing: 3px;
@@ -604,18 +699,18 @@
             background: linear-gradient(135deg, var(--azul-electrico), var(--azul-neon));
             color: #fff;
             border-radius: 50px;
-            box-shadow: 0 4px 14px rgba(0, 102, 255, 0.5);
+            box-shadow: 0 4px 14px rgba(0, 102, 255, 0.6);
             text-transform: uppercase;
         }
         .next-event-card.remarcado .next-event-badge {
             background: linear-gradient(135deg, #ffd700, #ff8c00);
             color: #0a0a0a;
-            box-shadow: 0 4px 14px rgba(255, 215, 0, 0.55);
+            box-shadow: 0 4px 14px rgba(255, 215, 0, 0.6);
             animation: remarcadoPulse 2s ease-in-out infinite;
         }
         .next-event-card.live .next-event-badge {
             background: linear-gradient(135deg, var(--rojo-rock), var(--rojo-live));
-            box-shadow: 0 4px 14px rgba(230, 57, 70, 0.6);
+            box-shadow: 0 4px 14px rgba(230, 57, 70, 0.7);
             animation: liveBadgePulse 1.6s ease-in-out infinite;
         }
 
@@ -655,6 +750,8 @@
 
         .next-event-content {
             padding: 1.3rem 1.5rem 1.5rem;
+            position: relative;
+            z-index: 3;
         }
         .next-event-date {
             display: inline-flex;
@@ -718,12 +815,10 @@
         }
         .next-event-cta:hover {
             filter: brightness(1.15);
-            box-shadow: 0 6px 25px rgba(0, 102, 255, 0.5);
+            box-shadow: 0 6px 25px rgba(0, 102, 255, 0.6);
             transform: translateY(-2px);
         }
-        .next-event-cta svg {
-            width: 18px; height: 18px; fill: #fff;
-        }
+        .next-event-cta svg { width: 18px; height: 18px; fill: #fff; }
         .next-event-card.remarcado .next-event-cta {
             background: linear-gradient(135deg, #ffd700, #ff8c00);
             color: #0a0a0a;
@@ -740,13 +835,14 @@
             background: rgba(255, 255, 255, 0.08);
             overflow: hidden;
             border-radius: 0 0 16px 16px;
+            z-index: 5;
         }
         .next-event-progress-bar {
             height: 100%;
             width: 100%;
             background: linear-gradient(90deg, var(--azul-electrico), var(--azul-neon));
             transform-origin: left center;
-            animation: progressBar 3s linear both;
+            animation: progressBar 6s linear both;
         }
         .next-event-card.remarcado .next-event-progress-bar {
             background: linear-gradient(90deg, #ffd700, #ff8c00);
@@ -768,6 +864,7 @@
             .next-event-content { padding: 1.1rem 1.2rem 1.3rem; }
             .next-event-title { font-size: 1.4rem; }
             .next-event-date { font-size: 1.3rem; }
+            .next-event-sound { right: 3.2rem; }
         }
 
         /* LIGHTBOX */
@@ -1155,7 +1252,7 @@
                         </div>
                         <div class="stat">
                             <span class="stat-number">∞</span>
-                            <div class="stat-label">Energía</div>
+                            <span class="stat-label">Energía</span>
                         </div>
                     </div>
                 </div>
@@ -1312,11 +1409,22 @@
         </div>
     </footer>
 
+    <!-- AUDIO: música de fondo del popup -->
+    <!-- 📌 Reemplazá "music/rock80s.mp3" por el archivo real que subiste -->
+    <audio id="popupMusic" src="music/rock80s.mp3" loop preload="auto"></audio>
+
     <!-- POPUP AUTOMÁTICO DEL PRÓXIMO EVENTO -->
     <div class="next-event-popup" id="nextEventPopup" aria-hidden="true">
         <div class="next-event-backdrop" onclick="closeNextEventPopup()"></div>
+        <!-- ⚡ Rayos de luz pulsantes detrás de la card -->
+        <div class="next-event-lights"></div>
+        <!-- 💥 Flash inicial -->
+        <div class="next-event-flash"></div>
         <div class="next-event-card" id="nextEventCard">
+            <!-- ✨ Barrido strobe sobre la card -->
+            <div class="next-event-strobe"></div>
             <button class="next-event-close" onclick="closeNextEventPopup()" aria-label="Cerrar">✕</button>
+            <button class="next-event-sound" id="nextEventSoundBtn" onclick="togglePopupMusic()" aria-label="Activar/desactivar sonido">🔇</button>
             <div class="next-event-badge" id="nextEventBadge">PRÓXIMO SHOW</div>
             <div class="next-event-flyer" id="nextEventFlyer"></div>
             <div class="next-event-content">
@@ -1558,16 +1666,66 @@
         }
 
         /* ══════════════════════════════════════════════════════ */
-        /* POPUP AUTOMÁTICO DEL PRÓXIMO EVENTO                  */
+        /* POPUP AUTOMÁTICO — MÚSICA + DESTELLOS                */
         /* ══════════════════════════════════════════════════════ */
         let nextEventPopupTimer = null;
         let nextEventData = null;
+        const popupMusic = document.getElementById('popupMusic');
+        const soundBtn = document.getElementById('nextEventSoundBtn');
+
+        /* Intenta reproducir la música */
+        function tryPlayPopupMusic(){
+            if(!popupMusic) return;
+            popupMusic.volume = 0.55;
+            popupMusic.currentTime = 0;
+            const p = popupMusic.play();
+            if(p !== undefined){
+                p.then(() => {
+                    soundBtn.textContent = '🔊';
+                    soundBtn.classList.remove('muted');
+                }).catch(() => {
+                    // Autoplay bloqueado → el usuario debe hacer click
+                    soundBtn.textContent = '🔇';
+                    soundBtn.classList.add('muted');
+                });
+            } else {
+                // Navegador viejo
+                soundBtn.textContent = '🔊';
+            }
+        }
+
+        /* Toggle manual */
+        function togglePopupMusic(){
+            if(!popupMusic) return;
+            if(popupMusic.paused){
+                popupMusic.volume = 0.55;
+                popupMusic.play().then(() => {
+                    soundBtn.textContent = '🔊';
+                    soundBtn.classList.remove('muted');
+                }).catch(() => {});
+            } else {
+                popupMusic.pause();
+                soundBtn.textContent = '🔇';
+                soundBtn.classList.add('muted');
+            }
+        }
+        window.togglePopupMusic = togglePopupMusic;
+
+        /* Detener música */
+        function stopPopupMusic(){
+            if(!popupMusic) return;
+            popupMusic.pause();
+            popupMusic.currentTime = 0;
+            soundBtn.textContent = '🔇';
+            soundBtn.classList.add('muted');
+        }
 
         function closeNextEventPopup(){
             const popup = document.getElementById('nextEventPopup');
             if(!popup || !popup.classList.contains('show')) return;
             popup.classList.add('closing');
             clearTimeout(nextEventPopupTimer);
+            stopPopupMusic();
             setTimeout(() => {
                 popup.classList.remove('show');
                 popup.classList.remove('closing');
@@ -1575,6 +1733,7 @@
                 document.body.classList.remove('no-scroll');
             }, 350);
         }
+        window.closeNextEventPopup = closeNextEventPopup;
 
         function consultarProximoEvento(){
             if(!nextEventData) return;
@@ -1582,6 +1741,7 @@
             const fechaTxt = d.toLocaleDateString('es-AR',{year:'numeric',month:'long',day:'numeric'});
             sendEventWhatsApp(`${fechaTxt} - ${nextEventData.lugar}`);
         }
+        window.consultarProximoEvento = consultarProximoEvento;
 
         function showNextEventPopup(ev){
             if(!ev) return;
@@ -1596,15 +1756,12 @@
             const lugarEl = document.getElementById('nextEventLugar');
             const progressBar = document.getElementById('nextEventProgressBar');
 
-            // Reset clases
             card.classList.remove('remarcado', 'live');
 
-            // Calcular estado
             const estado = getEstado(ev, new Date());
             const cat = ev.categoria || 'covers';
             const isRemarcado = cat === 'remarcado';
 
-            // Aplicar clase según prioridad
             if(estado === 'live'){
                 card.classList.add('live');
                 badge.textContent = '¡EN VIVO AHORA!';
@@ -1615,7 +1772,6 @@
                 badge.textContent = 'PRÓXIMO SHOW';
             }
 
-            // Fecha formateada
             const d = new Date(ev.fecha + 'T00:00:00');
             const dd = String(d.getDate()).padStart(2,'0');
             const mm = d.toLocaleDateString('es-AR',{month:'long'}).toUpperCase();
@@ -1623,7 +1779,6 @@
             const fechaCorta = `${dd} ${mm} ${yy}`;
             dateEl.textContent = ev.hora ? `${fechaCorta} · ${ev.hora}` : fechaCorta;
 
-            // Título y lugar
             titleEl.textContent = ev.titulo || 'Evento';
             lugarEl.innerHTML = `
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1631,26 +1786,35 @@
                 </svg>
                 ${escapeHtml(ev.lugar || '')}`;
 
-            // Flyer
             if(ev.flyer){
                 flyerBox.innerHTML = `<img src="${ev.flyer}" alt="${escapeHtml(ev.titulo)}">`;
             } else {
                 flyerBox.innerHTML = `<div class="no-flyer">TAXI BLUE</div>`;
             }
 
-            // Reiniciar animación de la barra de progreso
+            // Reiniciar animaciones (barra de progreso 6s)
             progressBar.style.animation = 'none';
-            void progressBar.offsetWidth; // reflow
-            progressBar.style.animation = 'progressBar 3s linear both';
+            void progressBar.offsetWidth;
+            progressBar.style.animation = 'progressBar 6s linear both';
 
-            // Mostrar popup
+            // Reiniciar flash overlay
+            const flash = document.querySelector('.next-event-flash');
+            if(flash){
+                flash.style.animation = 'none';
+                void flash.offsetWidth;
+                flash.style.animation = 'bigFlash 6s ease-out both';
+            }
+
             popup.classList.add('show');
             popup.setAttribute('aria-hidden', 'false');
             document.body.classList.add('no-scroll');
 
-            // Auto-cerrar a los 3 segundos
+            // 🎵 Intentar reproducir música
+            tryPlayPopupMusic();
+
+            // Auto-cerrar a los 6 segundos
             clearTimeout(nextEventPopupTimer);
-            nextEventPopupTimer = setTimeout(closeNextEventPopup, 3000);
+            nextEventPopupTimer = setTimeout(closeNextEventPopup, 6000);
         }
 
         /* ========== RENDER EVENTOS ========== */
@@ -1754,19 +1918,16 @@
                     </div>`;
             }).join('');
 
-            // 🎉 Mostrar popup automático la primera vez que cargan los eventos
+            // 🎉 Mostrar popup automático INMEDIATAMENTE la primera vez
             if(!popupMostrado && cachedEventos.length){
                 popupMostrado = true;
-                // Buscar primero uno en vivo, si no hay, el primero próximo
                 const ahora2 = new Date();
                 let elegido = cachedEventos.find(e => getEstado(e, ahora2) === 'live');
                 if(!elegido){
                     elegido = cachedEventos.find(e => getEstado(e, ahora2) === 'proximo');
                 }
-                // Si no hay ni vivo ni próximo (todos pasados), no mostramos nada
                 if(elegido){
-                    // Delay corto para que la página termine de cargar visualmente
-                    setTimeout(() => showNextEventPopup(elegido), 800);
+                    showNextEventPopup(elegido);
                 }
             }
         }
