@@ -183,6 +183,7 @@ body[data-theme="light"] .event-item.cat-concluido{
 .event-item .info::after{content:'👆 ver notas';position:absolute;top:.4rem;right:.6rem;font-size:.62rem;color:var(--azul-neon);background:rgba(0,102,255,.12);padding:.15rem .5rem;border-radius:12px;letter-spacing:.5px;opacity:0;transition:opacity .2s;pointer-events:none;font-weight:600;}
 .event-item .info:hover::after{opacity:1;}
 .event-item .date{font-family:var(--fuente-titulo);font-size:1.2rem;color:var(--azul);letter-spacing:1px;display:block;line-height:1.1;}
+.event-item .date .date-sub{ font-size: 1em; } /* desktop mantiene formato original */
 .event-item.cat-remarcado .date{color:var(--dorado);}
 .event-item .title{font-size:.9rem;font-weight:600;margin:.1rem 0;transition:color .2s;}
 .event-item .place{font-size:.72rem;color:var(--gris-claro);text-transform:uppercase;letter-spacing:.8px;}
@@ -357,6 +358,40 @@ body.no-notes-access .event-item .info:hover{background:transparent !important;}
 body.no-notes-access .event-item .info:hover .title{color:inherit !important;}
 body.no-notes-access #dragHintNotas{display:none !important;}
 
+/* 🆕 LIGHTBOX para ver flyer a pantalla completa */
+.lightbox{
+  position:fixed;inset:0;z-index:6000;
+  background:rgba(0,0,0,.95);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  padding:1rem;
+  opacity:0;visibility:hidden;
+  transition:opacity .3s ease,visibility .3s ease;
+}
+.lightbox.open{opacity:1;visibility:visible;}
+.lightbox img{
+  max-width:95vw;max-height:90vh;
+  width:auto;height:auto;
+  border-radius:10px;
+  box-shadow:0 20px 60px rgba(0,102,255,.35);
+  user-select:none;-webkit-user-drag:none;
+  pointer-events:none;
+}
+.lightbox-close{
+  position:absolute;top:1rem;right:1rem;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.2);
+  color:var(--blanco);font-size:1.4rem;font-weight:300;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:var(--trans);z-index:2;
+}
+.lightbox-close:hover{
+  background:var(--azul);border-color:var(--azul);
+  transform:rotate(90deg);
+}
+
 @media (max-width:768px){
   .panel{padding:1rem .8rem 3rem;}
   .topbar{flex-direction:column;align-items:flex-start;}
@@ -364,14 +399,143 @@ body.no-notes-access #dragHintNotas{display:none !important;}
   .btn-new-event{width:100%;justify-content:center;}
   .events-card{padding:1rem;}
   .form-row,.form-row-3{grid-template-columns:1fr;}
-  .event-item{flex-wrap:wrap;gap:.6rem;padding-left:.6rem;min-height:72px;align-items:stretch;}
-  .event-item .drag-handle{order:1;min-width:40px;min-height:44px;padding:.6rem .8rem;background:rgba(0,102,255,.08);border-radius:8px;color:var(--azul-neon);margin-right:.3rem;align-self:center;}
-  .event-item .event-thumb{order:2;min-width:56px;min-height:56px;max-width:80px;align-self:stretch;aspect-ratio:1 / 1;}
-  .event-item .info{flex:1 1 100%;order:3;align-self:auto;}
-  .event-item .actions{order:4;margin-left:0;margin-top:.5rem;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;align-self:auto;}
-  .event-item .actions button{width:100%;height:52px;font-size:1.35rem;border-radius:8px;display:flex;align-items:center;justify-content:center;}
-  .event-item .info::after{content:'👆 tocar para ver notas';opacity:.85;position:static;display:inline-block;margin-top:.5rem;}
-  body.no-notes-access .event-item .info::after{display:none !important;}
+
+  /* 🆕 EVENTO MOBILE: banner cuadrado + info (fecha izq / datos der) + acciones */
+  .event-item{
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 0;
+    min-height: 0;
+    align-items: stretch;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Handle flotante top-left sobre el banner */
+  .event-item .drag-handle{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    margin: 0;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 10px;
+    color: #fff;
+    align-self: auto;
+    order: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,.4);
+  }
+  .event-item .drag-handle::before{ font-size: 1.3rem; }
+  .event-item:not(.has-flyer) .drag-handle{
+    background: rgba(0,102,255,.18);
+    border-color: rgba(0,102,255,.4);
+    color: var(--azul-neon);
+    box-shadow: none;
+  }
+
+  /* Banner cuadrado full-width */
+  .event-item .event-thumb{
+    order: 1;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0;
+    border: 0;
+    border-bottom: 1px solid var(--gris-medio);
+    flex-shrink: 0;
+    align-self: auto;
+    pointer-events: auto;
+    cursor: zoom-in;
+  }
+
+  /* Info: fecha a la izquierda | datos a la derecha */
+  .event-item .info{
+    order: 2;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "date title"
+      "date place"
+      "date badges"
+      "date nota";
+    gap: .25rem 1rem;
+    padding: 1rem;
+    margin: 0;
+    border-radius: 0;
+    align-self: auto;
+    align-items: center;
+    cursor: pointer;
+  }
+  /* Cuando no hay flyer, dejar espacio para el handle flotante */
+  .event-item:not(.has-flyer) .info{
+    padding-top: 4.2rem;
+  }
+  /* En mobile ocultamos el tooltip "👆 ver notas" */
+  .event-item .info::after{ display: none !important; }
+
+  /* Fecha destacada (columna izquierda) */
+  .event-item .info .date{
+    grid-area: date;
+    align-self: center;
+    text-align: center;
+    font-family: var(--fuente-titulo);
+    font-size: 1.6rem;
+    line-height: 1.05;
+    letter-spacing: 1px;
+    color: var(--azul);
+    padding-right: 1rem;
+    border-right: 1px solid var(--gris-medio);
+    min-width: 84px;
+  }
+  .event-item .info .date .date-main{ display: block; font-size: 1.75rem; }
+  .event-item .info .date .date-sub{ display: block; font-size: .7rem; color: var(--gris-claro); margin-top: .25rem; letter-spacing: .5px; }
+  .event-item.cat-remarcado .info .date{ color: var(--dorado); border-color: rgba(255,215,0,.3); }
+  .event-item.cat-concluido .info .date{ color: #999 !important; border-color: rgba(120,120,120,.3); }
+
+  /* Detalles a la derecha */
+  .event-item .info .title{ grid-area: title; font-size: 1.05rem; font-weight: 600; margin: 0; line-height: 1.2; }
+  .event-item .info .place{ grid-area: place; font-size: .72rem; margin: 0; }
+  .event-item .info .badges{ grid-area: badges; margin-top: .4rem; }
+  .event-item .info .nota-preview{ grid-area: nota; margin-top: .5rem; }
+
+  /* Acciones: grid 3 columnas en la parte inferior */
+  .event-item .actions{
+    order: 3;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .5rem;
+    padding: 1rem;
+    margin: 0;
+    width: 100%;
+    border-top: 1px solid var(--gris-medio);
+    align-self: auto;
+  }
+  .event-item .actions button{
+    width: 100%;
+    height: 52px;
+    font-size: 1.35rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .toast{left:1rem;right:1rem;bottom:1rem;max-width:none;}
   .section-title{font-size:1.5rem;}
   .modal{padding:1.3rem;}
@@ -782,6 +946,12 @@ body.no-notes-access #dragHintNotas{display:none !important;}
   </div>
 </div>
 
+<!-- 🆕 LIGHTBOX para ver flyer a pantalla completa -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="Cerrar">✕</button>
+  <img id="lightboxImg" alt="Flyer ampliado">
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- Script de Instagram Embed (para preview en vivo) -->
@@ -863,6 +1033,25 @@ function formatBytes(b){ if(b<1024) return b+' B'; if(b<1048576) return (b/1024)
 function todayStart(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
 function showModal(id){ document.getElementById(id).classList.add('show'); }
 function hideModal(id){ document.getElementById(id).classList.remove('show'); }
+
+/* 🆕 LIGHTBOX: visor fullscreen de flyer */
+function openLightbox(src){
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  if(!lb || !img || !src) return;
+  img.src = src;
+  lb.classList.add('open');
+  lb.setAttribute('aria-hidden', 'false');
+}
+function closeLightbox(){
+  const lb = document.getElementById('lightbox');
+  if(!lb) return;
+  lb.classList.remove('open');
+  lb.setAttribute('aria-hidden', 'true');
+  setTimeout(() => { const img = document.getElementById('lightboxImg'); if(img) img.src = ''; }, 300);
+}
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
 
 /* 🔒 PERMISOS DE NOTAS PRIVADAS */
 function puedeVerNotas(){
@@ -990,7 +1179,6 @@ function updateReservaFields(){
 
 /* ====== MODAL NOTAS ====== */
 function openNotasModal(id){
-  /* 🔒 Bloqueo por permisos */
   if(!puedeVerNotas()){
     toast('🔒 Las notas son privadas.', 'error');
     return;
@@ -1009,7 +1197,6 @@ function openNotasModal(id){
 function closeNotasModal(){ hideModal('notasModal'); }
 
 async function saveNotas(){
-  /* 🔒 Bloqueo por permisos */
   if(!puedeVerNotas()){
     toast('🔒 No tenés permiso para guardar notas.', 'error');
     return;
@@ -1164,7 +1351,7 @@ function hideLoginError(){ const e=document.getElementById('loginError'); e.inne
 onAuthStateChanged(auth, (user) => {
   if(user){
     currentUserEmail = user.email || '';
-    applyNotesVisibility();  /* 🔒 aplica permisos según email */
+    applyNotesVisibility();
     const isOwner = currentUserEmail.toLowerCase() === OWNER_EMAIL.toLowerCase();
     document.getElementById('topbarUser').innerHTML = `👤 <strong>${user.email}</strong>${isOwner?' <span class="crown-badge">👑</span>':''}`;
     document.getElementById('loginScreen').classList.add('hidden');
@@ -1861,13 +2048,11 @@ function resetForm(){
   document.getElementById('mapsUrl').value = '';
   document.getElementById('descripcion').value = '';
   document.getElementById('notasInternas').value = '';
-  // Reserva
   document.getElementById('reservaTipo').value = '';
   document.getElementById('reservaNombre').value = '';
   document.getElementById('reservaWhatsApp').value = '';
   document.getElementById('reservaLink').value = '';
   updateReservaFields();
-  // Flyer
   removeFlyer();
   updateMiniMap();
 }
@@ -1973,14 +2158,15 @@ function renderEvents(){
 
   const dragHint = document.getElementById('dragHint');
   const fOrder = document.getElementById('filterOrder').value;
-  dragHint.style.display = fOrder === 'manual' ? '' : 'none';
+  /* 🆕 Mostrar el hint también en auto-fecha (drag & drop activo ahí también) */
+  dragHint.style.display = (fOrder === 'manual' || fOrder === 'auto-fecha') ? '' : 'none';
 
   if(!eventsFiltered.length){
     list.innerHTML = '<div class="empty-state">No hay eventos que coincidan.</div>';
     return;
   }
 
-  const puedeNotas = puedeVerNotas();  /* 🔒 calcular una sola vez */
+  const puedeNotas = puedeVerNotas();
 
   list.innerHTML = eventsFiltered.map(ev => {
     const d = new Date(ev.fecha + 'T00:00:00');
@@ -2004,7 +2190,6 @@ function renderEvents(){
     else if(ev.reservaTipo === 'link') reservaBadge = '<span class="badge reserva-link">🔗 Reserva online</span>';
     else if(ev.reservaTipo === 'ambos') reservaBadge = '<span class="badge reserva-ambos">📱🔗 Reserva local</span>';
 
-    /* 🔒 Solo renderizamos notas si el usuario tiene permiso */
     const tieneNotas = !!(ev.notasInternas && ev.notasInternas.trim());
     const notasHtml = (puedeNotas && tieneNotas)
       ? `<div class="nota-preview">
@@ -2025,12 +2210,13 @@ function renderEvents(){
       ? `onclick="openNotasModal('${ev.id}')" title="Click para ver/editar las notas"`
       : `title="Evento"`;
 
+    /* 🆕 Fecha dividida en dos spans: .date-main (día+mes) y .date-sub (año+hora) */
     return `
-      <div class="event-item estado-${estado} cat-${cat}" data-id="${ev.id}">
+      <div class="event-item${ev.flyer ? ' has-flyer' : ''} estado-${estado} cat-${cat}" data-id="${ev.id}">
         <div class="drag-handle" title="Mantené y arrastrá para reordenar"></div>
-        ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false">` : ''}
+        ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false" onclick="openLightbox(this.src)">` : ''}
         <div class="info" ${infoClick}>
-          <span class="date">${dd} ${mm} ${yy}${horaFmt?' · '+horaFmt:''}</span>
+          <span class="date"><span class="date-main">${dd} ${mm}</span> <span class="date-sub">${yy}${horaFmt?' · '+horaFmt:''}</span></span>
           <div class="title">${escapeHtml(ev.titulo)}</div>
           <div class="place">${escapeHtml(ev.lugar)}</div>
           <div class="badges">
@@ -2074,7 +2260,6 @@ function renderDashboard(){
   })() : '—';
   const proximoSub = proximo ? proximo.titulo : 'Sin eventos';
 
-  /* 🔒 La tarjeta "Con notas" solo la mostramos si el usuario puede verlas */
   const conNotasCard = puedeVerNotas()
     ? `<div class="stat-card">
          <div class="stat-label">📝 Con notas</div>
@@ -2119,7 +2304,10 @@ function initSortable(){
   if(!el) return;
   safeDestroySortable();
 
-  if(document.getElementById('filterOrder').value !== 'manual') return;
+  /* 🆕 Drag & drop activo en "manual" y "auto-fecha".
+     En los demás modos (fecha-asc, fecha-desc, recientes) el orden es fijo. */
+  const fOrder = document.getElementById('filterOrder').value;
+  if(fOrder !== 'manual' && fOrder !== 'auto-fecha') return;
   if(!eventsFiltered.length) return;
 
   try{
@@ -2152,7 +2340,15 @@ function initSortable(){
           });
           await batch.commit();
           await logAction('reorder_events', `"${moved.titulo}" → posición ${evt.newIndex+1}`);
-          toast('✅ Orden guardado','success');
+
+          /* 🆕 Si estaba en auto-fecha, cambiar a manual para preservar el orden */
+          const sel = document.getElementById('filterOrder');
+          if(sel.value === 'auto-fecha'){
+            sel.value = 'manual';
+            toast('✋ Orden guardado · ahora en modo manual','success');
+          } else {
+            toast('✅ Orden guardado','success');
+          }
         }catch(err){
           console.error(err);
           toast('❌ Error al guardar orden.','error');
@@ -2245,16 +2441,12 @@ function editEvent(id){
   document.getElementById('lugar').value = ev.lugar;
   document.getElementById('mapsUrl').value = ev.mapsUrl || '';
   document.getElementById('descripcion').value = ev.descripcion || '';
-  /* 🔒 Solo rellenar el campo si tiene permiso (aunque esté oculto con CSS, no dejamos
-     el valor en el DOM por si alguien inspecciona el HTML) */
   document.getElementById('notasInternas').value = puedeVerNotas() ? (ev.notasInternas || '') : '';
-  // Reserva
   document.getElementById('reservaTipo').value = ev.reservaTipo || '';
   document.getElementById('reservaNombre').value = ev.reservaNombre || '';
   document.getElementById('reservaWhatsApp').value = ev.reservaWhatsApp || '';
   document.getElementById('reservaLink').value = ev.reservaLink || '';
   updateReservaFields();
-  // Flyer
   if(ev.flyer){
     flyerBase64 = ev.flyer;
     document.getElementById('flyerImg').src = ev.flyer;
@@ -2276,7 +2468,6 @@ async function duplicateEvent(id){
     fecha: '', hora: ev.hora || '', estado: 'borrador', categoria: ev.categoria || 'covers',
     titulo: ev.titulo + ' (copia)', lugar: ev.lugar, mapsUrl: ev.mapsUrl || null,
     descripcion: ev.descripcion || '',
-    /* 🔒 Solo copiamos las notas si el usuario tiene permiso */
     notasInternas: puedeVerNotas() ? (ev.notasInternas || '') : '',
     reservaTipo: ev.reservaTipo || null,
     reservaNombre: ev.reservaNombre || null,
@@ -2347,7 +2538,6 @@ async function exportBackup(){
       };
     });
     const admins = adminsList.map(a => ({ email: a.email, createdAt: a.createdAt?.toDate ? a.createdAt.toDate().toISOString() : null }));
-    /* 🔒 Solo incluimos las notas internas si el usuario tiene permiso */
     const eventos = events.map(e => {
       const copy = { ...e, updatedAt: undefined, createdAt: undefined };
       if(!puedeVerNotas()) delete copy.notasInternas;
@@ -2385,6 +2575,9 @@ document.addEventListener('keydown', (e) => {
     if(document.getElementById('eventModal').classList.contains('show')) closeEventModal();
     if(document.getElementById('notasModal').classList.contains('show')) closeNotasModal();
     if(document.getElementById('flyerArchiveModal').classList.contains('show')) hideModal('flyerArchiveModal');
+    /* 🆕 Cerrar lightbox también con Escape */
+    const lb = document.getElementById('lightbox');
+    if(lb && lb.classList.contains('open')) closeLightbox();
   }
 });
 
@@ -2394,6 +2587,11 @@ document.addEventListener('keydown', (e) => {
       saveNotas();
     }
   }
+});
+
+/* 🆕 Cerrar lightbox al tocar el fondo */
+document.getElementById('lightbox').addEventListener('click', (e) => {
+  if(e.target.id === 'lightbox') closeLightbox();
 });
 
 /* Refrescar cada minuto para que la categoría "concluido" se aplique sola */
@@ -2420,7 +2618,8 @@ Object.assign(window, {
   showChangePasswordModal: () => showModal('changePasswordModal'),
   applyFilters,
   openFlyerArchive, selectFlyerFromArchive, filterFlyerArchive,
-  updateReservaFields
+  updateReservaFields,
+  openLightbox, closeLightbox
 });
 </script>
 </body>
