@@ -783,7 +783,6 @@
         .next-event-card.live .next-event-cta {
             background: linear-gradient(135deg, var(--rojo-rock), var(--rojo-live));
         }
-        /* 🆕 CTA reserva WhatsApp del local en el popup */
         .next-event-card .next-event-cta.cta-reserva-wa {
             background: linear-gradient(135deg, var(--verde-wa), #1ebe5d);
             color: #fff;
@@ -1087,36 +1086,127 @@
             .nav-links.active { display: flex; }
             .menu-toggle { display: block; }
 
-            .event-card { grid-template-columns: 70px 1fr; gap: 1rem; padding: 1.2rem; }
+            /* 🆕 EVENTO MOBILE: banner cuadrado + fecha izq + info der + acciones abajo */
+            .event-card,
             .event-card.has-flyer {
-                grid-template-columns: 80px 70px 1fr;
-                min-height: 110px;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-template-areas:
+                    "flyer flyer"
+                    "date info"
+                    "acciones acciones";
+                align-items: stretch;
+                gap: 0;
+                padding: 0;
+                min-height: 0;
             }
-            .event-flyer {
-                width: 100%; height: 100%;
-                min-height: 80px; align-self: stretch;
-            }
-            .event-acciones {
-                grid-column: 1 / -1;
+
+            /* Banner cuadrado 1:1 full width */
+            .event-card .event-flyer {
+                grid-area: flyer;
                 width: 100%;
-                flex-direction: row;
-                justify-content: center;
-                flex-wrap: wrap;
-                margin-top: 0.3rem;
+                max-width: none;
                 min-width: 0;
+                min-height: 0;
+                height: auto;
+                aspect-ratio: 1 / 1;
+                object-fit: cover;
+                border-radius: 0;
+                border: 0;
+                border-bottom: 1px solid var(--gris-medio);
+                align-self: auto;
+                cursor: zoom-in;
             }
-            .event-acciones .event-cta {
-                flex: 1;
-                min-width: 140px;
-                padding: 0.85rem 1rem;
+
+            /* Fecha: columna izquierda con separador vertical */
+            .event-card .event-date {
+                grid-area: date;
+                padding: 1rem 1rem 1rem 1.2rem;
+                text-align: center;
+                align-self: center;
+                border-right: 1px solid var(--gris-medio);
+                min-width: 92px;
             }
-            .event-cta { grid-column: 1 / -1; width: 100%; text-align: center; }
-            .past-badge { grid-column: 1 / -1; justify-self: center; margin-top: 0.3rem; }
-            .live-block {
-                grid-column: 1 / -1; width: 100%;
-                align-items: center; text-align: center; margin-top: 0.3rem;
+            .event-card .event-date .day {
+                font-size: 2.4rem;
+                line-height: 1;
             }
-            .live-badge { font-size: 0.75rem; padding: 0.6rem 1.2rem; }
+            .event-card .event-date .month {
+                font-size: 0.62rem;
+                letter-spacing: 1.5px;
+                margin-top: 0.25rem;
+            }
+
+            /* Info: columna derecha */
+            .event-card .event-info {
+                grid-area: info;
+                padding: 1rem 1rem 1rem 1.2rem;
+                align-self: center;
+            }
+            .event-card .event-info h4 {
+                font-size: 1.25rem;
+                margin-bottom: 0.25rem;
+                line-height: 1.15;
+            }
+            .event-card .event-info p {
+                font-size: 0.8rem;
+            }
+            .event-card .event-info .categoria-badge {
+                margin-bottom: 0.35rem;
+            }
+
+            /* Acciones / Estados: fila completa abajo */
+            .event-card > .event-acciones,
+            .event-card > .live-block,
+            .event-card > .past-badge {
+                grid-area: acciones;
+            }
+
+            .event-card .event-acciones {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+                padding: 1rem;
+                border-top: 1px solid var(--gris-medio);
+                min-width: 0;
+                width: 100%;
+            }
+            .event-card .event-acciones .event-cta {
+                width: 100%;
+                padding: 0.9rem 1rem;
+                font-size: 0.8rem;
+                justify-self: stretch;
+                align-self: stretch;
+            }
+
+            /* Si hay 2 botones, los apilamos (ya está con 1fr) */
+            .event-card .event-acciones .event-cta + .event-cta {
+                margin-top: 0;
+            }
+
+            .event-card .live-block {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 0.5rem;
+                padding: 1rem;
+                border-top: 1px solid var(--gris-medio);
+                width: 100%;
+                align-self: auto;
+            }
+            .event-card .live-badge {
+                font-size: 0.78rem;
+                padding: 0.65rem 1.25rem;
+            }
+
+            .event-card .past-badge {
+                margin: 1rem;
+                justify-self: center;
+                align-self: center;
+            }
+
+            /* Ajustes menores */
             .directions-link { margin-top: 0.4rem; }
 
             .instagram-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -1126,7 +1216,7 @@
             .lightbox img { max-width: 100vw; max-height: 85vh; border-radius: 6px; }
             .lightbox-close { top: 0.7rem; right: 0.7rem; width: 40px; height: 40px; }
 
-            .events-list { max-height: 660px; padding-right: 0.6rem; }
+            .events-list { max-height: 720px; padding-right: 0.6rem; }
             .events-list::-webkit-scrollbar { width: 6px; }
         }
         @media (max-width: 480px) {
@@ -1135,17 +1225,6 @@
             .hero-buttons { flex-direction: column; align-items: center; }
             .band-stats { grid-template-columns: 1fr; }
             .stat { padding: 1rem; }
-
-            .event-card.has-flyer {
-                grid-template-columns: 70px 60px 1fr;
-                min-height: 100px;
-            }
-            .event-flyer { min-height: 70px; }
-            .live-badge { font-size: 0.7rem; padding: 0.55rem 1rem; letter-spacing: 1.3px; }
-            .live-text { font-size: 0.68rem; }
-
-            .event-acciones { flex-direction: column; }
-            .event-acciones .event-cta { width: 100%; }
 
             .whatsapp-float {
                 width: 50px; height: 50px; bottom: 1.5rem; right: 1.5rem;
@@ -1159,7 +1238,7 @@
             }
             .instagram-float svg { width: 25px; height: 25px; }
 
-            .events-list { max-height: 600px; padding-right: 0.5rem; }
+            .events-list { max-height: 680px; padding-right: 0.5rem; }
         }
     </style>
 </head>
@@ -2058,7 +2137,7 @@
                         return est === 'confirmado';
                     });
 
-                    // 🆕 Mismo orden que el admin en modo "auto-fecha":
+                    // Mismo orden que el admin en modo "auto-fecha":
                     // Próximos primero (fecha ascendente) y luego pasados (fecha descendente, más reciente primero).
                     const hoy = new Date(); hoy.setHours(0,0,0,0);
                     eventos.sort((a, b) => {
@@ -2066,9 +2145,9 @@
                         const db_ = new Date((b.fecha || '2099-12-31') + 'T00:00:00');
                         const aProx = da >= hoy;
                         const bProx = db_ >= hoy;
-                        if (aProx !== bProx) return aProx ? -1 : 1;   // próximos primero
-                        if (aProx) return da - db_;                    // próximos: fecha ascendente
-                        return db_ - da;                               // pasados: fecha descendente
+                        if (aProx !== bProx) return aProx ? -1 : 1;
+                        if (aProx) return da - db_;
+                        return db_ - da;
                     });
 
                     cachedEventos = eventos;
