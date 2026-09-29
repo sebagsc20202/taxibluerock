@@ -1639,7 +1639,7 @@
 
         /* ========== VENTANA TEMPORAL DE EVENTO ========== */
         const LIVE_DURATION_MS = 2.5 * 60 * 60 * 1000;       // 2.5 h → "EN VIVO AHORA"
-        const EVENT_REMOVAL_AFTER_MS = 3 * 60 * 60 * 1000;   // 🆕 3 h → se elimina del listado
+        const EVENT_REMOVAL_AFTER_MS = 3 * 60 * 60 * 1000;   // 3 h → se elimina del listado
 
         function getEventWindow(fecha, hora) {
             const inicio = new Date(fecha + 'T00:00:00');
@@ -1666,7 +1666,7 @@
             return 'pasado';
         }
 
-        /* 🆕 ¿Ya pasaron más de 3 h desde el inicio del evento? */
+        /* ¿Ya pasaron más de 3 h desde el inicio del evento? */
         function eventoVencido(ev, ahora) {
             const { inicio } = getEventWindow(ev.fecha, ev.hora);
             const limite = new Date(inicio.getTime() + EVENT_REMOVAL_AFTER_MS);
@@ -1727,6 +1727,32 @@
             soundBtn.textContent = '🔇';
             soundBtn.classList.add('muted');
         }
+
+        /* 🆕 Reintentar música cuando el usuario interactúe por primera vez */
+        let musicUnlocked = false;
+        function unlockMusicOnInteraction(){
+            if(musicUnlocked) return;
+            if(!popupMusic) return;
+            // Solo si el popup está abierto
+            const popup = document.getElementById('nextEventPopup');
+            if(!popup || !popup.classList.contains('show')) return;
+
+            popupMusic.volume = 0.55;
+            popupMusic.play().then(() => {
+                musicUnlocked = true;
+                soundBtn.textContent = '🔊';
+                soundBtn.classList.remove('muted');
+                // Ya no necesitamos más listeners
+                ['click','touchstart','keydown','scroll'].forEach(ev =>
+                    window.removeEventListener(ev, unlockMusicOnInteraction)
+                );
+            }).catch(() => {
+                // Todavía bloqueado, seguimos esperando otro gesto
+            });
+        }
+        ['click','touchstart','keydown','scroll'].forEach(ev =>
+            window.addEventListener(ev, unlockMusicOnInteraction, { passive: true })
+        );
 
         function closeNextEventPopup(){
             const popup = document.getElementById('nextEventPopup');
@@ -1835,7 +1861,7 @@
 
             const ahora = new Date();
 
-            // 🆕 Filtrar eventos vencidos (más de 3 h desde el inicio)
+            // Filtrar eventos vencidos (más de 3 h desde el inicio)
             const eventosVigentes = cachedEventos.filter(ev => !eventoVencido(ev, ahora));
 
             if (!eventosVigentes.length) {
