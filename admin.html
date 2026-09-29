@@ -155,7 +155,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .event-item.cat-remarcado{background:linear-gradient(135deg,var(--negro),rgba(255,215,0,.04));border-color:rgba(255,215,0,.35);}
 .event-item.cat-remarcado:hover{border-color:var(--dorado);}
 
-/* 🆕 CONCLUIDO — tonos grises */
+/* CONCLUIDO — tonos grises */
 .event-item.cat-concluido{
   background:linear-gradient(135deg,#0a0a0a,#151515);
   border-color:rgba(120,120,120,.35);
@@ -268,7 +268,7 @@ body[data-theme="light"] .event-item.cat-concluido{
 .ig-preview{display: flex;justify-content: center;background: rgba(0,0,0,.35);border: 1px dashed rgba(0,102,255,.35);border-radius: 10px;padding: 1rem;min-height: 80px;transition: var(--trans);}
 .ig-preview .instagram-media{margin: 0 !important;max-width: 100% !important;min-width: 0 !important;background: #1a1a1a !important;border: 1px solid #2a2a2a !important;border-radius: 10px !important;}
 .ig-preview .ig-preview-loading{text-align: center;color: var(--gris-claro);font-size: .82rem;padding: 1rem;}
-.ig-preview-status{font-size: .72rem;text-align: center;margin-top:.5rem;color: var(--gris-claro);min-height: 1rem;}
+.ig-preview-status{font-size:.72rem;text-align:center;margin-top:.5rem;color: var(--gris-claro);min-height: 1rem;}
 .ig-preview-status.ok{ color: var(--verde); font-weight: 600; }
 .ig-preview-status.error{ color: var(--rojo); font-weight: 600; }
 
@@ -346,6 +346,17 @@ body[data-theme="light"] .event-item.cat-concluido{
 .toast.error{border-color:var(--rojo);}
 .toast.warn{border-color:var(--amarillo);}
 
+/* 🔒 NOTAS PRIVADAS: ocultar para admins no autorizados */
+body.no-notes-access .notas-group{display:none !important;}
+body.no-notes-access .nota-preview{display:none !important;}
+body.no-notes-access .badge.notas-badge{display:none !important;}
+body.no-notes-access .event-item .actions button.notes{display:none !important;}
+body.no-notes-access .event-item .info{cursor:default !important;}
+body.no-notes-access .event-item .info::after{display:none !important;}
+body.no-notes-access .event-item .info:hover{background:transparent !important;}
+body.no-notes-access .event-item .info:hover .title{color:inherit !important;}
+body.no-notes-access #dragHintNotas{display:none !important;}
+
 @media (max-width:768px){
   .panel{padding:1rem .8rem 3rem;}
   .topbar{flex-direction:column;align-items:flex-start;}
@@ -357,8 +368,10 @@ body[data-theme="light"] .event-item.cat-concluido{
   .event-item .drag-handle{order:1;min-width:40px;min-height:44px;padding:.6rem .8rem;background:rgba(0,102,255,.08);border-radius:8px;color:var(--azul-neon);margin-right:.3rem;align-self:center;}
   .event-item .event-thumb{order:2;min-width:56px;min-height:56px;max-width:80px;align-self:stretch;aspect-ratio:1 / 1;}
   .event-item .info{flex:1 1 100%;order:3;align-self:auto;}
-  .event-item .actions{order:4;margin-left:auto;width:100%;justify-content:flex-end;align-self:auto;}
+  .event-item .actions{order:4;margin-left:0;margin-top:.5rem;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;align-self:auto;}
+  .event-item .actions button{width:100%;height:52px;font-size:1.35rem;border-radius:8px;display:flex;align-items:center;justify-content:center;}
   .event-item .info::after{content:'👆 tocar para ver notas';opacity:.85;position:static;display:inline-block;margin-top:.5rem;}
+  body.no-notes-access .event-item .info::after{display:none !important;}
   .toast{left:1rem;right:1rem;bottom:1rem;max-width:none;}
   .section-title{font-size:1.5rem;}
   .modal{padding:1.3rem;}
@@ -442,7 +455,7 @@ body[data-theme="light"] .event-item.cat-concluido{
     </div>
 
     <div class="drag-hint" id="dragHint">
-      ✋ Mantené presionado <strong>⋮⋮</strong> para reordenar · 👆 Tocá el evento para ver/editar sus notas
+      ✋ Mantené presionado <strong>⋮⋮</strong> para reordenar · <span id="dragHintNotas">👆 Tocá el evento para ver/editar sus notas</span>
     </div>
     <div class="events-list" id="eventsList"></div>
   </div>
@@ -547,6 +560,7 @@ body[data-theme="light"] .event-item.cat-concluido{
         </div>
       </div>
 
+      <!-- 🔒 Notas privadas — visible solo para admins autorizados -->
       <div class="form-group notas-group">
         <label>📝 Notas y recordatorios (solo admin)</label>
         <textarea id="notasInternas" placeholder="Ej:
@@ -555,7 +569,7 @@ body[data-theme="light"] .event-item.cat-concluido{
 • Seña pagada $20.000
 • Llevar amplificador extra
 • Camerino con 6 botellas de agua"></textarea>
-        <div class="field-hint">Estas notas <strong>NO se muestran al público</strong>. Solo las ves vos en el panel.</div>
+        <div class="field-hint">Estas notas <strong>NO se muestran al público</strong>. Solo las ven los admins autorizados.</div>
       </div>
 
       <!-- ===== FLYER: SUBIR O ELEGIR DEL ARCHIVO ===== -->
@@ -620,7 +634,7 @@ body[data-theme="light"] .event-item.cat-concluido{
     </div>
     <input type="hidden" id="notasEventId">
     <textarea id="notasTexto" placeholder="Escribí tus notas o recordatorios..." style="width:100%;min-height:180px;padding:1rem;background:var(--negro);border:1px solid var(--gris-medio);border-radius:8px;color:var(--blanco);font-family:var(--fuente-cuerpo);font-size:.9rem;line-height:1.7;outline:none;resize:vertical;"></textarea>
-    <div class="hint" style="font-size:.72rem;color:var(--gris-claro);margin-top:.5rem;line-height:1.5;">💡 Estas notas son <strong>privadas</strong> (solo las ves vos).</div>
+    <div class="hint" style="font-size:.72rem;color:var(--gris-claro);margin-top:.5rem;line-height:1.5;">💡 Estas notas son <strong>privadas</strong> (solo las ven los admins autorizados).</div>
     <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem;">
       <button type="button" class="btn btn-primary" style="flex:1;justify-content:center;" onclick="saveNotas()">💾 Guardar notas</button>
       <button type="button" class="btn btn-outline" onclick="closeNotasModal()">Cancelar</button>
@@ -807,6 +821,8 @@ const LOGS_COL = "logs";
 const IG_COL = "instagram";
 
 const OWNER_EMAIL = 'sebagsc2020@gmail.com';
+/* 🔒 Emails autorizados para ver/editar las notas privadas de los eventos */
+const NOTAS_ALLOWED_EMAILS = ['sebagsc2020@gmail.com', 'ariel@taxiblue.com.ar'];
 const MAX_FLYER_KB = 800;
 const LOGS_FETCH_LIMIT = 300;
 const LOGS_DISPLAY_LIMIT = 100;
@@ -847,6 +863,20 @@ function formatBytes(b){ if(b<1024) return b+' B'; if(b<1048576) return (b/1024)
 function todayStart(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
 function showModal(id){ document.getElementById(id).classList.add('show'); }
 function hideModal(id){ document.getElementById(id).classList.remove('show'); }
+
+/* 🔒 PERMISOS DE NOTAS PRIVADAS */
+function puedeVerNotas(){
+  if(!currentUserEmail) return false;
+  const email = currentUserEmail.toLowerCase().trim();
+  return NOTAS_ALLOWED_EMAILS.some(e => e.toLowerCase() === email);
+}
+function applyNotesVisibility(){
+  if(puedeVerNotas()){
+    document.body.classList.remove('no-notes-access');
+  } else {
+    document.body.classList.add('no-notes-access');
+  }
+}
 
 /* Próximo orden (para compatibilidad con drag & drop manual) */
 function nextTopOrder(){
@@ -910,7 +940,6 @@ function updateHoraPreview(){
 }
 
 /* ====== DETECCIÓN AUTOMÁTICA DE CONCLUIDO ====== */
-/* Devuelve true si ya pasaron 3 h desde el inicio del evento. */
 function eventoYaConcluyo(ev){
   if(!ev || !ev.fecha) return false;
   const ahora = new Date();
@@ -929,7 +958,6 @@ function eventoYaConcluyo(ev){
   return ahora > limite;
 }
 
-/* Categoría efectiva (concluido pisa a cualquier otra si ya pasó) */
 function categoriaEfectiva(ev){
   return eventoYaConcluyo(ev) ? 'concluido' : (ev.categoria || 'covers');
 }
@@ -962,6 +990,11 @@ function updateReservaFields(){
 
 /* ====== MODAL NOTAS ====== */
 function openNotasModal(id){
+  /* 🔒 Bloqueo por permisos */
+  if(!puedeVerNotas()){
+    toast('🔒 Las notas son privadas.', 'error');
+    return;
+  }
   const ev = events.find(e => e.id === id);
   if(!ev) return;
   document.getElementById('notasEventId').value = id;
@@ -976,6 +1009,11 @@ function openNotasModal(id){
 function closeNotasModal(){ hideModal('notasModal'); }
 
 async function saveNotas(){
+  /* 🔒 Bloqueo por permisos */
+  if(!puedeVerNotas()){
+    toast('🔒 No tenés permiso para guardar notas.', 'error');
+    return;
+  }
   const id = document.getElementById('notasEventId').value;
   const texto = document.getElementById('notasTexto').value.trim();
   if(!id){ toast('Error: evento no encontrado.','error'); return; }
@@ -1126,6 +1164,7 @@ function hideLoginError(){ const e=document.getElementById('loginError'); e.inne
 onAuthStateChanged(auth, (user) => {
   if(user){
     currentUserEmail = user.email || '';
+    applyNotesVisibility();  /* 🔒 aplica permisos según email */
     const isOwner = currentUserEmail.toLowerCase() === OWNER_EMAIL.toLowerCase();
     document.getElementById('topbarUser').innerHTML = `👤 <strong>${user.email}</strong>${isOwner?' <span class="crown-badge">👑</span>':''}`;
     document.getElementById('loginScreen').classList.add('hidden');
@@ -1134,6 +1173,7 @@ onAuthStateChanged(auth, (user) => {
     subscribeAdmins();
     subscribeInstagram();
   } else {
+    document.body.classList.remove('no-notes-access');
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('panel').classList.remove('active');
     try{ if(unsubscribe) unsubscribe(); }catch(_){}
@@ -1838,7 +1878,6 @@ function subscribeEvents(){
     unsubscribe = onSnapshot(collection(db, COL), (snap)=>{
       if(isReordering) return;
       events = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-      // Orden base: por `orden` cuando exista (compatibilidad con manual)
       events.sort((a,b)=>{
         const oa = typeof a.orden === 'number' ? a.orden : Infinity;
         const ob = typeof b.orden === 'number' ? b.orden : Infinity;
@@ -1881,7 +1920,6 @@ function applyFilters(){
   if(q) arr = arr.filter(e => (e.titulo||'').toLowerCase().includes(q) || (e.lugar||'').toLowerCase().includes(q));
   if(fEstado) arr = arr.filter(e => (e.estado||'confirmado') === fEstado);
 
-  // Filtro de categoría considerando el "concluido" automático
   if(fCategoria){
     if(fCategoria === 'concluido'){
       arr = arr.filter(e => eventoYaConcluyo(e));
@@ -1892,11 +1930,9 @@ function applyFilters(){
     }
   }
 
-  // Filtro de tiempo
   if(fTiempo === 'proximos') arr = arr.filter(e => !eventoYaConcluyo(e));
   if(fTiempo === 'pasados') arr = arr.filter(e => eventoYaConcluyo(e));
 
-  // Orden
   if(fOrder === 'fecha-asc'){
     arr.sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
   } else if(fOrder === 'fecha-desc'){
@@ -1904,7 +1940,6 @@ function applyFilters(){
   } else if(fOrder === 'recientes'){
     arr.sort((a,b)=>((b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0)));
   } else if(fOrder === 'manual'){
-    // Respeta el campo `orden` (drag & drop)
     arr.sort((a,b) => {
       const oa = typeof a.orden === 'number' ? a.orden : Infinity;
       const ob = typeof b.orden === 'number' ? b.orden : Infinity;
@@ -1912,16 +1947,15 @@ function applyFilters(){
       return (b.fecha||'').localeCompare(a.fecha||'');
     });
   } else {
-    // 🆕 AUTO-FECHA (default): próximos primero (más cercano arriba), luego los pasados (más reciente primero)
     const hoy = new Date(); hoy.setHours(0,0,0,0);
     arr.sort((a,b) => {
       const da = new Date((a.fecha||'2099-12-31') + 'T00:00:00');
       const db_ = new Date((b.fecha||'2099-12-31') + 'T00:00:00');
       const aProx = da >= hoy;
       const bProx = db_ >= hoy;
-      if(aProx !== bProx) return aProx ? -1 : 1;   // próximos primero
-      if(aProx) return da - db_;                    // próximos: fecha asc
-      return db_ - da;                              // pasados: fecha desc
+      if(aProx !== bProx) return aProx ? -1 : 1;
+      if(aProx) return da - db_;
+      return db_ - da;
     });
   }
 
@@ -1946,6 +1980,8 @@ function renderEvents(){
     return;
   }
 
+  const puedeNotas = puedeVerNotas();  /* 🔒 calcular una sola vez */
+
   list.innerHTML = eventsFiltered.map(ev => {
     const d = new Date(ev.fecha + 'T00:00:00');
     const dd = String(d.getDate()).padStart(2,'0');
@@ -1953,7 +1989,6 @@ function renderEvents(){
     const yy = d.getFullYear();
     const estado = ev.estado || 'confirmado';
     const concluido = eventoYaConcluyo(ev);
-    // 🆕 Si concluyó, la categoría efectiva es "concluido"
     const cat = categoriaEfectiva(ev);
     const horaFmt = ev.hora ? formatHora(ev.hora) : '';
 
@@ -1964,25 +1999,37 @@ function renderEvents(){
       if(!ev.hora) alertas.push('<span class="badge warn">⚠️ Sin hora</span>');
     }
 
-    // Badge de reserva
     let reservaBadge = '';
     if(ev.reservaTipo === 'local_whatsapp') reservaBadge = '<span class="badge reserva-local">📱 Reserva local</span>';
     else if(ev.reservaTipo === 'link') reservaBadge = '<span class="badge reserva-link">🔗 Reserva online</span>';
     else if(ev.reservaTipo === 'ambos') reservaBadge = '<span class="badge reserva-ambos">📱🔗 Reserva local</span>';
 
+    /* 🔒 Solo renderizamos notas si el usuario tiene permiso */
     const tieneNotas = !!(ev.notasInternas && ev.notasInternas.trim());
-    const notasHtml = tieneNotas
+    const notasHtml = (puedeNotas && tieneNotas)
       ? `<div class="nota-preview">
            <span class="icon">📝</span>
            <span class="text">${escapeHtml(ev.notasInternas.trim())}</span>
          </div>`
       : '';
+    const notasBadge = puedeNotas
+      ? (tieneNotas
+          ? '<span class="badge notas-badge">📝 Con notas</span>'
+          : '<span class="badge notas-badge">📝 Sin notas</span>')
+      : '';
+    const notasBtn = puedeNotas
+      ? `<button class="notes${tieneNotas?' has-notes':''}" title="Ver/editar notas" onclick="openNotasModal('${ev.id}')">📝</button>`
+      : '';
+
+    const infoClick = puedeNotas
+      ? `onclick="openNotasModal('${ev.id}')" title="Click para ver/editar las notas"`
+      : `title="Evento"`;
 
     return `
       <div class="event-item estado-${estado} cat-${cat}" data-id="${ev.id}">
         <div class="drag-handle" title="Mantené y arrastrá para reordenar"></div>
         ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false">` : ''}
-        <div class="info" onclick="openNotasModal('${ev.id}')" title="Click para ver/editar las notas">
+        <div class="info" ${infoClick}>
           <span class="date">${dd} ${mm} ${yy}${horaFmt?' · '+horaFmt:''}</span>
           <div class="title">${escapeHtml(ev.titulo)}</div>
           <div class="place">${escapeHtml(ev.lugar)}</div>
@@ -1991,12 +2038,12 @@ function renderEvents(){
             <span class="badge cat-${cat}">${CATEGORIA_LABEL[cat]||'🎸 Covers'}</span>
             ${reservaBadge}
             ${alertas.join('')}
-            ${tieneNotas ? '<span class="badge notas-badge">📝 Con notas</span>' : '<span class="badge notas-badge">📝 Sin notas</span>'}
+            ${notasBadge}
           </div>
           ${notasHtml}
         </div>
         <div class="actions">
-          <button class="notes${tieneNotas?' has-notes':''}" title="Ver/editar notas" onclick="openNotasModal('${ev.id}')">📝</button>
+          ${notasBtn}
           <button class="prev" title="Vista pública" onclick="showPreview('${ev.id}')">👁️</button>
           <button class="wa" title="Compartir por WhatsApp" onclick="shareWhatsApp('${ev.id}')">💬</button>
           <button class="dup" title="Duplicar" onclick="duplicateEvent('${ev.id}')">📋</button>
@@ -2027,6 +2074,15 @@ function renderDashboard(){
   })() : '—';
   const proximoSub = proximo ? proximo.titulo : 'Sin eventos';
 
+  /* 🔒 La tarjeta "Con notas" solo la mostramos si el usuario puede verlas */
+  const conNotasCard = puedeVerNotas()
+    ? `<div class="stat-card">
+         <div class="stat-label">📝 Con notas</div>
+         <div class="stat-value">${conNotas}</div>
+         <div class="stat-sub">recordatorios</div>
+       </div>`
+    : '';
+
   document.getElementById('dashboard').innerHTML = `
     <div class="stat-card highlight">
       <div class="stat-label">Próximo show</div>
@@ -2053,11 +2109,7 @@ function renderDashboard(){
       <div class="stat-value">${borradores}</div>
       <div class="stat-sub">no publicados</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">📝 Con notas</div>
-      <div class="stat-value">${conNotas}</div>
-      <div class="stat-sub">recordatorios</div>
-    </div>
+    ${conNotasCard}
   `;
 }
 
@@ -2067,7 +2119,6 @@ function initSortable(){
   if(!el) return;
   safeDestroySortable();
 
-  // Solo activo en modo manual
   if(document.getElementById('filterOrder').value !== 'manual') return;
   if(!eventsFiltered.length) return;
 
@@ -2129,6 +2180,19 @@ async function saveEvent(e){
   const hora = horaRaw ? formatHora(horaRaw) : '';
 
   const reservaTipo = document.getElementById('reservaTipo').value || null;
+
+  /* 🔒 Preservar notas originales si el usuario no tiene permiso para verlas */
+  const notasInternas = (() => {
+    if(puedeVerNotas()){
+      return document.getElementById('notasInternas').value.trim();
+    }
+    if(id){
+      const ex = events.find(x => x.id === id);
+      return (ex && ex.notasInternas) ? ex.notasInternas : '';
+    }
+    return '';
+  })();
+
   const data = {
     fecha: document.getElementById('fecha').value,
     hora: hora,
@@ -2138,8 +2202,7 @@ async function saveEvent(e){
     lugar: document.getElementById('lugar').value.trim(),
     mapsUrl: document.getElementById('mapsUrl').value.trim() || null,
     descripcion: document.getElementById('descripcion').value.trim(),
-    notasInternas: document.getElementById('notasInternas').value.trim(),
-    // Reserva
+    notasInternas: notasInternas,
     reservaTipo: reservaTipo,
     reservaNombre: reservaTipo ? (document.getElementById('reservaNombre').value.trim() || null) : null,
     reservaWhatsApp: (reservaTipo === 'local_whatsapp' || reservaTipo === 'ambos') ? (document.getElementById('reservaWhatsApp').value.trim() || null) : null,
@@ -2177,13 +2240,14 @@ function editEvent(id){
   document.getElementById('hora').value = parseHoraToInput(ev.hora || '');
   updateHoraPreview();
   document.getElementById('estado').value = ev.estado || 'confirmado';
-  // Si ya concluyó, mostramos la categoría original (no la efectiva "concluido")
   document.getElementById('categoria').value = ev.categoria || 'covers';
   document.getElementById('titulo').value = ev.titulo;
   document.getElementById('lugar').value = ev.lugar;
   document.getElementById('mapsUrl').value = ev.mapsUrl || '';
   document.getElementById('descripcion').value = ev.descripcion || '';
-  document.getElementById('notasInternas').value = ev.notasInternas || '';
+  /* 🔒 Solo rellenar el campo si tiene permiso (aunque esté oculto con CSS, no dejamos
+     el valor en el DOM por si alguien inspecciona el HTML) */
+  document.getElementById('notasInternas').value = puedeVerNotas() ? (ev.notasInternas || '') : '';
   // Reserva
   document.getElementById('reservaTipo').value = ev.reservaTipo || '';
   document.getElementById('reservaNombre').value = ev.reservaNombre || '';
@@ -2211,7 +2275,9 @@ async function duplicateEvent(id){
   const data = {
     fecha: '', hora: ev.hora || '', estado: 'borrador', categoria: ev.categoria || 'covers',
     titulo: ev.titulo + ' (copia)', lugar: ev.lugar, mapsUrl: ev.mapsUrl || null,
-    descripcion: ev.descripcion || '', notasInternas: ev.notasInternas || '',
+    descripcion: ev.descripcion || '',
+    /* 🔒 Solo copiamos las notas si el usuario tiene permiso */
+    notasInternas: puedeVerNotas() ? (ev.notasInternas || '') : '',
     reservaTipo: ev.reservaTipo || null,
     reservaNombre: ev.reservaNombre || null,
     reservaWhatsApp: ev.reservaWhatsApp || null,
@@ -2281,7 +2347,12 @@ async function exportBackup(){
       };
     });
     const admins = adminsList.map(a => ({ email: a.email, createdAt: a.createdAt?.toDate ? a.createdAt.toDate().toISOString() : null }));
-    const eventos = events.map(e => ({ ...e, updatedAt: undefined, createdAt: undefined }));
+    /* 🔒 Solo incluimos las notas internas si el usuario tiene permiso */
+    const eventos = events.map(e => {
+      const copy = { ...e, updatedAt: undefined, createdAt: undefined };
+      if(!puedeVerNotas()) delete copy.notasInternas;
+      return copy;
+    });
     const ig = igPosts.map(p => ({ ...p, createdAt: undefined, updatedAt: undefined }));
     const data = { exportedAt: new Date().toISOString(), exportedBy: currentUserEmail, eventos, admins, ig, logs };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
