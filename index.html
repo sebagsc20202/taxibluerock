@@ -111,6 +111,21 @@
             color: var(--azul-electrico);
             text-shadow: 0 0 40px rgba(0, 102, 255, 0.5), 0 0 80px rgba(0, 102, 255, 0.2);
         }
+
+        /* 🆕 Logo del hero (imagen en vez de texto) */
+        .hero-logo {
+            display: block;
+            width: clamp(280px, 60vw, 700px);
+            height: auto;
+            margin: 0 auto 0.5rem;
+            filter: drop-shadow(0 0 40px rgba(0, 102, 255, 0.5)) drop-shadow(0 0 80px rgba(0, 102, 255, 0.2));
+            animation: heroLogoIn 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+        @keyframes heroLogoIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
         .hero-sub {
             font-size: clamp(1rem, 2.5vw, 1.3rem); color: var(--gris-claro);
             margin-bottom: 3rem; font-weight: 300; letter-spacing: 1px;
@@ -1086,7 +1101,7 @@
             .nav-links.active { display: flex; }
             .menu-toggle { display: block; }
 
-            /* 🆕 EVENTO MOBILE: banner cuadrado + fecha izq + info der + acciones abajo */
+            /* EVENTO MOBILE: banner cuadrado + fecha izq + info der + acciones abajo */
             .event-card,
             .event-card.has-flyer {
                 display: grid;
@@ -1101,7 +1116,6 @@
                 min-height: 0;
             }
 
-            /* Banner cuadrado 1:1 full width */
             .event-card .event-flyer {
                 grid-area: flyer;
                 width: 100%;
@@ -1118,7 +1132,6 @@
                 cursor: zoom-in;
             }
 
-            /* Fecha: columna izquierda con separador vertical */
             .event-card .event-date {
                 grid-area: date;
                 padding: 1rem 1rem 1rem 1.2rem;
@@ -1137,7 +1150,6 @@
                 margin-top: 0.25rem;
             }
 
-            /* Info: columna derecha */
             .event-card .event-info {
                 grid-area: info;
                 padding: 1rem 1rem 1rem 1.2rem;
@@ -1155,7 +1167,6 @@
                 margin-bottom: 0.35rem;
             }
 
-            /* Acciones / Estados: fila completa abajo */
             .event-card > .event-acciones,
             .event-card > .live-block,
             .event-card > .past-badge {
@@ -1179,7 +1190,6 @@
                 align-self: stretch;
             }
 
-            /* Si hay 2 botones, los apilamos (ya está con 1fr) */
             .event-card .event-acciones .event-cta + .event-cta {
                 margin-top: 0;
             }
@@ -1206,7 +1216,6 @@
                 align-self: center;
             }
 
-            /* Ajustes menores */
             .directions-link { margin-top: 0.4rem; }
 
             .instagram-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -1221,6 +1230,7 @@
         }
         @media (max-width: 480px) {
             .hero h1 { letter-spacing: 2px; }
+            .hero-logo { width: clamp(240px, 78vw, 420px); }
             .btn { padding: 0.8rem 1.5rem; font-size: 0.75rem; }
             .hero-buttons { flex-direction: column; align-items: center; }
             .band-stats { grid-template-columns: 1fr; }
@@ -1264,7 +1274,7 @@
         <div class="hero-noise"></div>
         <div class="hero-content">
             <div class="hero-badge">Covers de Rock & Roll · En Vivo</div>
-            <h1>TAXI <span class="blue">BLUE</span></h1>
+            <img src="fotos/logotaxi.png" alt="Taxi Blue Rock" class="hero-logo">
             <p class="hero-sub">Revive la energía de los clásicos. Rock de los 80 y 90 en estado puro.</p>
             <div class="hero-buttons">
                 <a href="#contacto" class="btn btn-primary">Contratar Show</a>
@@ -2137,8 +2147,6 @@
                         return est === 'confirmado';
                     });
 
-                    // Mismo orden que el admin en modo "auto-fecha":
-                    // Próximos primero (fecha ascendente) y luego pasados (fecha descendente, más reciente primero).
                     const hoy = new Date(); hoy.setHours(0,0,0,0);
                     eventos.sort((a, b) => {
                         const da = new Date((a.fecha || '2099-12-31') + 'T00:00:00');
