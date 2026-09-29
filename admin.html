@@ -70,10 +70,12 @@ a{color:inherit;text-decoration:none;}
 .stat-card:hover{border-color:var(--azul);transform:translateY(-2px);}
 .stat-card.highlight{border-color:var(--azul);background:linear-gradient(135deg,var(--gris-oscuro),rgba(0,102,255,.08));}
 .stat-card.gold{border-color:var(--dorado);background:linear-gradient(135deg,var(--gris-oscuro),rgba(255,215,0,.06));}
+.stat-card.gray{border-color:#555;background:linear-gradient(135deg,var(--gris-oscuro),rgba(120,120,120,.08));}
 .stat-label{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gris-claro);font-weight:600;}
 .stat-value{font-family:var(--fuente-titulo);font-size:1.8rem;color:var(--blanco);line-height:1;}
 .stat-card.highlight .stat-value{color:var(--azul-neon);}
 .stat-card.gold .stat-value{color:var(--dorado);}
+.stat-card.gray .stat-value{color:#999;}
 .stat-sub{font-size:.72rem;color:var(--gris-claro);margin-top:.2rem;}
 .stat-card.warn .stat-value{color:var(--amarillo);}
 
@@ -100,6 +102,13 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover{ opacity: 1; }
 .notas-group{background:rgba(0,102,255,.05);border:1px solid rgba(0,102,255,.25);border-radius:8px;padding:1rem;margin-bottom:1rem;}
 .notas-group label{color:var(--azul-neon) !important;font-size:.75rem;display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;}
 .notas-group textarea{min-height:90px;background:var(--negro);font-size:.88rem;line-height:1.6;}
+
+/* NUEVO: bloque reserva */
+.reserva-group{background:rgba(37,211,102,.05);border:1px solid rgba(37,211,102,.25);border-radius:8px;padding:1rem;margin-bottom:1rem;}
+.reserva-group label{color:var(--verde) !important;font-size:.75rem;display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;}
+.reserva-group select,.reserva-group input{background:var(--negro);}
+.reserva-group .field-hint{color:var(--gris-claro);}
+.reserva-fields{margin-top:.7rem;padding-top:.7rem;border-top:1px dashed rgba(37,211,102,.25);animation:fadeIn .25s;}
 
 .mini-map{margin-top:.5rem;border-radius:8px;overflow:hidden;border:1px solid var(--gris-medio);display:none;height:200px;}
 .mini-map.show{display:block;}
@@ -145,6 +154,28 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .event-item.estado-cancelado .title{text-decoration:line-through;}
 .event-item.cat-remarcado{background:linear-gradient(135deg,var(--negro),rgba(255,215,0,.04));border-color:rgba(255,215,0,.35);}
 .event-item.cat-remarcado:hover{border-color:var(--dorado);}
+
+/* 🆕 CONCLUIDO — tonos grises */
+.event-item.cat-concluido{
+  background:linear-gradient(135deg,#0a0a0a,#151515);
+  border-color:rgba(120,120,120,.35);
+  opacity:.72;
+  filter:saturate(.35);
+}
+body[data-theme="light"] .event-item.cat-concluido{
+  background:linear-gradient(135deg,#e8e8e8,#dcdcdc);
+}
+.event-item.cat-concluido:hover{
+  border-color:rgba(150,150,150,.6);
+  opacity:.85;
+}
+.event-item.cat-concluido .date{color:#999 !important;}
+.event-item.cat-concluido .title{color:#aaa;}
+.event-item.cat-concluido .place{color:#777;}
+.event-item.cat-concluido .event-thumb{filter:grayscale(80%);}
+.event-item.cat-concluido .info:hover{background:rgba(150,150,150,.08);}
+.event-item.cat-concluido .info:hover .title{color:#ccc;}
+
 .event-item .info{flex:1;min-width:0;cursor:pointer;padding:.4rem .6rem;margin:-.4rem -.6rem;border-radius:8px;transition:background .2s, transform .1s;position:relative;align-self:center;}
 .event-item .info:hover{background:rgba(0,102,255,.07);}
 .event-item .info:hover .title{color:var(--azul-neon);}
@@ -165,12 +196,20 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .badge.cat-festival{background:rgba(251,146,60,.15);color:var(--naranja);}
 .badge.cat-privado{background:rgba(136,136,136,.15);color:var(--gris-claro);}
 .badge.cat-remarcado{background:rgba(255,215,0,.18);color:var(--dorado);font-weight:800;}
+.badge.cat-concluido{background:rgba(120,120,120,.2);color:#b0b0b0;font-weight:800;letter-spacing:1.5px;}
 .badge.warn{background:rgba(245,166,35,.15);color:var(--amarillo);}
 .badge.notas-badge{background:rgba(0,102,255,.15);color:var(--azul-neon);cursor:pointer;}
 .badge.notas-badge:hover{background:rgba(0,102,255,.3);}
+.badge.reserva-local{background:rgba(37,211,102,.15);color:var(--verde);}
+.badge.reserva-link{background:rgba(0,102,255,.15);color:var(--azul-neon);}
+.badge.reserva-ambos{background:linear-gradient(135deg,rgba(37,211,102,.15),rgba(0,102,255,.15));color:#1fd6b1;}
+
 .nota-preview{margin-top:.5rem;padding:.5rem .7rem;background:rgba(0,102,255,.06);border-left:3px solid var(--azul);border-radius:4px;font-size:.72rem;color:var(--gris-claro);line-height:1.4;display:flex;align-items:flex-start;gap:.4rem;transition:background .2s,color .2s;}
 .nota-preview .icon{flex-shrink:0;font-size:.85rem;line-height:1.2;}
 .nota-preview .text{flex:1;white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+
+.event-item.cat-concluido .nota-preview{background:rgba(120,120,120,.06);border-left-color:#666;}
+
 .event-item .actions{display:flex;gap:.3rem;flex-wrap:wrap;position:relative;z-index:2;align-self:center;}
 .event-item .actions button{width:32px;height:32px;border-radius:6px;background:var(--gris-oscuro);border:1px solid var(--gris-medio);color:var(--blanco);cursor:pointer;font-size:.85rem;transition:var(--trans);}
 .event-item .actions .edit:hover{border-color:var(--azul);color:var(--azul-neon);}
@@ -181,6 +220,8 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .event-item .actions .wa:hover{border-color:var(--verde);color:var(--verde);}
 .event-item .actions .notes:hover{border-color:var(--azul-neon);color:var(--azul-neon);}
 .event-item .actions .notes.has-notes{border-color:var(--azul);color:var(--azul-neon);background:rgba(0,102,255,.1);}
+.event-item.cat-concluido .actions button{opacity:.7;}
+
 .event-thumb{width:auto;height:auto;min-width:70px;min-height:70px;max-width:110px;aspect-ratio:1 / 1;align-self:stretch;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--gris-medio);-webkit-user-drag:none;user-drag:none;pointer-events:none;position:relative;z-index:2;}
 .event-item.cat-remarcado .event-thumb{border-color:rgba(255,215,0,.5);}
 .drag-handle{cursor:grab;color:var(--gris-claro);font-size:1.2rem;letter-spacing:-3px;padding:.6rem .5rem;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;min-width:32px;min-height:44px;position:relative;z-index:2;align-self:center;}
@@ -227,7 +268,7 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .ig-preview{display: flex;justify-content: center;background: rgba(0,0,0,.35);border: 1px dashed rgba(0,102,255,.35);border-radius: 10px;padding: 1rem;min-height: 80px;transition: var(--trans);}
 .ig-preview .instagram-media{margin: 0 !important;max-width: 100% !important;min-width: 0 !important;background: #1a1a1a !important;border: 1px solid #2a2a2a !important;border-radius: 10px !important;}
 .ig-preview .ig-preview-loading{text-align: center;color: var(--gris-claro);font-size: .82rem;padding: 1rem;}
-.ig-preview-status{font-size: .72rem;text-align: center;margin-top: .5rem;color: var(--gris-claro);min-height: 1rem;}
+.ig-preview-status{font-size: .72rem;text-align: center;margin-top:.5rem;color: var(--gris-claro);min-height: 1rem;}
 .ig-preview-status.ok{ color: var(--verde); font-weight: 600; }
 .ig-preview-status.error{ color: var(--rojo); font-weight: 600; }
 
@@ -280,6 +321,9 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
 .preview-box .pv-lugar{color:#00a8ff;font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:.3rem;}
 .preview-box .pv-extra{color:#888;font-size:.85rem;}
 .preview-box .pv-card.remarcado{border-color:#ffd700;box-shadow:0 0 30px rgba(255,215,0,.2);}
+.preview-box .pv-card.concluido{border-color:#666;filter:saturate(.4);opacity:.85;}
+.preview-box .pv-reserva{margin-top:.7rem;padding-top:.7rem;border-top:1px solid #2a2a2a;font-size:.8rem;color:#ccc;}
+.preview-box .pv-reserva strong{color:#25D366;}
 
 .confirm-box{max-width:420px;text-align:center;padding:2rem 1.8rem;}
 .confirm-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem;}
@@ -375,6 +419,8 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
       </select>
       <select id="filterCategoria" onchange="applyFilters()">
         <option value="">Todas las categorías</option>
+        <option value="proximos">🎯 Próximos (no concluidos)</option>
+        <option value="concluido">⚫ Concluido</option>
         <option value="remarcado">⭐ Remarcados</option>
         <option value="covers">🎸 Covers</option>
         <option value="homenaje">🎤 Homenaje</option>
@@ -387,7 +433,8 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
         <option value="pasados">Pasados</option>
       </select>
       <select id="filterOrder" onchange="applyFilters()">
-        <option value="manual">Orden manual (recientes primero)</option>
+        <option value="auto-fecha">📅 Próximos primero (auto)</option>
+        <option value="manual">✋ Orden manual (drag & drop)</option>
         <option value="fecha-asc">Fecha ↑</option>
         <option value="fecha-desc">Fecha ↓</option>
         <option value="recientes">Última edición</option>
@@ -470,6 +517,34 @@ body[data-theme="light"] .mini-map iframe{filter:none;}
       <div class="form-group">
         <label>Descripción pública</label>
         <textarea id="descripcion" placeholder="Breve descripción del show..."></textarea>
+      </div>
+
+      <!-- ===== RESERVA ===== -->
+      <div class="form-group reserva-group">
+        <label>🎟️ Método de reserva (opcional)</label>
+        <select id="reservaTipo" onchange="updateReservaFields()">
+          <option value="">Sin reserva — Consulta general a Taxi Blue</option>
+          <option value="local_whatsapp">📱 WhatsApp del local</option>
+          <option value="link">🔗 Link de reserva del local</option>
+          <option value="ambos">📱🔗 WhatsApp del local + Link de reserva</option>
+        </select>
+        <div class="reserva-fields" id="reservaFields" style="display:none;">
+          <div class="form-group">
+            <label>Nombre del local / contacto</label>
+            <input type="text" id="reservaNombre" placeholder="Ej: Bar La Esquina">
+          </div>
+          <div class="form-group" id="reservaWhatsGroup">
+            <label>WhatsApp del local (con código país)</label>
+            <input type="tel" id="reservaWhatsApp" placeholder="Ej: 5493541123456">
+          </div>
+          <div class="form-group" id="reservaLinkGroup">
+            <label>Link de reserva / venta de entradas</label>
+            <input type="url" id="reservaLink" placeholder="https://...">
+          </div>
+        </div>
+        <div class="field-hint">
+          Si cargás un método de reserva, en la <strong>web pública</strong> el botón principal apuntará al local (WhatsApp o link) en vez de a Taxi Blue.
+        </div>
       </div>
 
       <div class="form-group notas-group">
@@ -735,13 +810,15 @@ const OWNER_EMAIL = 'sebagsc2020@gmail.com';
 const MAX_FLYER_KB = 800;
 const LOGS_FETCH_LIMIT = 300;
 const LOGS_DISPLAY_LIMIT = 100;
+const CONCLUDED_AFTER_MS = 3 * 60 * 60 * 1000; // 3 h de gracia tras el inicio
 
 const CATEGORIA_LABEL = {
   covers:'🎸 Covers',
   remarcado:'⭐ Remarcado',
   homenaje:'🎤 Homenaje',
   festival:'🎪 Festival',
-  privado:'🎩 Privado'
+  privado:'🎩 Privado',
+  concluido:'⚫ Concluido'
 };
 
 let flyerBase64 = null;
@@ -771,7 +848,7 @@ function todayStart(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
 function showModal(id){ document.getElementById(id).classList.add('show'); }
 function hideModal(id){ document.getElementById(id).classList.remove('show'); }
 
-/* NUEVO: helper para el próximo orden (siempre al tope) */
+/* Próximo orden (para compatibilidad con drag & drop manual) */
 function nextTopOrder(){
   if(!events.length) return 0;
   const nums = events.map(x => typeof x.orden === 'number' ? x.orden : 0);
@@ -832,6 +909,31 @@ function updateHoraPreview(){
   box.style.display = 'inline-flex';
 }
 
+/* ====== DETECCIÓN AUTOMÁTICA DE CONCLUIDO ====== */
+/* Devuelve true si ya pasaron 3 h desde el inicio del evento. */
+function eventoYaConcluyo(ev){
+  if(!ev || !ev.fecha) return false;
+  const ahora = new Date();
+  const d = new Date(ev.fecha + 'T00:00:00');
+  if(ev.hora){
+    const m = String(ev.hora).match(/(\d{1,2})[:.](\d{1,2})/);
+    if(m){
+      d.setHours(parseInt(m[1],10), parseInt(m[2],10), 0, 0);
+    } else {
+      d.setHours(23, 59, 0, 0);
+    }
+  } else {
+    d.setHours(23, 59, 0, 0);
+  }
+  const limite = new Date(d.getTime() + CONCLUDED_AFTER_MS);
+  return ahora > limite;
+}
+
+/* Categoría efectiva (concluido pisa a cualquier otra si ya pasó) */
+function categoriaEfectiva(ev){
+  return eventoYaConcluyo(ev) ? 'concluido' : (ev.categoria || 'covers');
+}
+
 /* ====== MODAL EVENTO ====== */
 function openEventModal(){
   resetForm();
@@ -841,6 +943,22 @@ function openEventModal(){
   setTimeout(() => document.getElementById('fecha')?.focus(), 100);
 }
 function closeEventModal(){ hideModal('eventModal'); }
+
+/* ====== RESERVA ====== */
+function updateReservaFields(){
+  const tipo = document.getElementById('reservaTipo').value;
+  const box = document.getElementById('reservaFields');
+  const whatsGroup = document.getElementById('reservaWhatsGroup');
+  const linkGroup = document.getElementById('reservaLinkGroup');
+
+  if(!tipo){
+    box.style.display = 'none';
+    return;
+  }
+  box.style.display = 'block';
+  whatsGroup.style.display = (tipo === 'local_whatsapp' || tipo === 'ambos') ? '' : 'none';
+  linkGroup.style.display = (tipo === 'link' || tipo === 'ambos') ? '' : 'none';
+}
 
 /* ====== MODAL NOTAS ====== */
 function openNotasModal(id){
@@ -1603,10 +1721,25 @@ function showPreview(id){
   const yy = d.getFullYear();
   const flyer = ev.flyer ? `<img class="pv-flyer" src="${ev.flyer}">` : '';
   const extra = [ev.hora, ev.descripcion].filter(Boolean).join(' · ');
-  const isRemarcado = (ev.categoria||'') === 'remarcado';
-  const catLabel = CATEGORIA_LABEL[ev.categoria||'covers'] || '🎸 Covers';
+  const cat = categoriaEfectiva(ev);
+  const catLabel = CATEGORIA_LABEL[cat] || '🎸 Covers';
+  const claseCat = cat === 'remarcado' ? ' remarcado' : (cat === 'concluido' ? ' concluido' : '');
+
+  let reservaHtml = '';
+  if(ev.reservaTipo){
+    const partes = [];
+    if(ev.reservaNombre) partes.push(`<strong>${escapeHtml(ev.reservaNombre)}</strong>`);
+    if((ev.reservaTipo === 'local_whatsapp' || ev.reservaTipo === 'ambos') && ev.reservaWhatsApp)
+      partes.push(`📱 WhatsApp: ${escapeHtml(ev.reservaWhatsApp)}`);
+    if((ev.reservaTipo === 'link' || ev.reservaTipo === 'ambos') && ev.reservaLink)
+      partes.push(`🔗 <a href="${escapeHtml(ev.reservaLink)}" target="_blank" style="color:#00a8ff">${escapeHtml(ev.reservaLink)}</a>`);
+    if(partes.length){
+      reservaHtml = `<div class="pv-reserva">🎟️ <strong>Reserva:</strong> ${partes.join(' · ')}</div>`;
+    }
+  }
+
   document.getElementById('previewBox').innerHTML = `
-    <div class="pv-card${isRemarcado?' remarcado':''}" style="${ev.flyer?'grid-template-columns:auto auto 1fr':'grid-template-columns:auto 1fr'}">
+    <div class="pv-card${claseCat}" style="${ev.flyer?'grid-template-columns:auto auto 1fr':'grid-template-columns:auto 1fr'}">
       ${flyer}
       <div style="text-align:center">
         <div class="pv-date">${dd}</div>
@@ -1619,6 +1752,7 @@ function showPreview(id){
         ${extra?`<div class="pv-extra">${escapeHtml(extra)}</div>`:''}
       </div>
     </div>
+    ${reservaHtml}
   `;
   showModal('previewModal');
 }
@@ -1687,6 +1821,13 @@ function resetForm(){
   document.getElementById('mapsUrl').value = '';
   document.getElementById('descripcion').value = '';
   document.getElementById('notasInternas').value = '';
+  // Reserva
+  document.getElementById('reservaTipo').value = '';
+  document.getElementById('reservaNombre').value = '';
+  document.getElementById('reservaWhatsApp').value = '';
+  document.getElementById('reservaLink').value = '';
+  updateReservaFields();
+  // Flyer
   removeFlyer();
   updateMiniMap();
 }
@@ -1697,12 +1838,11 @@ function subscribeEvents(){
     unsubscribe = onSnapshot(collection(db, COL), (snap)=>{
       if(isReordering) return;
       events = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-      // Orden: el `orden` más bajo (o más negativo) primero → los nuevos (negativos) van arriba.
+      // Orden base: por `orden` cuando exista (compatibilidad con manual)
       events.sort((a,b)=>{
         const oa = typeof a.orden === 'number' ? a.orden : Infinity;
         const ob = typeof b.orden === 'number' ? b.orden : Infinity;
         if(oa !== ob) return oa-ob;
-        // Desempate: fecha más reciente primero
         return (b.fecha||'').localeCompare(a.fecha||'');
       });
       applyFilters();
@@ -1736,25 +1876,52 @@ function applyFilters(){
   const fCategoria = document.getElementById('filterCategoria').value;
   const fTiempo = document.getElementById('filterTiempo').value;
   const fOrder = document.getElementById('filterOrder').value;
-  const hoy = todayStart();
 
   let arr = events.slice();
   if(q) arr = arr.filter(e => (e.titulo||'').toLowerCase().includes(q) || (e.lugar||'').toLowerCase().includes(q));
   if(fEstado) arr = arr.filter(e => (e.estado||'confirmado') === fEstado);
-  if(fCategoria) arr = arr.filter(e => (e.categoria||'covers') === fCategoria);
-  if(fTiempo === 'proximos') arr = arr.filter(e => new Date(e.fecha+'T00:00:00') >= hoy);
-  if(fTiempo === 'pasados') arr = arr.filter(e => new Date(e.fecha+'T00:00:00') < hoy);
-  if(fOrder === 'fecha-asc') arr.sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
-  else if(fOrder === 'fecha-desc') arr.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
-  else if(fOrder === 'recientes') arr.sort((a,b)=>((b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0)));
-  else {
-    // 🆕 Orden manual: respeta el campo `orden`.
-    // Los recién creados tienen orden negativo y quedan arriba.
+
+  // Filtro de categoría considerando el "concluido" automático
+  if(fCategoria){
+    if(fCategoria === 'concluido'){
+      arr = arr.filter(e => eventoYaConcluyo(e));
+    } else if(fCategoria === 'proximos'){
+      arr = arr.filter(e => !eventoYaConcluyo(e));
+    } else {
+      arr = arr.filter(e => (e.categoria||'covers') === fCategoria && !eventoYaConcluyo(e));
+    }
+  }
+
+  // Filtro de tiempo
+  if(fTiempo === 'proximos') arr = arr.filter(e => !eventoYaConcluyo(e));
+  if(fTiempo === 'pasados') arr = arr.filter(e => eventoYaConcluyo(e));
+
+  // Orden
+  if(fOrder === 'fecha-asc'){
+    arr.sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
+  } else if(fOrder === 'fecha-desc'){
+    arr.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  } else if(fOrder === 'recientes'){
+    arr.sort((a,b)=>((b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0)));
+  } else if(fOrder === 'manual'){
+    // Respeta el campo `orden` (drag & drop)
     arr.sort((a,b) => {
       const oa = typeof a.orden === 'number' ? a.orden : Infinity;
       const ob = typeof b.orden === 'number' ? b.orden : Infinity;
       if(oa !== ob) return oa - ob;
       return (b.fecha||'').localeCompare(a.fecha||'');
+    });
+  } else {
+    // 🆕 AUTO-FECHA (default): próximos primero (más cercano arriba), luego los pasados (más reciente primero)
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    arr.sort((a,b) => {
+      const da = new Date((a.fecha||'2099-12-31') + 'T00:00:00');
+      const db_ = new Date((b.fecha||'2099-12-31') + 'T00:00:00');
+      const aProx = da >= hoy;
+      const bProx = db_ >= hoy;
+      if(aProx !== bProx) return aProx ? -1 : 1;   // próximos primero
+      if(aProx) return da - db_;                    // próximos: fecha asc
+      return db_ - da;                              // pasados: fecha desc
     });
   }
 
@@ -1778,21 +1945,30 @@ function renderEvents(){
     list.innerHTML = '<div class="empty-state">No hay eventos que coincidan.</div>';
     return;
   }
-  const hoy = todayStart();
+
   list.innerHTML = eventsFiltered.map(ev => {
     const d = new Date(ev.fecha + 'T00:00:00');
     const dd = String(d.getDate()).padStart(2,'0');
     const mm = d.toLocaleDateString('es-AR',{month:'short'}).replace('.','').toUpperCase();
     const yy = d.getFullYear();
     const estado = ev.estado || 'confirmado';
-    const cat = ev.categoria || 'covers';
-    const esPasado = d < hoy;
+    const concluido = eventoYaConcluyo(ev);
+    // 🆕 Si concluyó, la categoría efectiva es "concluido"
+    const cat = categoriaEfectiva(ev);
     const horaFmt = ev.hora ? formatHora(ev.hora) : '';
 
     const alertas = [];
-    if(!ev.flyer) alertas.push('<span class="badge warn">⚠️ Sin flyer</span>');
-    if(!ev.mapsUrl && (!ev.lugar || ev.lugar.length < 10)) alertas.push('<span class="badge warn">⚠️ Dirección</span>');
-    if(!ev.hora) alertas.push('<span class="badge warn">⚠️ Sin hora</span>');
+    if(!concluido){
+      if(!ev.flyer) alertas.push('<span class="badge warn">⚠️ Sin flyer</span>');
+      if(!ev.mapsUrl && (!ev.lugar || ev.lugar.length < 10)) alertas.push('<span class="badge warn">⚠️ Dirección</span>');
+      if(!ev.hora) alertas.push('<span class="badge warn">⚠️ Sin hora</span>');
+    }
+
+    // Badge de reserva
+    let reservaBadge = '';
+    if(ev.reservaTipo === 'local_whatsapp') reservaBadge = '<span class="badge reserva-local">📱 Reserva local</span>';
+    else if(ev.reservaTipo === 'link') reservaBadge = '<span class="badge reserva-link">🔗 Reserva online</span>';
+    else if(ev.reservaTipo === 'ambos') reservaBadge = '<span class="badge reserva-ambos">📱🔗 Reserva local</span>';
 
     const tieneNotas = !!(ev.notasInternas && ev.notasInternas.trim());
     const notasHtml = tieneNotas
@@ -1807,12 +1983,13 @@ function renderEvents(){
         <div class="drag-handle" title="Mantené y arrastrá para reordenar"></div>
         ${ev.flyer ? `<img class="event-thumb" src="${ev.flyer}" alt="" draggable="false">` : ''}
         <div class="info" onclick="openNotasModal('${ev.id}')" title="Click para ver/editar las notas">
-          <span class="date">${dd} ${mm} ${yy}${horaFmt?' · '+horaFmt:''}${esPasado?' · ⚫':''}</span>
+          <span class="date">${dd} ${mm} ${yy}${horaFmt?' · '+horaFmt:''}</span>
           <div class="title">${escapeHtml(ev.titulo)}</div>
           <div class="place">${escapeHtml(ev.lugar)}</div>
           <div class="badges">
             <span class="badge ${estado}">${estado==='borrador'?'🟡 Borrador':estado==='cancelado'?'🔴 Cancelado':'✅ Confirmado'}</span>
             <span class="badge cat-${cat}">${CATEGORIA_LABEL[cat]||'🎸 Covers'}</span>
+            ${reservaBadge}
             ${alertas.join('')}
             ${tieneNotas ? '<span class="badge notas-badge">📝 Con notas</span>' : '<span class="badge notas-badge">📝 Sin notas</span>'}
           </div>
@@ -1833,14 +2010,15 @@ function renderEvents(){
 function renderDashboard(){
   const hoy = todayStart();
   const total = events.length;
-  const proximos = events.filter(e => (e.estado||'confirmado')==='confirmado' && new Date(e.fecha+'T00:00:00') >= hoy).length;
-  const borradores = events.filter(e => (e.estado||'confirmado')==='borrador').length;
-  const cancelados = events.filter(e => (e.estado||'confirmado')==='cancelado').length;
-  const remarcados = events.filter(e => (e.categoria||'')==='remarcado' && (e.estado||'confirmado')==='confirmado').length;
+  const concluidos = events.filter(e => eventoYaConcluyo(e)).length;
+  const activos = total - concluidos;
+  const proximos = events.filter(e => !eventoYaConcluyo(e) && (e.estado||'confirmado')==='confirmado').length;
+  const borradores = events.filter(e => (e.estado||'confirmado')==='borrador' && !eventoYaConcluyo(e)).length;
+  const remarcados = events.filter(e => (e.categoria||'')==='remarcado' && !eventoYaConcluyo(e) && (e.estado||'confirmado')==='confirmado').length;
   const conNotas = events.filter(e => e.notasInternas && e.notasInternas.trim()).length;
 
   const proximo = events
-    .filter(e => (e.estado||'confirmado')==='confirmado' && new Date(e.fecha+'T00:00:00') >= hoy)
+    .filter(e => !eventoYaConcluyo(e) && (e.estado||'confirmado')==='confirmado')
     .sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''))[0];
 
   const proximoTxt = proximo ? (() => {
@@ -1861,9 +2039,14 @@ function renderDashboard(){
       <div class="stat-sub">destacados</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Confirmados</div>
-      <div class="stat-value">${proximos}</div>
-      <div class="stat-sub">próximos</div>
+      <div class="stat-label">Activos</div>
+      <div class="stat-value">${activos}</div>
+      <div class="stat-sub">no concluidos</div>
+    </div>
+    <div class="stat-card gray">
+      <div class="stat-label">⚫ Concluidos</div>
+      <div class="stat-value">${concluidos}</div>
+      <div class="stat-sub">ya realizados</div>
     </div>
     <div class="stat-card ${borradores?'warn':''}">
       <div class="stat-label">Borradores</div>
@@ -1884,6 +2067,7 @@ function initSortable(){
   if(!el) return;
   safeDestroySortable();
 
+  // Solo activo en modo manual
   if(document.getElementById('filterOrder').value !== 'manual') return;
   if(!eventsFiltered.length) return;
 
@@ -1910,7 +2094,6 @@ function initSortable(){
         eventsFiltered.splice(evt.newIndex, 0, moved);
         isReordering = true;
         try{
-          // Renumeramos 0..n-1. Los próximos nuevos seguirán yendo a -1 → arriba.
           const batch = writeBatch(db);
           eventsFiltered.forEach((ev, i) => {
             ev.orden = i;
@@ -1934,8 +2117,6 @@ async function saveEvent(e){
   e.preventDefault();
   const id = document.getElementById('editId').value;
 
-  // 🆕 Si es nuevo → siempre al tope (orden más bajo - 1).
-  // Si es edición → mantenemos el orden que ya tenía (o lo mandamos al tope si no tenía).
   let orden;
   if(id){
     const ex = events.find(x => x.id === id);
@@ -1947,6 +2128,7 @@ async function saveEvent(e){
   const horaRaw = document.getElementById('hora').value.trim();
   const hora = horaRaw ? formatHora(horaRaw) : '';
 
+  const reservaTipo = document.getElementById('reservaTipo').value || null;
   const data = {
     fecha: document.getElementById('fecha').value,
     hora: hora,
@@ -1957,6 +2139,11 @@ async function saveEvent(e){
     mapsUrl: document.getElementById('mapsUrl').value.trim() || null,
     descripcion: document.getElementById('descripcion').value.trim(),
     notasInternas: document.getElementById('notasInternas').value.trim(),
+    // Reserva
+    reservaTipo: reservaTipo,
+    reservaNombre: reservaTipo ? (document.getElementById('reservaNombre').value.trim() || null) : null,
+    reservaWhatsApp: (reservaTipo === 'local_whatsapp' || reservaTipo === 'ambos') ? (document.getElementById('reservaWhatsApp').value.trim() || null) : null,
+    reservaLink: (reservaTipo === 'link' || reservaTipo === 'ambos') ? (document.getElementById('reservaLink').value.trim() || null) : null,
     flyer: flyerBase64 || null,
     orden,
     updatedAt: serverTimestamp()
@@ -1990,12 +2177,20 @@ function editEvent(id){
   document.getElementById('hora').value = parseHoraToInput(ev.hora || '');
   updateHoraPreview();
   document.getElementById('estado').value = ev.estado || 'confirmado';
+  // Si ya concluyó, mostramos la categoría original (no la efectiva "concluido")
   document.getElementById('categoria').value = ev.categoria || 'covers';
   document.getElementById('titulo').value = ev.titulo;
   document.getElementById('lugar').value = ev.lugar;
   document.getElementById('mapsUrl').value = ev.mapsUrl || '';
   document.getElementById('descripcion').value = ev.descripcion || '';
   document.getElementById('notasInternas').value = ev.notasInternas || '';
+  // Reserva
+  document.getElementById('reservaTipo').value = ev.reservaTipo || '';
+  document.getElementById('reservaNombre').value = ev.reservaNombre || '';
+  document.getElementById('reservaWhatsApp').value = ev.reservaWhatsApp || '';
+  document.getElementById('reservaLink').value = ev.reservaLink || '';
+  updateReservaFields();
+  // Flyer
   if(ev.flyer){
     flyerBase64 = ev.flyer;
     document.getElementById('flyerImg').src = ev.flyer;
@@ -2017,8 +2212,12 @@ async function duplicateEvent(id){
     fecha: '', hora: ev.hora || '', estado: 'borrador', categoria: ev.categoria || 'covers',
     titulo: ev.titulo + ' (copia)', lugar: ev.lugar, mapsUrl: ev.mapsUrl || null,
     descripcion: ev.descripcion || '', notasInternas: ev.notasInternas || '',
+    reservaTipo: ev.reservaTipo || null,
+    reservaNombre: ev.reservaNombre || null,
+    reservaWhatsApp: ev.reservaWhatsApp || null,
+    reservaLink: ev.reservaLink || null,
     flyer: null,
-    orden: nextTopOrder(), // 🆕 la copia también arriba
+    orden: nextTopOrder(),
     createdAt: serverTimestamp(), updatedAt: serverTimestamp()
   };
   try{
@@ -2052,7 +2251,19 @@ function shareWhatsApp(id){
   const fechaTxt = d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
   const mapsLink = ev.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.lugar)}`;
   const catLabel = CATEGORIA_LABEL[ev.categoria||'covers'] || '';
-  const texto = `🎸 *TAXI BLUE ROCK*\n${catLabel?'\n'+catLabel:''}\n\n*${ev.titulo}*\n📅 ${fechaTxt}${ev.hora?' · '+ev.hora:''}\n📍 ${ev.lugar}\n🗺️ ${mapsLink}${ev.descripcion?'\n\n'+ev.descripcion:''}\n\n¡Te esperamos!`;
+
+  let reservaTxt = '';
+  if(ev.reservaTipo){
+    const partes = [];
+    if(ev.reservaNombre) partes.push(ev.reservaNombre);
+    if((ev.reservaTipo === 'local_whatsapp' || ev.reservaTipo === 'ambos') && ev.reservaWhatsApp)
+      partes.push(`WhatsApp: ${ev.reservaWhatsApp}`);
+    if((ev.reservaTipo === 'link' || ev.reservaTipo === 'ambos') && ev.reservaLink)
+      partes.push(`Reserva: ${ev.reservaLink}`);
+    if(partes.length) reservaTxt = `\n🎟️ *Reserva:* ${partes.join(' · ')}`;
+  }
+
+  const texto = `🎸 *TAXI BLUE ROCK*\n${catLabel?'\n'+catLabel:''}\n\n*${ev.titulo}*\n📅 ${fechaTxt}${ev.hora?' · '+ev.hora:''}\n📍 ${ev.lugar}\n🗺️ ${mapsLink}${reservaTxt}${ev.descripcion?'\n\n'+ev.descripcion:''}\n\n¡Te esperamos!`;
   window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
 }
 
@@ -2114,6 +2325,14 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+/* Refrescar cada minuto para que la categoría "concluido" se aplique sola */
+setInterval(() => {
+  if(events.length && !isReordering){
+    applyFilters();
+    renderDashboard();
+  }
+}, 60000);
+
 Object.assign(window, {
   tryLogin, logout, addUser, removeUser, changePassword,
   showLogsModal, showGalleryModal, showPreview, toggleTheme,
@@ -2129,7 +2348,8 @@ Object.assign(window, {
   showUsersModal: () => showModal('usersModal'),
   showChangePasswordModal: () => showModal('changePasswordModal'),
   applyFilters,
-  openFlyerArchive, selectFlyerFromArchive, filterFlyerArchive
+  openFlyerArchive, selectFlyerFromArchive, filterFlyerArchive,
+  updateReservaFields
 });
 </script>
 </body>
