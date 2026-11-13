@@ -27,6 +27,7 @@
             --fuente-titulo: 'Bebas Neue', sans-serif;
             --fuente-cuerpo: 'Inter', sans-serif;
             --transicion: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --alto-nav: 76px;
         }
         html { scroll-behavior: smooth; }
         body {
@@ -35,11 +36,27 @@
             color: var(--blanco);
             line-height: 1.7;
             overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--azul-electrico) var(--negro-suave);
         }
         body.no-scroll { overflow: hidden; }
         a { text-decoration: none; color: inherit; }
         img { max-width: 100%; display: block; }
         .container { width: 90%; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+        /* Scrollbar general del sitio */
+        body::-webkit-scrollbar { width: 12px; }
+        body::-webkit-scrollbar-track { background: var(--negro-suave); }
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--azul-electrico), #0b3f9e);
+            border-radius: 10px; border: 3px solid var(--negro-suave);
+        }
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--azul-neon), var(--azul-electrico));
+        }
+
+        /* Anclas: que no queden tapadas por la navbar fija */
+        section, header.hero { scroll-margin-top: var(--alto-nav); }
 
         /* NAVEGACIÓN */
         .navbar {
@@ -70,6 +87,8 @@
         }
         .nav-links a:hover { color: var(--blanco); }
         .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active { color: var(--blanco); }
+        .nav-links a.active::after { width: 100%; box-shadow: 0 0 12px rgba(0,102,255,.8); }
         .menu-toggle {
             display: none; background: none; border: 2px solid var(--gris-claro);
             color: var(--blanco); font-size: 1.5rem; padding: 0.4rem 0.8rem;
@@ -112,7 +131,7 @@
             text-shadow: 0 0 40px rgba(0, 102, 255, 0.5), 0 0 80px rgba(0, 102, 255, 0.2);
         }
 
-        /* 🆕 Logo del hero (imagen en vez de texto) */
+        /* Logo del hero (imagen en vez de texto) */
         .hero-logo {
             display: block;
             width: clamp(420px, 90vw, 1050px);
@@ -211,6 +230,7 @@
             border-radius: 12px; display: flex; align-items: center;
             justify-content: center; border: 1px solid var(--gris-medio);
             overflow: hidden; position: relative;
+            transition: var(--transicion);
         }
         .band-visual .image-placeholder::after {
             content: 'TAXI BLUE'; font-family: var(--fuente-titulo);
@@ -220,6 +240,46 @@
         .band-visual .image-placeholder svg {
             width: 80px; height: 80px; fill: var(--azul-electrico); opacity: 0.3;
         }
+
+        /* 🆕 Foto aleatoria de la banda: una sola imagen, distinta en cada acceso */
+        .band-visual .image-placeholder .band-photo {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            cursor: zoom-in; z-index: 1;
+            opacity: 0; transform: scale(1.03);
+            transition: opacity 0.9s ease, transform 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .band-visual .image-placeholder .band-photo.visible {
+            opacity: 1; transform: scale(1);
+        }
+        .band-visual .image-placeholder.con-foto {
+            border-color: rgba(0,102,255,.35);
+            box-shadow: 0 18px 50px rgba(0,0,0,.55);
+        }
+        .band-visual .image-placeholder.con-foto::after { display: none; }
+        .band-visual .image-placeholder.con-foto svg { display: none; }
+        .band-visual .image-placeholder.con-foto:hover {
+            border-color: var(--azul-electrico);
+            box-shadow: 0 22px 60px rgba(0,0,0,.6), 0 0 40px rgba(0,102,255,.28);
+        }
+        .band-visual .image-placeholder.con-foto:hover .band-photo.visible { transform: scale(1.04); }
+        .band-visual .image-placeholder .band-photo:focus-visible {
+            outline: 3px solid var(--azul-neon); outline-offset: -3px;
+        }
+        .band-visual .photo-hint {
+            position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+            padding: 2.6rem 1.1rem 0.9rem;
+            display: flex; align-items: center; gap: 0.45rem;
+            font-size: 0.66rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: rgba(255,255,255,.78);
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,.78));
+            pointer-events: none; opacity: 0;
+            transition: opacity .35s ease;
+        }
+        .band-visual .image-placeholder.con-foto:hover .photo-hint,
+        .band-visual .image-placeholder.con-foto:focus-within .photo-hint { opacity: 1; }
+        .band-visual .photo-hint svg { width: 13px; height: 13px; fill: var(--azul-neon); opacity: 1; }
 
         /* EVENTOS */
         .events-section { background: var(--negro); }
@@ -1091,6 +1151,7 @@
             .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
         }
         @media (max-width: 768px) {
+            :root { --alto-nav: 68px; }
             .nav-links {
                 display: none; position: absolute; top: 100%; left: 0;
                 width: 100%; background: rgba(10, 10, 10, 0.98);
@@ -1227,6 +1288,8 @@
 
             .events-list { max-height: 720px; padding-right: 0.6rem; }
             .events-list::-webkit-scrollbar { width: 6px; }
+
+            .band-visual .photo-hint { opacity: 1; }
         }
         @media (max-width: 480px) {
             .hero h1 { letter-spacing: 2px; }
@@ -1250,6 +1313,15 @@
 
             .events-list { max-height: 680px; padding-right: 0.5rem; }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1258,7 +1330,7 @@
     <nav class="navbar" id="navbar">
         <div class="container nav-container">
             <a href="#inicio" class="logo">TAXI <span>BLUE</span></a>
-            <button class="menu-toggle" id="menuToggle" aria-label="Menú">☰</button>
+            <button class="menu-toggle" id="menuToggle" aria-label="Menú" aria-expanded="false">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#banda">La Banda</a></li>
                 <li><a href="#eventos">Eventos</a></li>
@@ -1273,7 +1345,7 @@
         <div class="hero-bg"></div>
         <div class="hero-noise"></div>
         <div class="hero-content">
-            <div class="hero-badge">Covers de Rock & Roll · En Vivo</div>
+            <div class="hero-badge">Covers de Rock &amp; Roll · En Vivo</div>
             <img src="fotos/logotaxi.png" alt="Taxi Blue Rock" class="hero-logo">
             <p class="hero-sub">Revive la energía de los clásicos. Rock de los 80 y 90 en estado puro.</p>
             <div class="hero-buttons">
@@ -1316,10 +1388,17 @@
                     </div>
                 </div>
                 <div class="band-visual">
-                    <div class="image-placeholder">
+                    <div class="image-placeholder" id="bandVisual">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
                         </svg>
+                        <!-- La foto aleatoria (fotos/banda1.jpg, fotos/banda2.jpg, ...) se inserta acá por JS -->
+                        <div class="photo-hint">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zm.5-7H9v2H7v1h2v2h1v-2h2V9h-2z"/>
+                            </svg>
+                            Click para ampliar
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1502,7 +1581,7 @@
     <!-- LIGHTBOX -->
     <div class="lightbox" id="lightbox" aria-hidden="true">
         <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar">✕</button>
-        <img id="lightboxImg" alt="Flyer ampliado">
+        <img id="lightboxImg" alt="Imagen ampliada">
         <div class="lightbox-hint">Tocá o deslizá para cerrar</div>
     </div>
 
@@ -1512,15 +1591,44 @@
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) navbar.classList.add('scrolled');
             else navbar.classList.remove('scrolled');
-        });
+        }, { passive: true });
 
         /* ========== MENÚ MÓVIL ========== */
         const menuToggle = document.getElementById('menuToggle');
         const navLinks = document.getElementById('navLinks');
-        menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => navLinks.classList.remove('active'));
+        menuToggle.addEventListener('click', () => {
+            const abierto = navLinks.classList.toggle('active');
+            menuToggle.setAttribute('aria-expanded', abierto ? 'true' : 'false');
         });
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        /* ========== SECCIÓN ACTIVA EN LA NAV ========== */
+        (function scrollSpy(){
+            if (!('IntersectionObserver' in window)) return;
+            const enlaces = new Map();
+            navLinks.querySelectorAll('a').forEach(a => {
+                const id = (a.getAttribute('href') || '').replace('#', '');
+                if (id) enlaces.set(id, a);
+            });
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    enlaces.forEach(a => a.classList.remove('active'));
+                    const activo = enlaces.get(entry.target.id);
+                    if (activo) activo.classList.add('active');
+                });
+            }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+
+            enlaces.forEach((a, id) => {
+                const sec = document.getElementById(id);
+                if (sec) observer.observe(sec);
+            });
+        })();
 
         /* ========== FORMULARIO WHATSAPP ========== */
         const WHATSAPP_NUMBER = '5493541381626';
@@ -1685,7 +1793,7 @@
 
         function openLightbox(src, alt) {
             lightboxImg.src = src;
-            lightboxImg.alt = alt || 'Flyer ampliado';
+            lightboxImg.alt = alt || 'Imagen ampliada';
             lightbox.classList.add('open');
             lightbox.setAttribute('aria-hidden', 'false');
             document.body.classList.add('no-scroll');
@@ -1705,6 +1813,7 @@
             lightbox.classList.remove('open');
             lightbox.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('no-scroll');
+            lightbox.style.background = '';
             isDragging = false;
         }
 
@@ -1760,6 +1869,101 @@
         }, { passive: false });
 
         window.openLightbox = openLightbox;
+
+        /* ══════════════════════════════════════════════════════ */
+        /* FOTO ALEATORIA — LA BANDA (carpeta /fotos)             */
+        /* Una sola imagen por acceso, sin slideshow              */
+        /* ══════════════════════════════════════════════════════ */
+        const BAND_FOTOS = {
+            carpeta:       'fotos/',   // carpeta de las imágenes
+            prefijo:       'banda',    // banda1.jpg, banda2.jpg, banda3.jpg...
+            extension:     '.jpg',
+            total:         12,         // cuántas fotos hay (banda1 ... banda12)
+            evitarRepetir: true        // no repetir la misma foto del acceso anterior
+        };
+
+        // Soporta ambos nombres: fotos/banda1.jpg  y  fotos/banda#1.jpg
+        // (el "#" físico debe ir codificado como %23 para que el navegador no lo corte)
+        function rutasFotoBanda(n){
+            const { carpeta:c, prefijo:p, extension:e } = BAND_FOTOS;
+            return [`${c}${p}${n}${e}`, `${c}${p}%23${n}${e}`];
+        }
+
+        function precargarImagen(src){
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload  = () => resolve(img);
+                img.onerror = () => resolve(null);
+                img.src = src;
+            });
+        }
+
+        async function precargarFotoBanda(n){
+            for(const src of rutasFotoBanda(n)){
+                const img = await precargarImagen(src);
+                if(img) return { img, n };
+            }
+            return null;
+        }
+
+        function mezclarArray(arr){
+            const a = arr.slice();
+            for(let i = a.length - 1; i > 0; i--){
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function leerUltimaFotoBanda(){
+            try { return parseInt(localStorage.getItem('taxiBlueUltimaFotoBanda'), 10) || null; }
+            catch(_) { return null; }
+        }
+        function guardarUltimaFotoBanda(n){
+            try { localStorage.setItem('taxiBlueUltimaFotoBanda', String(n)); } catch(_) {}
+        }
+
+        function mostrarFotoBanda(box, img){
+            img.className = 'band-photo';
+            img.alt = 'Taxi Blue Rock en vivo';
+            img.decoding = 'async';
+            img.tabIndex = 0;
+            img.setAttribute('role', 'button');
+            img.setAttribute('aria-label', 'Ampliar foto de Taxi Blue Rock');
+
+            const ampliar = () => openLightbox(img.src, img.alt);
+            img.addEventListener('click', ampliar);
+            img.addEventListener('keydown', e => {
+                if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); ampliar(); }
+            });
+
+            const hint = box.querySelector('.photo-hint');
+            box.insertBefore(img, hint || null);
+            box.classList.add('con-foto');
+            requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('visible')));
+        }
+
+        async function loadBandPhotos(){
+            const box = document.getElementById('bandVisual');
+            if(!box || BAND_FOTOS.total < 1) return;
+
+            // Sorteo nuevo en cada acceso o actualización del navegador
+            const pool = mezclarArray(Array.from({ length: BAND_FOTOS.total }, (_, i) => i + 1));
+            const ultima = BAND_FOTOS.evitarRepetir ? leerUltimaFotoBanda() : null;
+            const orden = (ultima && pool.length > 1)
+                ? [...pool.filter(n => n !== ultima), ...pool.filter(n => n === ultima)]
+                : pool;
+
+            // Muestra la primera que exista; si falta un archivo, prueba con la siguiente
+            for(const n of orden){
+                const res = await precargarFotoBanda(n);
+                if(!res) continue;
+                mostrarFotoBanda(box, res.img);
+                guardarUltimaFotoBanda(res.n);
+                return;   // una sola imagen, sin rotación
+            }
+            // Si no hay fotos disponibles, queda el placeholder original
+        }
 
         /* ========== VENTANA TEMPORAL DE EVENTO ========== */
         const LIVE_DURATION_MS = 2.5 * 60 * 60 * 1000;
@@ -1877,7 +2081,7 @@
                 popup.classList.remove('show');
                 popup.classList.remove('closing');
                 popup.setAttribute('aria-hidden', 'true');
-                document.body.classList.remove('no-scroll');
+                if(!lightbox.classList.contains('open')) document.body.classList.remove('no-scroll');
             }, 350);
         }
         window.closeNextEventPopup = closeNextEventPopup;
@@ -1968,7 +2172,7 @@
                 ${escapeHtml(ev.lugar || '')}`;
 
             if(ev.flyer){
-                flyerBox.innerHTML = `<img src="${ev.flyer}" alt="${escapeHtml(ev.titulo)}">`;
+                flyerBox.innerHTML = `<img src="${escapeAttr(ev.flyer)}" alt="${escapeAttr(ev.titulo)}">`;
             } else {
                 flyerBox.innerHTML = `<div class="no-flyer">TAXI BLUE</div>`;
             }
@@ -2036,8 +2240,8 @@
 
                 const flyerHtml = ev.flyer
                     ? `<img class="event-flyer"
-                          src="${ev.flyer}"
-                          alt="Flyer ${escapeHtml(ev.titulo)}"
+                          src="${escapeAttr(ev.flyer)}"
+                          alt="Flyer ${escapeAttr(ev.titulo)}"
                           onclick="openLightbox(this.src, this.alt)">`
                     : '';
 
@@ -2045,7 +2249,7 @@
 
                 const directionsUrl = getDirectionsUrl(ev);
                 const lugarHtml = (estado !== 'pasado' && directionsUrl)
-                    ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="venue-link" title="Trazar ruta más corta en Google Maps">
+                    ? `<a href="${escapeAttr(directionsUrl)}" target="_blank" rel="noopener" class="venue-link" title="Trazar ruta más corta en Google Maps">
                            <svg class="venue-pin" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
                            </svg>
@@ -2054,7 +2258,7 @@
                     : `<span class="venue-text">${escapeHtml(ev.lugar)}</span>`;
 
                 const directionsHtml = (estado !== 'pasado' && directionsUrl)
-                    ? `<a href="${directionsUrl}" target="_blank" rel="noopener" class="directions-link" title="Ruta más corta en Google Maps">
+                    ? `<a href="${escapeAttr(directionsUrl)}" target="_blank" rel="noopener" class="directions-link" title="Ruta más corta en Google Maps">
                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                <path d="M21.71 11.29l-9-9a.996.996 0 00-1.41 0l-9 9a.996.996 0 000 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 000-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/>
                            </svg>
@@ -2109,35 +2313,58 @@
             }
         }
 
+        let refreshTimer = null;
         function scheduleRefresh() {
-            setInterval(() => {
+            if (refreshTimer) return;
+            refreshTimer = setInterval(() => {
                 if (!lightbox.classList.contains('open')) {
                     renderEventos();
                 }
             }, 60000);
         }
 
-        /* ========== CARGAR DESDE FIRESTORE ========== */
+        /* ========== FIREBASE (inicialización única compartida) ========== */
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
+            authDomain: "taxiblue-87289.firebaseapp.com",
+            projectId: "taxiblue-87289",
+            storageBucket: "taxiblue-87289.firebasestorage.app",
+            messagingSenderId: "886873440517",
+            appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
+            measurementId: "G-M04PSGFYDM"
+        };
+
+        let firebasePromise = null;
+        function getFirebase(){
+            if(!firebasePromise){
+                firebasePromise = (async () => {
+                    const [appMod, fsMod] = await Promise.all([
+                        import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"),
+                        import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js")
+                    ]);
+                    const app = appMod.getApps().length
+                        ? appMod.getApp()
+                        : appMod.initializeApp(firebaseConfig);
+                    return {
+                        db: fsMod.getFirestore(app),
+                        collection: fsMod.collection,
+                        onSnapshot: fsMod.onSnapshot
+                    };
+                })().catch(err => {
+                    firebasePromise = null;
+                    throw err;
+                });
+            }
+            return firebasePromise;
+        }
+
+        /* ========== CARGAR EVENTOS DESDE FIRESTORE ========== */
         async function loadEventos() {
             const list = document.getElementById('eventsList');
             if (!list) return;
 
             try {
-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-                const { getFirestore, collection, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-
-                const firebaseConfig = {
-                    apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
-                    authDomain: "taxiblue-87289.firebaseapp.com",
-                    projectId: "taxiblue-87289",
-                    storageBucket: "taxiblue-87289.firebasestorage.app",
-                    messagingSenderId: "886873440517",
-                    appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
-                    measurementId: "G-M04PSGFYDM"
-                };
-
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
+                const { db, collection, onSnapshot } = await getFirebase();
 
                 onSnapshot(collection(db, "eventos"), (snap) => {
                     const todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2183,27 +2410,13 @@
             if (!grid) return;
 
             try {
-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-                const { getFirestore, collection, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+                const { db, collection, onSnapshot } = await getFirebase();
 
-                const firebaseConfig = {
-                    apiKey: "AIzaSyCbb85E5IgGiQEArNxW4AEdPZa6ljwh6Mk",
-                    authDomain: "taxiblue-87289.firebaseapp.com",
-                    projectId: "taxiblue-87289",
-                    storageBucket: "taxiblue-87289.firebasestorage.app",
-                    messagingSenderId: "886873440517",
-                    appId: "1:886873440517:web:40e806c6444fd7d2cff76c",
-                    measurementId: "G-M04PSGFYDM"
-                };
-
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-
-                const snap = await new Promise(resolve => {
+                const snap = await new Promise((resolve, reject) => {
                     const unsub = onSnapshot(collection(db, "instagram"), (s) => {
                         resolve(s);
                         unsub();
-                    });
+                    }, reject);
                 });
 
                 const posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2218,7 +2431,7 @@
                     <div class="ig-item-wrapper">
                         ${p.titulo ? `<div class="ig-titulo">${escapeHtml(p.titulo)}</div>` : ''}
                         <blockquote class="instagram-media"
-                            data-instgrm-permalink="${p.url}"
+                            data-instgrm-permalink="${escapeAttr(p.url)}"
                             data-instgrm-version="14"
                             style="background:#FFF;border:0;border-radius:10px;box-shadow:0 0 0 1px rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15);margin:0;max-width:540px;min-width:326px;padding:0;width:99.375%;">
                         </blockquote>
@@ -2228,14 +2441,14 @@
                 if (!window.instgrm) {
                     const s = document.createElement('script');
                     s.async = true;
-                    s.src = "//www.instagram.com/embed.js";
+                    s.src = "https://www.instagram.com/embed.js";
                     s.onload = () => {
                         if (window.instgrm && window.instgrm.Embeds) {
                             window.instgrm.Embeds.process();
                         }
                     };
                     document.body.appendChild(s);
-                } else {
+                } else if (window.instgrm.Embeds) {
                     window.instgrm.Embeds.process();
                 }
 
@@ -2247,7 +2460,9 @@
             }
         }
 
+        /* ========== INICIO ========== */
         document.addEventListener('DOMContentLoaded', () => {
+            loadBandPhotos();          // foto aleatoria de La Banda (carpeta /fotos)
             loadEventos();
             loadInstagramGallery();
         });
